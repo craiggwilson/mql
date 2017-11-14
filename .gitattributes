@@ -1,0 +1,5 @@
+*.sh eol=lf
+*.go eol=lf
+*.json eol=lf
+go.mod eol=lf
+go.sum eol=lf
