@@ -1,9 +1,11 @@
 package com.craiggwilson.mql
 
+import com.craiggwilson.mql.ast.Direction
 import com.craiggwilson.mql.ast.FieldDeclaration
 import com.craiggwilson.mql.ast.FieldReferenceExpression
 import com.craiggwilson.mql.ast.LimitStage
 import com.craiggwilson.mql.ast.SkipStage
+import com.craiggwilson.mql.ast.SortStage
 import com.craiggwilson.mql.ast.Statement
 import com.craiggwilson.mql.ast.UnwindStage
 import com.craiggwilson.mql.ast.Visitor
@@ -34,6 +36,20 @@ class ShellTranslator : Visitor<String>() {
 
     override fun visit(n: SkipStage): String {
         return "{ \$skip: ${n.skip} }"
+    }
+
+    override fun visit(n: SortStage): String {
+        val fieldString = n.fields.joinToString { field ->
+            val fieldName = quote(visit(field.field))
+            val direction = if (field.direction == Direction.ASCENDING) {
+                "1"
+            } else {
+                "-1"
+            }
+
+            fieldName + ": " + direction
+        }
+        return "{ \$sort: { $fieldString } }"
     }
 
     override fun visit(n: UnwindStage): String {

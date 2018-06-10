@@ -1,6 +1,6 @@
 package com.craiggwilson.mql.ast
 
-abstract class Expression : Node()
+sealed class Expression : Node()
 
 // Expressions
 data class FieldReferenceExpression(val parent: Expression?, val name: FieldName) : Expression() {

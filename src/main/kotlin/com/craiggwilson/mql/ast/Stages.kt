@@ -1,6 +1,6 @@
 package com.craiggwilson.mql.ast
 
-abstract class Stage : Node()
+sealed class Stage : Node()
 
 data class LimitStage(val limit: Long) : Stage() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
@@ -23,6 +23,24 @@ data class SkipStage(val skip: Long) : Stage() {
         }
 
         return this
+    }
+}
+
+data class SortStage(val fields: List<Field>) : Stage() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(fields: List<Field>): SortStage {
+        return if (fields !== this.fields) {
+            SortStage(fields)
+        } else this
+    }
+
+    data class Field(val field: FieldReferenceExpression, val direction: Direction) {
+        fun update(field: FieldReferenceExpression, direction: Direction): Field {
+            return if (field !== this.field || direction != this.direction) {
+                Field(field, direction)
+            } else this
+        }
     }
 }
 

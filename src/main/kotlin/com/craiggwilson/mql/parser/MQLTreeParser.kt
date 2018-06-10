@@ -2,11 +2,13 @@ package com.craiggwilson.mql.parser
 
 import com.craiggwilson.mql.ast.CollectionName
 import com.craiggwilson.mql.ast.DatabaseName
+import com.craiggwilson.mql.ast.Direction
 import com.craiggwilson.mql.ast.FieldDeclaration
 import com.craiggwilson.mql.ast.FieldName
 import com.craiggwilson.mql.ast.FieldReferenceExpression
 import com.craiggwilson.mql.ast.LimitStage
 import com.craiggwilson.mql.ast.SkipStage
+import com.craiggwilson.mql.ast.SortStage
 import com.craiggwilson.mql.ast.Stage
 import com.craiggwilson.mql.ast.Statement
 import com.craiggwilson.mql.ast.UnwindStage
@@ -61,6 +63,7 @@ class MQLTreeParser {
         return when {
             ctx.limit_stage() != null -> parseLimitStage(ctx.limit_stage())
             ctx.skip_stage() != null -> parseSkipStage(ctx.skip_stage())
+            ctx.sort_stage() != null -> parseSortStage(ctx.sort_stage())
             ctx.unwind_stage() != null -> parseUnwindStage(ctx.unwind_stage())
             else -> throw ParseException("stage is not supported: ${ctx.text}")
         }
@@ -72,6 +75,21 @@ class MQLTreeParser {
 
     private fun parseSkipStage(ctx: MQLParser.Skip_stageContext): SkipStage {
         return SkipStage(ctx.INT().text.toLong())
+    }
+
+    private fun parseSortStage(ctx: MQLParser.Sort_stageContext): SortStage {
+        val fields = ctx.sort_field().map { fieldCtx ->
+            val field = getFieldReferenceExpression(fieldCtx.multipart_field_name())
+            val direction = if (fieldCtx.DESC() != null) {
+                Direction.DESCENDING
+            } else {
+                Direction.ASCENDING
+            }
+
+            SortStage.Field(field, direction)
+        }
+
+        return SortStage(fields)
     }
 
     private fun parseUnwindStage(ctx: MQLParser.Unwind_stageContext): UnwindStage {

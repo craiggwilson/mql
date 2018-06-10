@@ -37,6 +37,12 @@ class ShellTranslatorTest() {
                     "db.bar.aggregate([{ \$skip: 10 }])"
                 ),
 
+                // SORT
+                test(
+                    "FROM bar SORT a, b.a DESC, c.a ASC",
+                    "db.bar.aggregate([{ \$sort: { \"a\": 1, \"b.a\": -1, \"c.a\": 1 } }])"
+                ),
+
                 // UNWIND
                 test(
                     "FROM bar UNWIND a.b",
