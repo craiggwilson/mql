@@ -17,44 +17,46 @@ public class MQLParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		AND_SYMBOL=1, ASSIGN=2, CARET=3, COMMA=4, DIV=5, DOLLAR=6, DOT=7, EQ=8, 
-		GT=9, GTE=10, LBRACE=11, LBRACK=12, LPAREN=13, LT=14, LTE=15, MINUS=16, 
-		MOD=17, MULT=18, NEQ=19, NOT_SYMBOL=20, OR_SYMBOL=21, PIPE=22, PLUS=23, 
-		RBRACE=24, RBRACK=25, RPAREN=26, SEMI=27, AND=28, AS=29, ASC=30, BY=31, 
-		CASE=32, DESC=33, ELSE=34, FALSE=35, FILTER=36, FROM=37, GROUP=38, IF=39, 
-		IN=40, INDEX=41, LET=42, LIMIT=43, LOOKUP=44, MAP=45, MATCH=46, NOT=47, 
-		NULL=48, OR=49, PROJECT=50, REDUCE=51, SKIP_=52, SORT=53, STARTING=54, 
-		SWITCH=55, THEN=56, TRUE=57, UNWIND=58, WITH=59, PRESERVE_NULL_AND_EMPTY=60, 
-		INT=61, DECIMAL=62, BIN=63, HEX=64, STRING=65, QUOTED_ID=66, UNQUOTED_ID=67, 
-		WS=68;
+		AND_SYMBOL=1, ARROW=2, ASSIGN=3, CARET=4, COLON=5, COMMA=6, DIV=7, DOLLAR=8, 
+		DOT=9, EQ=10, GT=11, GTE=12, LBRACE=13, LBRACK=14, LPAREN=15, LT=16, LTE=17, 
+		MINUS=18, MOD=19, MULT=20, NEQ=21, NOT_SYMBOL=22, OR_SYMBOL=23, PIPE=24, 
+		PLUS=25, RANGE=26, RBRACE=27, RBRACK=28, RPAREN=29, SEMI=30, UNDERSCORE=31, 
+		AND=32, ASC=33, BY=34, CASE=35, DESC=36, ELSE=37, FALSE=38, FROM=39, GROUP=40, 
+		IF=41, IN=42, INDEX=43, LET=44, LIMIT=45, LOOKUP=46, MATCH=47, NOT=48, 
+		NULL=49, OR=50, PROJECT=51, SKIP_=52, SORT=53, STARTING=54, SWITCH=55, 
+		THEN=56, TRUE=57, UNWIND=58, WITH=59, PRESERVE_NULL_AND_EMPTY=60, INT=61, 
+		DECIMAL=62, BIN=63, HEX=64, STRING=65, QUOTED_ID=66, UNQUOTED_ID=67, WS=68;
 	public static final int
 		RULE_parse = 0, RULE_statement = 1, RULE_pipeline = 2, RULE_stage = 3, 
 		RULE_group_stage = 4, RULE_limit_stage = 5, RULE_lookup_stage = 6, RULE_match_stage = 7, 
 		RULE_project_stage = 8, RULE_skip_stage = 9, RULE_sort_stage = 10, RULE_sort_field = 11, 
 		RULE_unwind_stage = 12, RULE_unwind_option = 13, RULE_expression = 14, 
-		RULE_field_assignment = 15, RULE_variable_assignment = 16, RULE_collection_name = 17, 
-		RULE_database_name = 18, RULE_multipart_field_name = 19, RULE_field_name = 20, 
-		RULE_function_name = 21, RULE_variable_name = 22, RULE_keyword_as_id = 23;
+		RULE_field_assignment = 15, RULE_function_argument = 16, RULE_lambda_argument = 17, 
+		RULE_lambda_expression = 18, RULE_variable_assignment = 19, RULE_collection_name = 20, 
+		RULE_database_name = 21, RULE_multipart_field_name = 22, RULE_id = 23, 
+		RULE_function_name = 24, RULE_variable_name = 25;
 	public static final String[] ruleNames = {
 		"parse", "statement", "pipeline", "stage", "group_stage", "limit_stage", 
 		"lookup_stage", "match_stage", "project_stage", "skip_stage", "sort_stage", 
 		"sort_field", "unwind_stage", "unwind_option", "expression", "field_assignment", 
-		"variable_assignment", "collection_name", "database_name", "multipart_field_name", 
-		"field_name", "function_name", "variable_name", "keyword_as_id"
+		"function_argument", "lambda_argument", "lambda_expression", "variable_assignment", 
+		"collection_name", "database_name", "multipart_field_name", "id", "function_name", 
+		"variable_name"
 	};
 
 	private static final String[] _LITERAL_NAMES = {
-		null, "'&&'", "':='", "'^'", "','", "'/'", "'$'", "'.'", "'='", "'>'", 
-		"'>='", "'{'", "'['", "'('", "'<'", "'<='", "'-'", "'%'", "'*'", "'!='", 
-		"'!'", "'||'", "'|'", "'+'", "'}'", "']'", "')'", "';'"
+		null, "'&&'", "'=>'", "':='", "'^'", "':'", "','", "'/'", "'$'", "'.'", 
+		"'='", "'>'", "'>='", "'{'", "'['", "'('", "'<'", "'<='", "'-'", "'%'", 
+		"'*'", "'!='", "'!'", "'||'", "'|'", "'+'", "'..'", "'}'", "']'", "')'", 
+		"';'", "'_'"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
-		null, "AND_SYMBOL", "ASSIGN", "CARET", "COMMA", "DIV", "DOLLAR", "DOT", 
-		"EQ", "GT", "GTE", "LBRACE", "LBRACK", "LPAREN", "LT", "LTE", "MINUS", 
-		"MOD", "MULT", "NEQ", "NOT_SYMBOL", "OR_SYMBOL", "PIPE", "PLUS", "RBRACE", 
-		"RBRACK", "RPAREN", "SEMI", "AND", "AS", "ASC", "BY", "CASE", "DESC", 
-		"ELSE", "FALSE", "FILTER", "FROM", "GROUP", "IF", "IN", "INDEX", "LET", 
-		"LIMIT", "LOOKUP", "MAP", "MATCH", "NOT", "NULL", "OR", "PROJECT", "REDUCE", 
+		null, "AND_SYMBOL", "ARROW", "ASSIGN", "CARET", "COLON", "COMMA", "DIV", 
+		"DOLLAR", "DOT", "EQ", "GT", "GTE", "LBRACE", "LBRACK", "LPAREN", "LT", 
+		"LTE", "MINUS", "MOD", "MULT", "NEQ", "NOT_SYMBOL", "OR_SYMBOL", "PIPE", 
+		"PLUS", "RANGE", "RBRACE", "RBRACK", "RPAREN", "SEMI", "UNDERSCORE", "AND", 
+		"ASC", "BY", "CASE", "DESC", "ELSE", "FALSE", "FROM", "GROUP", "IF", "IN", 
+		"INDEX", "LET", "LIMIT", "LOOKUP", "MATCH", "NOT", "NULL", "OR", "PROJECT", 
 		"SKIP_", "SORT", "STARTING", "SWITCH", "THEN", "TRUE", "UNWIND", "WITH", 
 		"PRESERVE_NULL_AND_EMPTY", "INT", "DECIMAL", "BIN", "HEX", "STRING", "QUOTED_ID", 
 		"UNQUOTED_ID", "WS"
@@ -124,11 +126,6 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_parse; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitParse(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final ParseContext parse() throws RecognitionException {
@@ -139,37 +136,37 @@ public class MQLParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(48);
+			setState(52);
 			statement();
-			setState(53);
+			setState(57);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,0,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					{
 					{
-					setState(49);
+					setState(53);
 					match(SEMI);
-					setState(50);
+					setState(54);
 					statement();
 					}
 					} 
 				}
-				setState(55);
+				setState(59);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,0,_ctx);
 			}
-			setState(57);
+			setState(61);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==SEMI) {
 				{
-				setState(56);
+				setState(60);
 				match(SEMI);
 				}
 			}
 
-			setState(59);
+			setState(63);
 			match(EOF);
 			}
 		}
@@ -192,11 +189,6 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_statement; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitStatement(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final StatementContext statement() throws RecognitionException {
@@ -205,7 +197,7 @@ public class MQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(61);
+			setState(65);
 			pipeline();
 			}
 		}
@@ -235,11 +227,6 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_pipeline; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitPipeline(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final PipelineContext pipeline() throws RecognitionException {
@@ -249,21 +236,21 @@ public class MQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(63);
+			setState(67);
 			match(FROM);
-			setState(64);
+			setState(68);
 			collection_name();
-			setState(66); 
+			setState(70); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(65);
+				setState(69);
 				stage();
 				}
 				}
-				setState(68); 
+				setState(72); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << GROUP) | (1L << LIMIT) | (1L << LOOKUP) | (1L << MATCH) | (1L << PROJECT) | (1L << SKIP_) | (1L << SORT) | (1L << UNWIND))) != 0) );
@@ -309,73 +296,68 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_stage; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitStage(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final StageContext stage() throws RecognitionException {
 		StageContext _localctx = new StageContext(_ctx, getState());
 		enterRule(_localctx, 6, RULE_stage);
 		try {
-			setState(78);
+			setState(82);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case GROUP:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(70);
+				setState(74);
 				group_stage();
 				}
 				break;
 			case LIMIT:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(71);
+				setState(75);
 				limit_stage();
 				}
 				break;
 			case LOOKUP:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(72);
+				setState(76);
 				lookup_stage();
 				}
 				break;
 			case MATCH:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(73);
+				setState(77);
 				match_stage();
 				}
 				break;
 			case PROJECT:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(74);
+				setState(78);
 				project_stage();
 				}
 				break;
 			case SKIP_:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(75);
+				setState(79);
 				skip_stage();
 				}
 				break;
 			case SORT:
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(76);
+				setState(80);
 				sort_stage();
 				}
 				break;
 			case UNWIND:
 				enterOuterAlt(_localctx, 8);
 				{
-				setState(77);
+				setState(81);
 				unwind_stage();
 				}
 				break;
@@ -417,11 +399,6 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_group_stage; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitGroup_stage(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Group_stageContext group_stage() throws RecognitionException {
@@ -431,43 +408,43 @@ public class MQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(80);
+			setState(84);
 			match(GROUP);
-			setState(81);
+			setState(85);
 			field_assignment();
-			setState(86);
+			setState(90);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==COMMA) {
 				{
 				{
-				setState(82);
+				setState(86);
 				match(COMMA);
-				setState(83);
+				setState(87);
 				field_assignment();
 				}
 				}
-				setState(88);
+				setState(92);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(89);
+			setState(93);
 			match(BY);
-			setState(90);
+			setState(94);
 			expression(0);
-			setState(95);
+			setState(99);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==COMMA) {
 				{
 				{
-				setState(91);
+				setState(95);
 				match(COMMA);
-				setState(92);
+				setState(96);
 				expression(0);
 				}
 				}
-				setState(97);
+				setState(101);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -491,11 +468,6 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_limit_stage; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitLimit_stage(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Limit_stageContext limit_stage() throws RecognitionException {
@@ -504,9 +476,9 @@ public class MQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(98);
+			setState(102);
 			match(LIMIT);
-			setState(99);
+			setState(103);
 			match(INT);
 			}
 		}
@@ -547,11 +519,6 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_lookup_stage; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitLookup_stage(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Lookup_stageContext lookup_stage() throws RecognitionException {
@@ -561,45 +528,45 @@ public class MQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(101);
+			setState(105);
 			match(LOOKUP);
-			setState(111);
+			setState(115);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==LET) {
 				{
-				setState(102);
+				setState(106);
 				match(LET);
-				setState(103);
+				setState(107);
 				variable_assignment();
-				setState(108);
+				setState(112);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==COMMA) {
 					{
 					{
-					setState(104);
+					setState(108);
 					match(COMMA);
-					setState(105);
+					setState(109);
 					variable_assignment();
 					}
 					}
-					setState(110);
+					setState(114);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
 				}
 			}
 
-			setState(113);
-			multipart_field_name();
-			setState(114);
-			match(ASSIGN);
-			setState(115);
-			match(LPAREN);
-			setState(116);
-			pipeline();
 			setState(117);
+			multipart_field_name();
+			setState(118);
+			match(ASSIGN);
+			setState(119);
+			match(LPAREN);
+			setState(120);
+			pipeline();
+			setState(121);
 			match(RPAREN);
 			}
 		}
@@ -623,11 +590,6 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_match_stage; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitMatch_stage(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Match_stageContext match_stage() throws RecognitionException {
@@ -636,9 +598,9 @@ public class MQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(119);
+			setState(123);
 			match(MATCH);
-			setState(120);
+			setState(124);
 			expression(0);
 			}
 		}
@@ -669,11 +631,6 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_project_stage; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitProject_stage(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Project_stageContext project_stage() throws RecognitionException {
@@ -683,23 +640,23 @@ public class MQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(122);
+			setState(126);
 			match(PROJECT);
-			setState(123);
+			setState(127);
 			field_assignment();
-			setState(128);
+			setState(132);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==COMMA) {
 				{
 				{
-				setState(124);
+				setState(128);
 				match(COMMA);
-				setState(125);
+				setState(129);
 				field_assignment();
 				}
 				}
-				setState(130);
+				setState(134);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -723,11 +680,6 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_skip_stage; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitSkip_stage(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Skip_stageContext skip_stage() throws RecognitionException {
@@ -736,9 +688,9 @@ public class MQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(131);
+			setState(135);
 			match(SKIP_);
-			setState(132);
+			setState(136);
 			match(INT);
 			}
 		}
@@ -769,11 +721,6 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_sort_stage; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitSort_stage(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Sort_stageContext sort_stage() throws RecognitionException {
@@ -783,23 +730,23 @@ public class MQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(134);
+			setState(138);
 			match(SORT);
-			setState(135);
+			setState(139);
 			sort_field();
-			setState(140);
+			setState(144);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==COMMA) {
 				{
 				{
-				setState(136);
+				setState(140);
 				match(COMMA);
-				setState(137);
+				setState(141);
 				sort_field();
 				}
 				}
-				setState(142);
+				setState(146);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -826,11 +773,6 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_sort_field; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitSort_field(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Sort_fieldContext sort_field() throws RecognitionException {
@@ -840,14 +782,14 @@ public class MQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(143);
+			setState(147);
 			multipart_field_name();
-			setState(145);
+			setState(149);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==ASC || _la==DESC) {
 				{
-				setState(144);
+				setState(148);
 				_la = _input.LA(1);
 				if ( !(_la==ASC || _la==DESC) ) {
 				_errHandler.recoverInline(this);
@@ -885,19 +827,10 @@ public class MQLParser extends Parser {
 		public Unwind_optionContext unwind_option(int i) {
 			return getRuleContext(Unwind_optionContext.class,i);
 		}
-		public List<TerminalNode> COMMA() { return getTokens(MQLParser.COMMA); }
-		public TerminalNode COMMA(int i) {
-			return getToken(MQLParser.COMMA, i);
-		}
 		public Unwind_stageContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_unwind_stage; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitUnwind_stage(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Unwind_stageContext unwind_stage() throws RecognitionException {
@@ -907,35 +840,31 @@ public class MQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(147);
+			setState(151);
 			match(UNWIND);
-			setState(148);
+			setState(152);
 			multipart_field_name();
-			setState(158);
+			setState(159);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==WITH) {
 				{
-				setState(149);
+				setState(153);
 				match(WITH);
-				setState(150);
-				unwind_option();
-				setState(155);
+				setState(155); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (_la==COMMA) {
+				do {
 					{
 					{
-					setState(151);
-					match(COMMA);
-					setState(152);
+					setState(154);
 					unwind_option();
 					}
 					}
-					setState(157);
+					setState(157); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-				}
+				} while ( _la==INDEX || _la==PRESERVE_NULL_AND_EMPTY );
 				}
 			}
 
@@ -962,33 +891,28 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_unwind_option; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitUnwind_option(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Unwind_optionContext unwind_option() throws RecognitionException {
 		Unwind_optionContext _localctx = new Unwind_optionContext(_ctx, getState());
 		enterRule(_localctx, 26, RULE_unwind_option);
 		try {
-			setState(163);
+			setState(164);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case INDEX:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(160);
-				match(INDEX);
 				setState(161);
+				match(INDEX);
+				setState(162);
 				multipart_field_name();
 				}
 				break;
 			case PRESERVE_NULL_AND_EMPTY:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(162);
+				setState(163);
 				match(PRESERVE_NULL_AND_EMPTY);
 				}
 				break;
@@ -1018,204 +942,6 @@ public class MQLParser extends Parser {
 			super.copyFrom(ctx);
 		}
 	}
-	public static class ReduceFunctionCallExpressionContext extends ExpressionContext {
-		public TerminalNode REDUCE() { return getToken(MQLParser.REDUCE, 0); }
-		public List<ExpressionContext> expression() {
-			return getRuleContexts(ExpressionContext.class);
-		}
-		public ExpressionContext expression(int i) {
-			return getRuleContext(ExpressionContext.class,i);
-		}
-		public TerminalNode IN() { return getToken(MQLParser.IN, 0); }
-		public TerminalNode STARTING() { return getToken(MQLParser.STARTING, 0); }
-		public TerminalNode WITH() { return getToken(MQLParser.WITH, 0); }
-		public ReduceFunctionCallExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitReduceFunctionCallExpression(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class AdditionExpressionContext extends ExpressionContext {
-		public Token op;
-		public List<ExpressionContext> expression() {
-			return getRuleContexts(ExpressionContext.class);
-		}
-		public ExpressionContext expression(int i) {
-			return getRuleContext(ExpressionContext.class,i);
-		}
-		public TerminalNode PLUS() { return getToken(MQLParser.PLUS, 0); }
-		public TerminalNode MINUS() { return getToken(MQLParser.MINUS, 0); }
-		public AdditionExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitAdditionExpression(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class NumberExpressionContext extends ExpressionContext {
-		public TerminalNode INT() { return getToken(MQLParser.INT, 0); }
-		public NumberExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitNumberExpression(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class FilterFunctionCallExpressionContext extends ExpressionContext {
-		public TerminalNode FILTER() { return getToken(MQLParser.FILTER, 0); }
-		public List<ExpressionContext> expression() {
-			return getRuleContexts(ExpressionContext.class);
-		}
-		public ExpressionContext expression(int i) {
-			return getRuleContext(ExpressionContext.class,i);
-		}
-		public TerminalNode AS() { return getToken(MQLParser.AS, 0); }
-		public Variable_nameContext variable_name() {
-			return getRuleContext(Variable_nameContext.class,0);
-		}
-		public TerminalNode IN() { return getToken(MQLParser.IN, 0); }
-		public FilterFunctionCallExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitFilterFunctionCallExpression(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class NotExpressionContext extends ExpressionContext {
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
-		}
-		public TerminalNode NOT() { return getToken(MQLParser.NOT, 0); }
-		public TerminalNode NOT_SYMBOL() { return getToken(MQLParser.NOT_SYMBOL, 0); }
-		public NotExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitNotExpression(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class ComparisonExpressionContext extends ExpressionContext {
-		public Token op;
-		public List<ExpressionContext> expression() {
-			return getRuleContexts(ExpressionContext.class);
-		}
-		public ExpressionContext expression(int i) {
-			return getRuleContext(ExpressionContext.class,i);
-		}
-		public TerminalNode EQ() { return getToken(MQLParser.EQ, 0); }
-		public TerminalNode GT() { return getToken(MQLParser.GT, 0); }
-		public TerminalNode GTE() { return getToken(MQLParser.GTE, 0); }
-		public TerminalNode LT() { return getToken(MQLParser.LT, 0); }
-		public TerminalNode LTE() { return getToken(MQLParser.LTE, 0); }
-		public TerminalNode NEQ() { return getToken(MQLParser.NEQ, 0); }
-		public ComparisonExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitComparisonExpression(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class DecimalExpressionContext extends ExpressionContext {
-		public TerminalNode DECIMAL() { return getToken(MQLParser.DECIMAL, 0); }
-		public DecimalExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitDecimalExpression(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class AndExpressionContext extends ExpressionContext {
-		public List<ExpressionContext> expression() {
-			return getRuleContexts(ExpressionContext.class);
-		}
-		public ExpressionContext expression(int i) {
-			return getRuleContext(ExpressionContext.class,i);
-		}
-		public TerminalNode AND() { return getToken(MQLParser.AND, 0); }
-		public TerminalNode AND_SYMBOL() { return getToken(MQLParser.AND_SYMBOL, 0); }
-		public AndExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitAndExpression(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class StringExpressionContext extends ExpressionContext {
-		public TerminalNode STRING() { return getToken(MQLParser.STRING, 0); }
-		public StringExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitStringExpression(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class NullExpressionContext extends ExpressionContext {
-		public TerminalNode NULL() { return getToken(MQLParser.NULL, 0); }
-		public NullExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitNullExpression(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class LetExpressionContext extends ExpressionContext {
-		public TerminalNode LET() { return getToken(MQLParser.LET, 0); }
-		public List<Variable_assignmentContext> variable_assignment() {
-			return getRuleContexts(Variable_assignmentContext.class);
-		}
-		public Variable_assignmentContext variable_assignment(int i) {
-			return getRuleContext(Variable_assignmentContext.class,i);
-		}
-		public TerminalNode IN() { return getToken(MQLParser.IN, 0); }
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
-		}
-		public List<TerminalNode> COMMA() { return getTokens(MQLParser.COMMA); }
-		public TerminalNode COMMA(int i) {
-			return getToken(MQLParser.COMMA, i);
-		}
-		public LetExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitLetExpression(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class FieldExpressionContext extends ExpressionContext {
-		public Field_nameContext field_name() {
-			return getRuleContext(Field_nameContext.class,0);
-		}
-		public FieldExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitFieldExpression(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class FunctionCallExpressionContext extends ExpressionContext {
-		public Function_nameContext function_name() {
-			return getRuleContext(Function_nameContext.class,0);
-		}
-		public TerminalNode LPAREN() { return getToken(MQLParser.LPAREN, 0); }
-		public TerminalNode RPAREN() { return getToken(MQLParser.RPAREN, 0); }
-		public List<ExpressionContext> expression() {
-			return getRuleContexts(ExpressionContext.class);
-		}
-		public ExpressionContext expression(int i) {
-			return getRuleContext(ExpressionContext.class,i);
-		}
-		public List<TerminalNode> COMMA() { return getTokens(MQLParser.COMMA); }
-		public TerminalNode COMMA(int i) {
-			return getToken(MQLParser.COMMA, i);
-		}
-		public FunctionCallExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitFunctionCallExpression(this);
-			else return visitor.visitChildren(this);
-		}
-	}
 	public static class DocumentExpressionContext extends ExpressionContext {
 		public TerminalNode LBRACE() { return getToken(MQLParser.LBRACE, 0); }
 		public TerminalNode RBRACE() { return getToken(MQLParser.RBRACE, 0); }
@@ -1230,11 +956,6 @@ public class MQLParser extends Parser {
 			return getToken(MQLParser.COMMA, i);
 		}
 		public DocumentExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitDocumentExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class ArrayExpressionContext extends ExpressionContext {
 		public TerminalNode LBRACK() { return getToken(MQLParser.LBRACK, 0); }
@@ -1249,22 +970,25 @@ public class MQLParser extends Parser {
 		public TerminalNode COMMA(int i) {
 			return getToken(MQLParser.COMMA, i);
 		}
+		public TerminalNode COLON() { return getToken(MQLParser.COLON, 0); }
 		public ArrayExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitArrayExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class BoolExpressionContext extends ExpressionContext {
 		public TerminalNode TRUE() { return getToken(MQLParser.TRUE, 0); }
 		public TerminalNode FALSE() { return getToken(MQLParser.FALSE, 0); }
 		public BoolExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitBoolExpression(this);
-			else return visitor.visitChildren(this);
+	}
+	public static class AdditionExpressionContext extends ExpressionContext {
+		public Token op;
+		public List<ExpressionContext> expression() {
+			return getRuleContexts(ExpressionContext.class);
 		}
+		public ExpressionContext expression(int i) {
+			return getRuleContext(ExpressionContext.class,i);
+		}
+		public TerminalNode PLUS() { return getToken(MQLParser.PLUS, 0); }
+		public TerminalNode MINUS() { return getToken(MQLParser.MINUS, 0); }
+		public AdditionExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
 	}
 	public static class ConditionalExpressionContext extends ExpressionContext {
 		public TerminalNode IF() { return getToken(MQLParser.IF, 0); }
@@ -1277,11 +1001,10 @@ public class MQLParser extends Parser {
 		public TerminalNode THEN() { return getToken(MQLParser.THEN, 0); }
 		public TerminalNode ELSE() { return getToken(MQLParser.ELSE, 0); }
 		public ConditionalExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitConditionalExpression(this);
-			else return visitor.visitChildren(this);
-		}
+	}
+	public static class NumberExpressionContext extends ExpressionContext {
+		public TerminalNode INT() { return getToken(MQLParser.INT, 0); }
+		public NumberExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
 	}
 	public static class SwitchExpressionContext extends ExpressionContext {
 		public TerminalNode SWITCH() { return getToken(MQLParser.SWITCH, 0); }
@@ -1301,11 +1024,6 @@ public class MQLParser extends Parser {
 		}
 		public TerminalNode ELSE() { return getToken(MQLParser.ELSE, 0); }
 		public SwitchExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitSwitchExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class ParenthesisExpressionContext extends ExpressionContext {
 		public TerminalNode LPAREN() { return getToken(MQLParser.LPAREN, 0); }
@@ -1314,11 +1032,14 @@ public class MQLParser extends Parser {
 		}
 		public TerminalNode RPAREN() { return getToken(MQLParser.RPAREN, 0); }
 		public ParenthesisExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitParenthesisExpression(this);
-			else return visitor.visitChildren(this);
+	}
+	public static class NotExpressionContext extends ExpressionContext {
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
 		}
+		public TerminalNode NOT() { return getToken(MQLParser.NOT, 0); }
+		public TerminalNode NOT_SYMBOL() { return getToken(MQLParser.NOT_SYMBOL, 0); }
+		public NotExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
 	}
 	public static class MultiplicationExpressionContext extends ExpressionContext {
 		public Token op;
@@ -1332,11 +1053,22 @@ public class MQLParser extends Parser {
 		public TerminalNode DIV() { return getToken(MQLParser.DIV, 0); }
 		public TerminalNode MOD() { return getToken(MQLParser.MOD, 0); }
 		public MultiplicationExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitMultiplicationExpression(this);
-			else return visitor.visitChildren(this);
+	}
+	public static class ComparisonExpressionContext extends ExpressionContext {
+		public Token op;
+		public List<ExpressionContext> expression() {
+			return getRuleContexts(ExpressionContext.class);
 		}
+		public ExpressionContext expression(int i) {
+			return getRuleContext(ExpressionContext.class,i);
+		}
+		public TerminalNode EQ() { return getToken(MQLParser.EQ, 0); }
+		public TerminalNode GT() { return getToken(MQLParser.GT, 0); }
+		public TerminalNode GTE() { return getToken(MQLParser.GTE, 0); }
+		public TerminalNode LT() { return getToken(MQLParser.LT, 0); }
+		public TerminalNode LTE() { return getToken(MQLParser.LTE, 0); }
+		public TerminalNode NEQ() { return getToken(MQLParser.NEQ, 0); }
+		public ComparisonExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
 	}
 	public static class MemberExpressionContext extends ExpressionContext {
 		public List<ExpressionContext> expression() {
@@ -1347,11 +1079,6 @@ public class MQLParser extends Parser {
 		}
 		public TerminalNode DOT() { return getToken(MQLParser.DOT, 0); }
 		public MemberExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitMemberExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class OrExpressionContext extends ExpressionContext {
 		public List<ExpressionContext> expression() {
@@ -1363,11 +1090,6 @@ public class MQLParser extends Parser {
 		public TerminalNode OR() { return getToken(MQLParser.OR, 0); }
 		public TerminalNode OR_SYMBOL() { return getToken(MQLParser.OR_SYMBOL, 0); }
 		public OrExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitOrExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class UnaryMinusExpressionContext extends ExpressionContext {
 		public TerminalNode MINUS() { return getToken(MQLParser.MINUS, 0); }
@@ -1375,31 +1097,6 @@ public class MQLParser extends Parser {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public UnaryMinusExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitUnaryMinusExpression(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class MapFunctionCallExpressionContext extends ExpressionContext {
-		public TerminalNode MAP() { return getToken(MQLParser.MAP, 0); }
-		public List<ExpressionContext> expression() {
-			return getRuleContexts(ExpressionContext.class);
-		}
-		public ExpressionContext expression(int i) {
-			return getRuleContext(ExpressionContext.class,i);
-		}
-		public TerminalNode AS() { return getToken(MQLParser.AS, 0); }
-		public Variable_nameContext variable_name() {
-			return getRuleContext(Variable_nameContext.class,0);
-		}
-		public TerminalNode IN() { return getToken(MQLParser.IN, 0); }
-		public MapFunctionCallExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitMapFunctionCallExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class PowerExpressionContext extends ExpressionContext {
 		public List<ExpressionContext> expression() {
@@ -1410,38 +1107,87 @@ public class MQLParser extends Parser {
 		}
 		public TerminalNode CARET() { return getToken(MQLParser.CARET, 0); }
 		public PowerExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitPowerExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
-	public static class VariableReferenceExpressionContext extends ExpressionContext {
-		public Variable_nameContext variable_name() {
-			return getRuleContext(Variable_nameContext.class,0);
-		}
-		public VariableReferenceExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitVariableReferenceExpression(this);
-			else return visitor.visitChildren(this);
-		}
+	public static class DecimalExpressionContext extends ExpressionContext {
+		public TerminalNode DECIMAL() { return getToken(MQLParser.DECIMAL, 0); }
+		public DecimalExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
 	}
-	public static class ArrayElementExpressionContext extends ExpressionContext {
+	public static class AndExpressionContext extends ExpressionContext {
 		public List<ExpressionContext> expression() {
 			return getRuleContexts(ExpressionContext.class);
 		}
 		public ExpressionContext expression(int i) {
 			return getRuleContext(ExpressionContext.class,i);
 		}
-		public TerminalNode LBRACK() { return getToken(MQLParser.LBRACK, 0); }
-		public TerminalNode RBRACK() { return getToken(MQLParser.RBRACK, 0); }
-		public ArrayElementExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitArrayElementExpression(this);
-			else return visitor.visitChildren(this);
+		public TerminalNode AND() { return getToken(MQLParser.AND, 0); }
+		public TerminalNode AND_SYMBOL() { return getToken(MQLParser.AND_SYMBOL, 0); }
+		public AndExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
+	}
+	public static class StringExpressionContext extends ExpressionContext {
+		public TerminalNode STRING() { return getToken(MQLParser.STRING, 0); }
+		public StringExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
+	}
+	public static class VariableReferenceExpressionContext extends ExpressionContext {
+		public Variable_nameContext variable_name() {
+			return getRuleContext(Variable_nameContext.class,0);
 		}
+		public VariableReferenceExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
+	}
+	public static class NullExpressionContext extends ExpressionContext {
+		public TerminalNode NULL() { return getToken(MQLParser.NULL, 0); }
+		public NullExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
+	}
+	public static class LetExpressionContext extends ExpressionContext {
+		public TerminalNode LET() { return getToken(MQLParser.LET, 0); }
+		public List<Variable_assignmentContext> variable_assignment() {
+			return getRuleContexts(Variable_assignmentContext.class);
+		}
+		public Variable_assignmentContext variable_assignment(int i) {
+			return getRuleContext(Variable_assignmentContext.class,i);
+		}
+		public TerminalNode IN() { return getToken(MQLParser.IN, 0); }
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
+		public List<TerminalNode> COMMA() { return getTokens(MQLParser.COMMA); }
+		public TerminalNode COMMA(int i) {
+			return getToken(MQLParser.COMMA, i);
+		}
+		public LetExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
+	}
+	public static class FieldExpressionContext extends ExpressionContext {
+		public IdContext id() {
+			return getRuleContext(IdContext.class,0);
+		}
+		public FieldExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
+	}
+	public static class FunctionCallExpressionContext extends ExpressionContext {
+		public Function_nameContext function_name() {
+			return getRuleContext(Function_nameContext.class,0);
+		}
+		public TerminalNode LPAREN() { return getToken(MQLParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(MQLParser.RPAREN, 0); }
+		public List<Function_argumentContext> function_argument() {
+			return getRuleContexts(Function_argumentContext.class);
+		}
+		public Function_argumentContext function_argument(int i) {
+			return getRuleContext(Function_argumentContext.class,i);
+		}
+		public List<TerminalNode> COMMA() { return getTokens(MQLParser.COMMA); }
+		public TerminalNode COMMA(int i) {
+			return getToken(MQLParser.COMMA, i);
+		}
+		public FunctionCallExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
+	}
+	public static class RangeExpressionContext extends ExpressionContext {
+		public List<ExpressionContext> expression() {
+			return getRuleContexts(ExpressionContext.class);
+		}
+		public ExpressionContext expression(int i) {
+			return getRuleContext(ExpressionContext.class,i);
+		}
+		public TerminalNode RANGE() { return getToken(MQLParser.RANGE, 0); }
+		public RangeExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
 	}
 
 	public final ExpressionContext expression() throws RecognitionException {
@@ -1460,7 +1206,7 @@ public class MQLParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(274);
+			setState(253);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,23,_ctx) ) {
 			case 1:
@@ -1469,10 +1215,10 @@ public class MQLParser extends Parser {
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
-				setState(166);
-				match(MINUS);
 				setState(167);
-				expression(26);
+				match(MINUS);
+				setState(168);
+				expression(24);
 				}
 				break;
 			case 2:
@@ -1480,7 +1226,7 @@ public class MQLParser extends Parser {
 				_localctx = new NotExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(168);
+				setState(169);
 				_la = _input.LA(1);
 				if ( !(_la==NOT_SYMBOL || _la==NOT) ) {
 				_errHandler.recoverInline(this);
@@ -1490,8 +1236,8 @@ public class MQLParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(169);
-				expression(25);
+				setState(170);
+				expression(23);
 				}
 				break;
 			case 3:
@@ -1499,9 +1245,9 @@ public class MQLParser extends Parser {
 				_localctx = new SwitchExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(170);
+				setState(171);
 				match(SWITCH);
-				setState(176); 
+				setState(177); 
 				_errHandler.sync(this);
 				_alt = 1;
 				do {
@@ -1509,13 +1255,13 @@ public class MQLParser extends Parser {
 					case 1:
 						{
 						{
-						setState(171);
-						match(CASE);
 						setState(172);
-						expression(0);
+						match(CASE);
 						setState(173);
-						match(THEN);
+						expression(0);
 						setState(174);
+						match(THEN);
+						setState(175);
 						expression(0);
 						}
 						}
@@ -1523,18 +1269,18 @@ public class MQLParser extends Parser {
 					default:
 						throw new NoViableAltException(this);
 					}
-					setState(178); 
+					setState(179); 
 					_errHandler.sync(this);
 					_alt = getInterpreter().adaptivePredict(_input,14,_ctx);
 				} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
-				setState(182);
+				setState(183);
 				_errHandler.sync(this);
 				switch ( getInterpreter().adaptivePredict(_input,15,_ctx) ) {
 				case 1:
 					{
-					setState(180);
-					match(ELSE);
 					setState(181);
+					match(ELSE);
+					setState(182);
 					expression(0);
 					}
 					break;
@@ -1546,18 +1292,18 @@ public class MQLParser extends Parser {
 				_localctx = new ConditionalExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(184);
-				match(IF);
 				setState(185);
-				expression(0);
+				match(IF);
 				setState(186);
-				match(THEN);
-				setState(187);
 				expression(0);
+				setState(187);
+				match(THEN);
 				setState(188);
-				match(ELSE);
+				expression(0);
 				setState(189);
-				expression(16);
+				match(ELSE);
+				setState(190);
+				expression(13);
 				}
 				break;
 			case 5:
@@ -1565,30 +1311,30 @@ public class MQLParser extends Parser {
 				_localctx = new LetExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(191);
-				match(LET);
 				setState(192);
+				match(LET);
+				setState(193);
 				variable_assignment();
-				setState(197);
+				setState(198);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==COMMA) {
 					{
 					{
-					setState(193);
-					match(COMMA);
 					setState(194);
+					match(COMMA);
+					setState(195);
 					variable_assignment();
 					}
 					}
-					setState(199);
+					setState(200);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(200);
-				match(IN);
 				setState(201);
-				expression(15);
+				match(IN);
+				setState(202);
+				expression(12);
 				}
 				break;
 			case 6:
@@ -1596,35 +1342,35 @@ public class MQLParser extends Parser {
 				_localctx = new DocumentExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(203);
+				setState(204);
 				match(LBRACE);
-				setState(212);
+				setState(213);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if (((((_la - 6)) & ~0x3f) == 0 && ((1L << (_la - 6)) & ((1L << (DOLLAR - 6)) | (1L << (LBRACE - 6)) | (1L << (LBRACK - 6)) | (1L << (LPAREN - 6)) | (1L << (MINUS - 6)) | (1L << (NOT_SYMBOL - 6)) | (1L << (FALSE - 6)) | (1L << (FILTER - 6)) | (1L << (IF - 6)) | (1L << (LET - 6)) | (1L << (MAP - 6)) | (1L << (NOT - 6)) | (1L << (NULL - 6)) | (1L << (REDUCE - 6)) | (1L << (SWITCH - 6)) | (1L << (TRUE - 6)) | (1L << (INT - 6)) | (1L << (DECIMAL - 6)) | (1L << (STRING - 6)) | (1L << (QUOTED_ID - 6)) | (1L << (UNQUOTED_ID - 6)))) != 0)) {
+				if (((((_la - 8)) & ~0x3f) == 0 && ((1L << (_la - 8)) & ((1L << (DOLLAR - 8)) | (1L << (LBRACE - 8)) | (1L << (LBRACK - 8)) | (1L << (LPAREN - 8)) | (1L << (MINUS - 8)) | (1L << (NOT_SYMBOL - 8)) | (1L << (FALSE - 8)) | (1L << (IF - 8)) | (1L << (LET - 8)) | (1L << (NOT - 8)) | (1L << (NULL - 8)) | (1L << (SWITCH - 8)) | (1L << (TRUE - 8)) | (1L << (INT - 8)) | (1L << (DECIMAL - 8)) | (1L << (STRING - 8)) | (1L << (QUOTED_ID - 8)) | (1L << (UNQUOTED_ID - 8)))) != 0)) {
 					{
-					setState(204);
+					setState(205);
 					field_assignment();
-					setState(209);
+					setState(210);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 					while (_la==COMMA) {
 						{
 						{
-						setState(205);
-						match(COMMA);
 						setState(206);
+						match(COMMA);
+						setState(207);
 						field_assignment();
 						}
 						}
-						setState(211);
+						setState(212);
 						_errHandler.sync(this);
 						_la = _input.LA(1);
 					}
 					}
 				}
 
-				setState(214);
+				setState(215);
 				match(RBRACE);
 				}
 				break;
@@ -1633,35 +1379,35 @@ public class MQLParser extends Parser {
 				_localctx = new ArrayExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(215);
+				setState(216);
 				match(LBRACK);
-				setState(224);
+				setState(225);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if (((((_la - 6)) & ~0x3f) == 0 && ((1L << (_la - 6)) & ((1L << (DOLLAR - 6)) | (1L << (LBRACE - 6)) | (1L << (LBRACK - 6)) | (1L << (LPAREN - 6)) | (1L << (MINUS - 6)) | (1L << (NOT_SYMBOL - 6)) | (1L << (FALSE - 6)) | (1L << (FILTER - 6)) | (1L << (IF - 6)) | (1L << (LET - 6)) | (1L << (MAP - 6)) | (1L << (NOT - 6)) | (1L << (NULL - 6)) | (1L << (REDUCE - 6)) | (1L << (SWITCH - 6)) | (1L << (TRUE - 6)) | (1L << (INT - 6)) | (1L << (DECIMAL - 6)) | (1L << (STRING - 6)) | (1L << (QUOTED_ID - 6)) | (1L << (UNQUOTED_ID - 6)))) != 0)) {
+				if (((((_la - 8)) & ~0x3f) == 0 && ((1L << (_la - 8)) & ((1L << (DOLLAR - 8)) | (1L << (LBRACE - 8)) | (1L << (LBRACK - 8)) | (1L << (LPAREN - 8)) | (1L << (MINUS - 8)) | (1L << (NOT_SYMBOL - 8)) | (1L << (FALSE - 8)) | (1L << (IF - 8)) | (1L << (LET - 8)) | (1L << (NOT - 8)) | (1L << (NULL - 8)) | (1L << (SWITCH - 8)) | (1L << (TRUE - 8)) | (1L << (INT - 8)) | (1L << (DECIMAL - 8)) | (1L << (STRING - 8)) | (1L << (QUOTED_ID - 8)) | (1L << (UNQUOTED_ID - 8)))) != 0)) {
 					{
-					setState(216);
+					setState(217);
 					expression(0);
-					setState(221);
+					setState(222);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 					while (_la==COMMA) {
 						{
 						{
-						setState(217);
-						match(COMMA);
 						setState(218);
+						match(COMMA);
+						setState(219);
 						expression(0);
 						}
 						}
-						setState(223);
+						setState(224);
 						_errHandler.sync(this);
 						_la = _input.LA(1);
 					}
 					}
 				}
 
-				setState(226);
+				setState(227);
 				match(RBRACK);
 				}
 				break;
@@ -1670,163 +1416,104 @@ public class MQLParser extends Parser {
 				_localctx = new ParenthesisExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(227);
-				match(LPAREN);
 				setState(228);
-				expression(0);
+				match(LPAREN);
 				setState(229);
+				expression(0);
+				setState(230);
 				match(RPAREN);
 				}
 				break;
 			case 9:
 				{
-				_localctx = new FilterFunctionCallExpressionContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(231);
-				match(FILTER);
-				setState(232);
-				expression(0);
-				setState(233);
-				match(AS);
-				setState(234);
-				variable_name();
-				setState(235);
-				match(IN);
-				setState(236);
-				expression(11);
-				}
-				break;
-			case 10:
-				{
-				_localctx = new MapFunctionCallExpressionContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(238);
-				match(MAP);
-				setState(239);
-				expression(0);
-				setState(240);
-				match(AS);
-				setState(241);
-				variable_name();
-				setState(242);
-				match(IN);
-				setState(243);
-				expression(10);
-				}
-				break;
-			case 11:
-				{
-				_localctx = new ReduceFunctionCallExpressionContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(245);
-				match(REDUCE);
-				setState(246);
-				expression(0);
-				setState(247);
-				match(IN);
-				setState(248);
-				expression(0);
-				setState(249);
-				match(STARTING);
-				setState(250);
-				match(WITH);
-				setState(251);
-				expression(9);
-				}
-				break;
-			case 12:
-				{
 				_localctx = new FunctionCallExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(253);
+				setState(232);
 				function_name();
-				setState(254);
+				setState(233);
 				match(LPAREN);
-				setState(263);
+				setState(242);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if (((((_la - 6)) & ~0x3f) == 0 && ((1L << (_la - 6)) & ((1L << (DOLLAR - 6)) | (1L << (LBRACE - 6)) | (1L << (LBRACK - 6)) | (1L << (LPAREN - 6)) | (1L << (MINUS - 6)) | (1L << (NOT_SYMBOL - 6)) | (1L << (FALSE - 6)) | (1L << (FILTER - 6)) | (1L << (IF - 6)) | (1L << (LET - 6)) | (1L << (MAP - 6)) | (1L << (NOT - 6)) | (1L << (NULL - 6)) | (1L << (REDUCE - 6)) | (1L << (SWITCH - 6)) | (1L << (TRUE - 6)) | (1L << (INT - 6)) | (1L << (DECIMAL - 6)) | (1L << (STRING - 6)) | (1L << (QUOTED_ID - 6)) | (1L << (UNQUOTED_ID - 6)))) != 0)) {
+				if (((((_la - 8)) & ~0x3f) == 0 && ((1L << (_la - 8)) & ((1L << (DOLLAR - 8)) | (1L << (LBRACE - 8)) | (1L << (LBRACK - 8)) | (1L << (LPAREN - 8)) | (1L << (MINUS - 8)) | (1L << (NOT_SYMBOL - 8)) | (1L << (UNDERSCORE - 8)) | (1L << (FALSE - 8)) | (1L << (IF - 8)) | (1L << (LET - 8)) | (1L << (NOT - 8)) | (1L << (NULL - 8)) | (1L << (SWITCH - 8)) | (1L << (TRUE - 8)) | (1L << (INT - 8)) | (1L << (DECIMAL - 8)) | (1L << (STRING - 8)) | (1L << (QUOTED_ID - 8)) | (1L << (UNQUOTED_ID - 8)))) != 0)) {
 					{
-					setState(255);
-					expression(0);
-					setState(260);
+					setState(234);
+					function_argument();
+					setState(239);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 					while (_la==COMMA) {
 						{
 						{
-						setState(256);
+						setState(235);
 						match(COMMA);
-						setState(257);
-						expression(0);
+						setState(236);
+						function_argument();
 						}
 						}
-						setState(262);
+						setState(241);
 						_errHandler.sync(this);
 						_la = _input.LA(1);
 					}
 					}
 				}
 
-				setState(265);
+				setState(244);
 				match(RPAREN);
 				}
 				break;
-			case 13:
+			case 10:
 				{
 				_localctx = new VariableReferenceExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(267);
+				setState(246);
 				variable_name();
 				}
 				break;
-			case 14:
+			case 11:
 				{
 				_localctx = new FieldExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(268);
-				field_name();
+				setState(247);
+				id();
 				}
 				break;
-			case 15:
+			case 12:
 				{
 				_localctx = new NumberExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(269);
+				setState(248);
 				match(INT);
 				}
 				break;
-			case 16:
+			case 13:
 				{
 				_localctx = new DecimalExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(270);
+				setState(249);
 				match(DECIMAL);
 				}
 				break;
-			case 17:
+			case 14:
 				{
 				_localctx = new StringExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(271);
+				setState(250);
 				match(STRING);
 				}
 				break;
-			case 18:
+			case 15:
 				{
 				_localctx = new BoolExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(272);
+				setState(251);
 				_la = _input.LA(1);
 				if ( !(_la==FALSE || _la==TRUE) ) {
 				_errHandler.recoverInline(this);
@@ -1838,47 +1525,47 @@ public class MQLParser extends Parser {
 				}
 				}
 				break;
-			case 19:
+			case 16:
 				{
 				_localctx = new NullExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(273);
+				setState(252);
 				match(NULL);
 				}
 				break;
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(304);
+			setState(298);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,25,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,28,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(302);
+					setState(296);
 					_errHandler.sync(this);
-					switch ( getInterpreter().adaptivePredict(_input,24,_ctx) ) {
+					switch ( getInterpreter().adaptivePredict(_input,27,_ctx) ) {
 					case 1:
 						{
 						_localctx = new PowerExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(276);
-						if (!(precpred(_ctx, 27))) throw new FailedPredicateException(this, "precpred(_ctx, 27)");
-						setState(277);
+						setState(255);
+						if (!(precpred(_ctx, 25))) throw new FailedPredicateException(this, "precpred(_ctx, 25)");
+						setState(256);
 						match(CARET);
-						setState(278);
-						expression(27);
+						setState(257);
+						expression(25);
 						}
 						break;
 					case 2:
 						{
 						_localctx = new MultiplicationExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(279);
-						if (!(precpred(_ctx, 24))) throw new FailedPredicateException(this, "precpred(_ctx, 24)");
-						setState(280);
+						setState(258);
+						if (!(precpred(_ctx, 22))) throw new FailedPredicateException(this, "precpred(_ctx, 22)");
+						setState(259);
 						((MultiplicationExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << DIV) | (1L << MOD) | (1L << MULT))) != 0)) ) {
@@ -1889,17 +1576,17 @@ public class MQLParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(281);
-						expression(25);
+						setState(260);
+						expression(23);
 						}
 						break;
 					case 3:
 						{
 						_localctx = new AdditionExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(282);
-						if (!(precpred(_ctx, 23))) throw new FailedPredicateException(this, "precpred(_ctx, 23)");
-						setState(283);
+						setState(261);
+						if (!(precpred(_ctx, 21))) throw new FailedPredicateException(this, "precpred(_ctx, 21)");
+						setState(262);
 						((AdditionExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !(_la==MINUS || _la==PLUS) ) {
@@ -1910,17 +1597,17 @@ public class MQLParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(284);
-						expression(24);
+						setState(263);
+						expression(22);
 						}
 						break;
 					case 4:
 						{
 						_localctx = new ComparisonExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(285);
-						if (!(precpred(_ctx, 22))) throw new FailedPredicateException(this, "precpred(_ctx, 22)");
-						setState(286);
+						setState(264);
+						if (!(precpred(_ctx, 20))) throw new FailedPredicateException(this, "precpred(_ctx, 20)");
+						setState(265);
 						((ComparisonExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << EQ) | (1L << GT) | (1L << GTE) | (1L << LT) | (1L << LTE) | (1L << NEQ))) != 0)) ) {
@@ -1931,17 +1618,17 @@ public class MQLParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(287);
-						expression(23);
+						setState(266);
+						expression(21);
 						}
 						break;
 					case 5:
 						{
 						_localctx = new AndExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(288);
-						if (!(precpred(_ctx, 21))) throw new FailedPredicateException(this, "precpred(_ctx, 21)");
-						setState(289);
+						setState(267);
+						if (!(precpred(_ctx, 19))) throw new FailedPredicateException(this, "precpred(_ctx, 19)");
+						setState(268);
 						_la = _input.LA(1);
 						if ( !(_la==AND_SYMBOL || _la==AND) ) {
 						_errHandler.recoverInline(this);
@@ -1951,17 +1638,17 @@ public class MQLParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(290);
-						expression(22);
+						setState(269);
+						expression(20);
 						}
 						break;
 					case 6:
 						{
 						_localctx = new OrExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(291);
-						if (!(precpred(_ctx, 20))) throw new FailedPredicateException(this, "precpred(_ctx, 20)");
-						setState(292);
+						setState(270);
+						if (!(precpred(_ctx, 18))) throw new FailedPredicateException(this, "precpred(_ctx, 18)");
+						setState(271);
 						_la = _input.LA(1);
 						if ( !(_la==OR_SYMBOL || _la==OR) ) {
 						_errHandler.recoverInline(this);
@@ -1971,42 +1658,98 @@ public class MQLParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(293);
-						expression(21);
+						setState(272);
+						expression(19);
 						}
 						break;
 					case 7:
 						{
-						_localctx = new MemberExpressionContext(new ExpressionContext(_parentctx, _parentState));
+						_localctx = new RangeExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(294);
-						if (!(precpred(_ctx, 18))) throw new FailedPredicateException(this, "precpred(_ctx, 18)");
-						setState(295);
-						match(DOT);
-						setState(296);
-						expression(19);
+						setState(273);
+						if (!(precpred(_ctx, 16))) throw new FailedPredicateException(this, "precpred(_ctx, 16)");
+						setState(274);
+						match(RANGE);
+						setState(275);
+						expression(17);
 						}
 						break;
 					case 8:
 						{
-						_localctx = new ArrayElementExpressionContext(new ExpressionContext(_parentctx, _parentState));
+						_localctx = new MemberExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(297);
-						if (!(precpred(_ctx, 19))) throw new FailedPredicateException(this, "precpred(_ctx, 19)");
-						setState(298);
+						setState(276);
+						if (!(precpred(_ctx, 15))) throw new FailedPredicateException(this, "precpred(_ctx, 15)");
+						setState(277);
+						match(DOT);
+						setState(278);
+						expression(16);
+						}
+						break;
+					case 9:
+						{
+						_localctx = new ArrayExpressionContext(new ExpressionContext(_parentctx, _parentState));
+						pushNewRecursionContext(_localctx, _startState, RULE_expression);
+						setState(279);
+						if (!(precpred(_ctx, 17))) throw new FailedPredicateException(this, "precpred(_ctx, 17)");
+						setState(280);
 						match(LBRACK);
-						setState(299);
-						expression(0);
-						setState(300);
+						setState(292);
+						_errHandler.sync(this);
+						switch ( getInterpreter().adaptivePredict(_input,26,_ctx) ) {
+						case 1:
+							{
+							setState(281);
+							expression(0);
+							}
+							break;
+						case 2:
+							{
+							setState(282);
+							expression(0);
+							setState(283);
+							match(COLON);
+							setState(285);
+							_errHandler.sync(this);
+							_la = _input.LA(1);
+							if (((((_la - 8)) & ~0x3f) == 0 && ((1L << (_la - 8)) & ((1L << (DOLLAR - 8)) | (1L << (LBRACE - 8)) | (1L << (LBRACK - 8)) | (1L << (LPAREN - 8)) | (1L << (MINUS - 8)) | (1L << (NOT_SYMBOL - 8)) | (1L << (FALSE - 8)) | (1L << (IF - 8)) | (1L << (LET - 8)) | (1L << (NOT - 8)) | (1L << (NULL - 8)) | (1L << (SWITCH - 8)) | (1L << (TRUE - 8)) | (1L << (INT - 8)) | (1L << (DECIMAL - 8)) | (1L << (STRING - 8)) | (1L << (QUOTED_ID - 8)) | (1L << (UNQUOTED_ID - 8)))) != 0)) {
+								{
+								setState(284);
+								expression(0);
+								}
+							}
+
+							}
+							break;
+						case 3:
+							{
+							setState(288);
+							_errHandler.sync(this);
+							_la = _input.LA(1);
+							if (((((_la - 8)) & ~0x3f) == 0 && ((1L << (_la - 8)) & ((1L << (DOLLAR - 8)) | (1L << (LBRACE - 8)) | (1L << (LBRACK - 8)) | (1L << (LPAREN - 8)) | (1L << (MINUS - 8)) | (1L << (NOT_SYMBOL - 8)) | (1L << (FALSE - 8)) | (1L << (IF - 8)) | (1L << (LET - 8)) | (1L << (NOT - 8)) | (1L << (NULL - 8)) | (1L << (SWITCH - 8)) | (1L << (TRUE - 8)) | (1L << (INT - 8)) | (1L << (DECIMAL - 8)) | (1L << (STRING - 8)) | (1L << (QUOTED_ID - 8)) | (1L << (UNQUOTED_ID - 8)))) != 0)) {
+								{
+								setState(287);
+								expression(0);
+								}
+							}
+
+							setState(290);
+							match(COLON);
+							setState(291);
+							expression(0);
+							}
+							break;
+						}
+						setState(294);
 						match(RBRACK);
 						}
 						break;
 					}
 					} 
 				}
-				setState(306);
+				setState(300);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,25,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,28,_ctx);
 			}
 			}
 		}
@@ -2033,11 +1776,6 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_field_assignment; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitField_assignment(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Field_assignmentContext field_assignment() throws RecognitionException {
@@ -2046,19 +1784,194 @@ public class MQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(310);
+			setState(304);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,26,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,29,_ctx) ) {
 			case 1:
 				{
-				setState(307);
+				setState(301);
 				multipart_field_name();
-				setState(308);
+				setState(302);
 				match(ASSIGN);
 				}
 				break;
 			}
-			setState(312);
+			setState(306);
+			expression(0);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Function_argumentContext extends ParserRuleContext {
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
+		public Lambda_expressionContext lambda_expression() {
+			return getRuleContext(Lambda_expressionContext.class,0);
+		}
+		public IdContext id() {
+			return getRuleContext(IdContext.class,0);
+		}
+		public TerminalNode ASSIGN() { return getToken(MQLParser.ASSIGN, 0); }
+		public Function_argumentContext function_argument() {
+			return getRuleContext(Function_argumentContext.class,0);
+		}
+		public Function_argumentContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_function_argument; }
+	}
+
+	public final Function_argumentContext function_argument() throws RecognitionException {
+		Function_argumentContext _localctx = new Function_argumentContext(_ctx, getState());
+		enterRule(_localctx, 32, RULE_function_argument);
+		try {
+			setState(314);
+			_errHandler.sync(this);
+			switch ( getInterpreter().adaptivePredict(_input,30,_ctx) ) {
+			case 1:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(308);
+				expression(0);
+				}
+				break;
+			case 2:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(309);
+				lambda_expression();
+				}
+				break;
+			case 3:
+				enterOuterAlt(_localctx, 3);
+				{
+				setState(310);
+				id();
+				setState(311);
+				match(ASSIGN);
+				setState(312);
+				function_argument();
+				}
+				break;
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Lambda_argumentContext extends ParserRuleContext {
+		public Variable_nameContext variable_name() {
+			return getRuleContext(Variable_nameContext.class,0);
+		}
+		public TerminalNode UNDERSCORE() { return getToken(MQLParser.UNDERSCORE, 0); }
+		public Lambda_argumentContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_lambda_argument; }
+	}
+
+	public final Lambda_argumentContext lambda_argument() throws RecognitionException {
+		Lambda_argumentContext _localctx = new Lambda_argumentContext(_ctx, getState());
+		enterRule(_localctx, 34, RULE_lambda_argument);
+		try {
+			setState(318);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case DOLLAR:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(316);
+				variable_name();
+				}
+				break;
+			case UNDERSCORE:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(317);
+				match(UNDERSCORE);
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Lambda_expressionContext extends ParserRuleContext {
+		public List<Lambda_argumentContext> lambda_argument() {
+			return getRuleContexts(Lambda_argumentContext.class);
+		}
+		public Lambda_argumentContext lambda_argument(int i) {
+			return getRuleContext(Lambda_argumentContext.class,i);
+		}
+		public TerminalNode ARROW() { return getToken(MQLParser.ARROW, 0); }
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
+		public List<TerminalNode> COMMA() { return getTokens(MQLParser.COMMA); }
+		public TerminalNode COMMA(int i) {
+			return getToken(MQLParser.COMMA, i);
+		}
+		public Lambda_expressionContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_lambda_expression; }
+	}
+
+	public final Lambda_expressionContext lambda_expression() throws RecognitionException {
+		Lambda_expressionContext _localctx = new Lambda_expressionContext(_ctx, getState());
+		enterRule(_localctx, 36, RULE_lambda_expression);
+		int _la;
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(320);
+			lambda_argument();
+			setState(325);
+			_errHandler.sync(this);
+			_la = _input.LA(1);
+			while (_la==COMMA) {
+				{
+				{
+				setState(321);
+				match(COMMA);
+				setState(322);
+				lambda_argument();
+				}
+				}
+				setState(327);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+			}
+			setState(328);
+			match(ARROW);
+			setState(329);
 			expression(0);
 			}
 		}
@@ -2085,32 +1998,27 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_variable_assignment; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitVariable_assignment(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Variable_assignmentContext variable_assignment() throws RecognitionException {
 		Variable_assignmentContext _localctx = new Variable_assignmentContext(_ctx, getState());
-		enterRule(_localctx, 32, RULE_variable_assignment);
+		enterRule(_localctx, 38, RULE_variable_assignment);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(317);
+			setState(334);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,27,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,33,_ctx) ) {
 			case 1:
 				{
-				setState(314);
+				setState(331);
 				variable_name();
-				setState(315);
+				setState(332);
 				match(ASSIGN);
 				}
 				break;
 			}
-			setState(319);
+			setState(336);
 			expression(0);
 			}
 		}
@@ -2136,25 +2044,20 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_collection_name; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitCollection_name(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Collection_nameContext collection_name() throws RecognitionException {
 		Collection_nameContext _localctx = new Collection_nameContext(_ctx, getState());
-		enterRule(_localctx, 34, RULE_collection_name);
+		enterRule(_localctx, 40, RULE_collection_name);
 		int _la;
 		try {
-			setState(326);
+			setState(343);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,28,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,34,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(321);
+				setState(338);
 				_la = _input.LA(1);
 				if ( !(_la==QUOTED_ID || _la==UNQUOTED_ID) ) {
 				_errHandler.recoverInline(this);
@@ -2169,11 +2072,11 @@ public class MQLParser extends Parser {
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(322);
+				setState(339);
 				database_name();
-				setState(323);
+				setState(340);
 				match(DOT);
-				setState(324);
+				setState(341);
 				_la = _input.LA(1);
 				if ( !(_la==QUOTED_ID || _la==UNQUOTED_ID) ) {
 				_errHandler.recoverInline(this);
@@ -2205,21 +2108,16 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_database_name; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitDatabase_name(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Database_nameContext database_name() throws RecognitionException {
 		Database_nameContext _localctx = new Database_nameContext(_ctx, getState());
-		enterRule(_localctx, 36, RULE_database_name);
+		enterRule(_localctx, 42, RULE_database_name);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(328);
+			setState(345);
 			_la = _input.LA(1);
 			if ( !(_la==QUOTED_ID || _la==UNQUOTED_ID) ) {
 			_errHandler.recoverInline(this);
@@ -2243,11 +2141,11 @@ public class MQLParser extends Parser {
 	}
 
 	public static class Multipart_field_nameContext extends ParserRuleContext {
-		public List<Field_nameContext> field_name() {
-			return getRuleContexts(Field_nameContext.class);
+		public List<IdContext> id() {
+			return getRuleContexts(IdContext.class);
 		}
-		public Field_nameContext field_name(int i) {
-			return getRuleContext(Field_nameContext.class,i);
+		public IdContext id(int i) {
+			return getRuleContext(IdContext.class,i);
 		}
 		public List<TerminalNode> DOT() { return getTokens(MQLParser.DOT); }
 		public TerminalNode DOT(int i) {
@@ -2257,35 +2155,30 @@ public class MQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_multipart_field_name; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitMultipart_field_name(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Multipart_field_nameContext multipart_field_name() throws RecognitionException {
 		Multipart_field_nameContext _localctx = new Multipart_field_nameContext(_ctx, getState());
-		enterRule(_localctx, 38, RULE_multipart_field_name);
+		enterRule(_localctx, 44, RULE_multipart_field_name);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(330);
-			field_name();
-			setState(335);
+			setState(347);
+			id();
+			setState(352);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==DOT) {
 				{
 				{
-				setState(331);
+				setState(348);
 				match(DOT);
-				setState(332);
-				field_name();
+				setState(349);
+				id();
 				}
 				}
-				setState(337);
+				setState(354);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -2302,147 +2195,23 @@ public class MQLParser extends Parser {
 		return _localctx;
 	}
 
-	public static class Field_nameContext extends ParserRuleContext {
+	public static class IdContext extends ParserRuleContext {
 		public TerminalNode QUOTED_ID() { return getToken(MQLParser.QUOTED_ID, 0); }
 		public TerminalNode UNQUOTED_ID() { return getToken(MQLParser.UNQUOTED_ID, 0); }
-		public Keyword_as_idContext keyword_as_id() {
-			return getRuleContext(Keyword_as_idContext.class,0);
-		}
-		public Field_nameContext(ParserRuleContext parent, int invokingState) {
+		public IdContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_field_name; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitField_name(this);
-			else return visitor.visitChildren(this);
-		}
+		@Override public int getRuleIndex() { return RULE_id; }
 	}
 
-	public final Field_nameContext field_name() throws RecognitionException {
-		Field_nameContext _localctx = new Field_nameContext(_ctx, getState());
-		enterRule(_localctx, 40, RULE_field_name);
-		try {
-			setState(341);
-			_errHandler.sync(this);
-			switch (_input.LA(1)) {
-			case QUOTED_ID:
-				enterOuterAlt(_localctx, 1);
-				{
-				setState(338);
-				match(QUOTED_ID);
-				}
-				break;
-			case UNQUOTED_ID:
-				enterOuterAlt(_localctx, 2);
-				{
-				setState(339);
-				match(UNQUOTED_ID);
-				}
-				break;
-			case FILTER:
-			case MAP:
-			case REDUCE:
-				enterOuterAlt(_localctx, 3);
-				{
-				setState(340);
-				keyword_as_id();
-				}
-				break;
-			default:
-				throw new NoViableAltException(this);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class Function_nameContext extends ParserRuleContext {
-		public TerminalNode UNQUOTED_ID() { return getToken(MQLParser.UNQUOTED_ID, 0); }
-		public Keyword_as_idContext keyword_as_id() {
-			return getRuleContext(Keyword_as_idContext.class,0);
-		}
-		public Function_nameContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_function_name; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitFunction_name(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final Function_nameContext function_name() throws RecognitionException {
-		Function_nameContext _localctx = new Function_nameContext(_ctx, getState());
-		enterRule(_localctx, 42, RULE_function_name);
-		try {
-			setState(345);
-			_errHandler.sync(this);
-			switch (_input.LA(1)) {
-			case UNQUOTED_ID:
-				enterOuterAlt(_localctx, 1);
-				{
-				setState(343);
-				match(UNQUOTED_ID);
-				}
-				break;
-			case FILTER:
-			case MAP:
-			case REDUCE:
-				enterOuterAlt(_localctx, 2);
-				{
-				setState(344);
-				keyword_as_id();
-				}
-				break;
-			default:
-				throw new NoViableAltException(this);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class Variable_nameContext extends ParserRuleContext {
-		public TerminalNode DOLLAR() { return getToken(MQLParser.DOLLAR, 0); }
-		public TerminalNode QUOTED_ID() { return getToken(MQLParser.QUOTED_ID, 0); }
-		public TerminalNode UNQUOTED_ID() { return getToken(MQLParser.UNQUOTED_ID, 0); }
-		public Variable_nameContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_variable_name; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitVariable_name(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final Variable_nameContext variable_name() throws RecognitionException {
-		Variable_nameContext _localctx = new Variable_nameContext(_ctx, getState());
-		enterRule(_localctx, 44, RULE_variable_name);
+	public final IdContext id() throws RecognitionException {
+		IdContext _localctx = new IdContext(_ctx, getState());
+		enterRule(_localctx, 46, RULE_id);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(347);
-			match(DOLLAR);
-			setState(348);
+			setState(355);
 			_la = _input.LA(1);
 			if ( !(_la==QUOTED_ID || _la==UNQUOTED_ID) ) {
 			_errHandler.recoverInline(this);
@@ -2465,31 +2234,57 @@ public class MQLParser extends Parser {
 		return _localctx;
 	}
 
-	public static class Keyword_as_idContext extends ParserRuleContext {
-		public TerminalNode FILTER() { return getToken(MQLParser.FILTER, 0); }
-		public TerminalNode MAP() { return getToken(MQLParser.MAP, 0); }
-		public TerminalNode REDUCE() { return getToken(MQLParser.REDUCE, 0); }
-		public Keyword_as_idContext(ParserRuleContext parent, int invokingState) {
+	public static class Function_nameContext extends ParserRuleContext {
+		public TerminalNode UNQUOTED_ID() { return getToken(MQLParser.UNQUOTED_ID, 0); }
+		public Function_nameContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_keyword_as_id; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MQLVisitor ) return ((MQLVisitor<? extends T>)visitor).visitKeyword_as_id(this);
-			else return visitor.visitChildren(this);
-		}
+		@Override public int getRuleIndex() { return RULE_function_name; }
 	}
 
-	public final Keyword_as_idContext keyword_as_id() throws RecognitionException {
-		Keyword_as_idContext _localctx = new Keyword_as_idContext(_ctx, getState());
-		enterRule(_localctx, 46, RULE_keyword_as_id);
+	public final Function_nameContext function_name() throws RecognitionException {
+		Function_nameContext _localctx = new Function_nameContext(_ctx, getState());
+		enterRule(_localctx, 48, RULE_function_name);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(357);
+			match(UNQUOTED_ID);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Variable_nameContext extends ParserRuleContext {
+		public TerminalNode DOLLAR() { return getToken(MQLParser.DOLLAR, 0); }
+		public TerminalNode QUOTED_ID() { return getToken(MQLParser.QUOTED_ID, 0); }
+		public TerminalNode UNQUOTED_ID() { return getToken(MQLParser.UNQUOTED_ID, 0); }
+		public Variable_nameContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_variable_name; }
+	}
+
+	public final Variable_nameContext variable_name() throws RecognitionException {
+		Variable_nameContext _localctx = new Variable_nameContext(_ctx, getState());
+		enterRule(_localctx, 50, RULE_variable_name);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(350);
+			setState(359);
+			match(DOLLAR);
+			setState(360);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << FILTER) | (1L << MAP) | (1L << REDUCE))) != 0)) ) {
+			if ( !(_la==QUOTED_ID || _la==UNQUOTED_ID) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -2520,156 +2315,163 @@ public class MQLParser extends Parser {
 	private boolean expression_sempred(ExpressionContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0:
-			return precpred(_ctx, 27);
+			return precpred(_ctx, 25);
 		case 1:
-			return precpred(_ctx, 24);
-		case 2:
-			return precpred(_ctx, 23);
-		case 3:
 			return precpred(_ctx, 22);
-		case 4:
+		case 2:
 			return precpred(_ctx, 21);
-		case 5:
+		case 3:
 			return precpred(_ctx, 20);
-		case 6:
-			return precpred(_ctx, 18);
-		case 7:
+		case 4:
 			return precpred(_ctx, 19);
+		case 5:
+			return precpred(_ctx, 18);
+		case 6:
+			return precpred(_ctx, 16);
+		case 7:
+			return precpred(_ctx, 15);
+		case 8:
+			return precpred(_ctx, 17);
 		}
 		return true;
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3F\u0163\4\2\t\2\4"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3F\u016d\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
-		"\3\2\3\2\3\2\7\2\66\n\2\f\2\16\29\13\2\3\2\5\2<\n\2\3\2\3\2\3\3\3\3\3"+
-		"\4\3\4\3\4\6\4E\n\4\r\4\16\4F\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\5\5Q\n\5"+
-		"\3\6\3\6\3\6\3\6\7\6W\n\6\f\6\16\6Z\13\6\3\6\3\6\3\6\3\6\7\6`\n\6\f\6"+
-		"\16\6c\13\6\3\7\3\7\3\7\3\b\3\b\3\b\3\b\3\b\7\bm\n\b\f\b\16\bp\13\b\5"+
-		"\br\n\b\3\b\3\b\3\b\3\b\3\b\3\b\3\t\3\t\3\t\3\n\3\n\3\n\3\n\7\n\u0081"+
-		"\n\n\f\n\16\n\u0084\13\n\3\13\3\13\3\13\3\f\3\f\3\f\3\f\7\f\u008d\n\f"+
-		"\f\f\16\f\u0090\13\f\3\r\3\r\5\r\u0094\n\r\3\16\3\16\3\16\3\16\3\16\3"+
-		"\16\7\16\u009c\n\16\f\16\16\16\u009f\13\16\5\16\u00a1\n\16\3\17\3\17\3"+
-		"\17\5\17\u00a6\n\17\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20"+
-		"\3\20\6\20\u00b3\n\20\r\20\16\20\u00b4\3\20\3\20\5\20\u00b9\n\20\3\20"+
-		"\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\7\20\u00c6\n\20\f\20"+
-		"\16\20\u00c9\13\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\7\20\u00d2\n\20"+
-		"\f\20\16\20\u00d5\13\20\5\20\u00d7\n\20\3\20\3\20\3\20\3\20\3\20\7\20"+
-		"\u00de\n\20\f\20\16\20\u00e1\13\20\5\20\u00e3\n\20\3\20\3\20\3\20\3\20"+
+		"\4\32\t\32\4\33\t\33\3\2\3\2\3\2\7\2:\n\2\f\2\16\2=\13\2\3\2\5\2@\n\2"+
+		"\3\2\3\2\3\3\3\3\3\4\3\4\3\4\6\4I\n\4\r\4\16\4J\3\5\3\5\3\5\3\5\3\5\3"+
+		"\5\3\5\3\5\5\5U\n\5\3\6\3\6\3\6\3\6\7\6[\n\6\f\6\16\6^\13\6\3\6\3\6\3"+
+		"\6\3\6\7\6d\n\6\f\6\16\6g\13\6\3\7\3\7\3\7\3\b\3\b\3\b\3\b\3\b\7\bq\n"+
+		"\b\f\b\16\bt\13\b\5\bv\n\b\3\b\3\b\3\b\3\b\3\b\3\b\3\t\3\t\3\t\3\n\3\n"+
+		"\3\n\3\n\7\n\u0085\n\n\f\n\16\n\u0088\13\n\3\13\3\13\3\13\3\f\3\f\3\f"+
+		"\3\f\7\f\u0091\n\f\f\f\16\f\u0094\13\f\3\r\3\r\5\r\u0098\n\r\3\16\3\16"+
+		"\3\16\3\16\6\16\u009e\n\16\r\16\16\16\u009f\5\16\u00a2\n\16\3\17\3\17"+
+		"\3\17\5\17\u00a7\n\17\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20"+
+		"\3\20\6\20\u00b4\n\20\r\20\16\20\u00b5\3\20\3\20\5\20\u00ba\n\20\3\20"+
+		"\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\7\20\u00c7\n\20\f\20"+
+		"\16\20\u00ca\13\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\7\20\u00d3\n\20"+
+		"\f\20\16\20\u00d6\13\20\5\20\u00d8\n\20\3\20\3\20\3\20\3\20\3\20\7\20"+
+		"\u00df\n\20\f\20\16\20\u00e2\13\20\5\20\u00e4\n\20\3\20\3\20\3\20\3\20"+
+		"\3\20\3\20\3\20\3\20\3\20\3\20\7\20\u00f0\n\20\f\20\16\20\u00f3\13\20"+
+		"\5\20\u00f5\n\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\5\20\u0100"+
+		"\n\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20"+
 		"\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20"+
-		"\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20"+
-		"\7\20\u0105\n\20\f\20\16\20\u0108\13\20\5\20\u010a\n\20\3\20\3\20\3\20"+
-		"\3\20\3\20\3\20\3\20\3\20\3\20\5\20\u0115\n\20\3\20\3\20\3\20\3\20\3\20"+
-		"\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20"+
-		"\3\20\3\20\3\20\3\20\3\20\3\20\3\20\7\20\u0131\n\20\f\20\16\20\u0134\13"+
-		"\20\3\21\3\21\3\21\5\21\u0139\n\21\3\21\3\21\3\22\3\22\3\22\5\22\u0140"+
-		"\n\22\3\22\3\22\3\23\3\23\3\23\3\23\3\23\5\23\u0149\n\23\3\24\3\24\3\25"+
-		"\3\25\3\25\7\25\u0150\n\25\f\25\16\25\u0153\13\25\3\26\3\26\3\26\5\26"+
-		"\u0158\n\26\3\27\3\27\5\27\u015c\n\27\3\30\3\30\3\30\3\31\3\31\3\31\2"+
-		"\3\36\32\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,.\60\2\f\4\2  "+
-		"##\4\2\26\26\61\61\4\2%%;;\4\2\7\7\23\24\4\2\22\22\31\31\5\2\n\f\20\21"+
-		"\25\25\4\2\3\3\36\36\4\2\27\27\63\63\3\2DE\5\2&&//\65\65\2\u0188\2\62"+
-		"\3\2\2\2\4?\3\2\2\2\6A\3\2\2\2\bP\3\2\2\2\nR\3\2\2\2\fd\3\2\2\2\16g\3"+
-		"\2\2\2\20y\3\2\2\2\22|\3\2\2\2\24\u0085\3\2\2\2\26\u0088\3\2\2\2\30\u0091"+
-		"\3\2\2\2\32\u0095\3\2\2\2\34\u00a5\3\2\2\2\36\u0114\3\2\2\2 \u0138\3\2"+
-		"\2\2\"\u013f\3\2\2\2$\u0148\3\2\2\2&\u014a\3\2\2\2(\u014c\3\2\2\2*\u0157"+
-		"\3\2\2\2,\u015b\3\2\2\2.\u015d\3\2\2\2\60\u0160\3\2\2\2\62\67\5\4\3\2"+
-		"\63\64\7\35\2\2\64\66\5\4\3\2\65\63\3\2\2\2\669\3\2\2\2\67\65\3\2\2\2"+
-		"\678\3\2\2\28;\3\2\2\29\67\3\2\2\2:<\7\35\2\2;:\3\2\2\2;<\3\2\2\2<=\3"+
-		"\2\2\2=>\7\2\2\3>\3\3\2\2\2?@\5\6\4\2@\5\3\2\2\2AB\7\'\2\2BD\5$\23\2C"+
-		"E\5\b\5\2DC\3\2\2\2EF\3\2\2\2FD\3\2\2\2FG\3\2\2\2G\7\3\2\2\2HQ\5\n\6\2"+
-		"IQ\5\f\7\2JQ\5\16\b\2KQ\5\20\t\2LQ\5\22\n\2MQ\5\24\13\2NQ\5\26\f\2OQ\5"+
-		"\32\16\2PH\3\2\2\2PI\3\2\2\2PJ\3\2\2\2PK\3\2\2\2PL\3\2\2\2PM\3\2\2\2P"+
-		"N\3\2\2\2PO\3\2\2\2Q\t\3\2\2\2RS\7(\2\2SX\5 \21\2TU\7\6\2\2UW\5 \21\2"+
-		"VT\3\2\2\2WZ\3\2\2\2XV\3\2\2\2XY\3\2\2\2Y[\3\2\2\2ZX\3\2\2\2[\\\7!\2\2"+
-		"\\a\5\36\20\2]^\7\6\2\2^`\5\36\20\2_]\3\2\2\2`c\3\2\2\2a_\3\2\2\2ab\3"+
-		"\2\2\2b\13\3\2\2\2ca\3\2\2\2de\7-\2\2ef\7?\2\2f\r\3\2\2\2gq\7.\2\2hi\7"+
-		",\2\2in\5\"\22\2jk\7\6\2\2km\5\"\22\2lj\3\2\2\2mp\3\2\2\2nl\3\2\2\2no"+
-		"\3\2\2\2or\3\2\2\2pn\3\2\2\2qh\3\2\2\2qr\3\2\2\2rs\3\2\2\2st\5(\25\2t"+
-		"u\7\4\2\2uv\7\17\2\2vw\5\6\4\2wx\7\34\2\2x\17\3\2\2\2yz\7\60\2\2z{\5\36"+
-		"\20\2{\21\3\2\2\2|}\7\64\2\2}\u0082\5 \21\2~\177\7\6\2\2\177\u0081\5 "+
-		"\21\2\u0080~\3\2\2\2\u0081\u0084\3\2\2\2\u0082\u0080\3\2\2\2\u0082\u0083"+
-		"\3\2\2\2\u0083\23\3\2\2\2\u0084\u0082\3\2\2\2\u0085\u0086\7\66\2\2\u0086"+
-		"\u0087\7?\2\2\u0087\25\3\2\2\2\u0088\u0089\7\67\2\2\u0089\u008e\5\30\r"+
-		"\2\u008a\u008b\7\6\2\2\u008b\u008d\5\30\r\2\u008c\u008a\3\2\2\2\u008d"+
-		"\u0090\3\2\2\2\u008e\u008c\3\2\2\2\u008e\u008f\3\2\2\2\u008f\27\3\2\2"+
-		"\2\u0090\u008e\3\2\2\2\u0091\u0093\5(\25\2\u0092\u0094\t\2\2\2\u0093\u0092"+
-		"\3\2\2\2\u0093\u0094\3\2\2\2\u0094\31\3\2\2\2\u0095\u0096\7<\2\2\u0096"+
-		"\u00a0\5(\25\2\u0097\u0098\7=\2\2\u0098\u009d\5\34\17\2\u0099\u009a\7"+
-		"\6\2\2\u009a\u009c\5\34\17\2\u009b\u0099\3\2\2\2\u009c\u009f\3\2\2\2\u009d"+
-		"\u009b\3\2\2\2\u009d\u009e\3\2\2\2\u009e\u00a1\3\2\2\2\u009f\u009d\3\2"+
-		"\2\2\u00a0\u0097\3\2\2\2\u00a0\u00a1\3\2\2\2\u00a1\33\3\2\2\2\u00a2\u00a3"+
-		"\7+\2\2\u00a3\u00a6\5(\25\2\u00a4\u00a6\7>\2\2\u00a5\u00a2\3\2\2\2\u00a5"+
-		"\u00a4\3\2\2\2\u00a6\35\3\2\2\2\u00a7\u00a8\b\20\1\2\u00a8\u00a9\7\22"+
-		"\2\2\u00a9\u0115\5\36\20\34\u00aa\u00ab\t\3\2\2\u00ab\u0115\5\36\20\33"+
-		"\u00ac\u00b2\79\2\2\u00ad\u00ae\7\"\2\2\u00ae\u00af\5\36\20\2\u00af\u00b0"+
-		"\7:\2\2\u00b0\u00b1\5\36\20\2\u00b1\u00b3\3\2\2\2\u00b2\u00ad\3\2\2\2"+
-		"\u00b3\u00b4\3\2\2\2\u00b4\u00b2\3\2\2\2\u00b4\u00b5\3\2\2\2\u00b5\u00b8"+
-		"\3\2\2\2\u00b6\u00b7\7$\2\2\u00b7\u00b9\5\36\20\2\u00b8\u00b6\3\2\2\2"+
-		"\u00b8\u00b9\3\2\2\2\u00b9\u0115\3\2\2\2\u00ba\u00bb\7)\2\2\u00bb\u00bc"+
-		"\5\36\20\2\u00bc\u00bd\7:\2\2\u00bd\u00be\5\36\20\2\u00be\u00bf\7$\2\2"+
-		"\u00bf\u00c0\5\36\20\22\u00c0\u0115\3\2\2\2\u00c1\u00c2\7,\2\2\u00c2\u00c7"+
-		"\5\"\22\2\u00c3\u00c4\7\6\2\2\u00c4\u00c6\5\"\22\2\u00c5\u00c3\3\2\2\2"+
-		"\u00c6\u00c9\3\2\2\2\u00c7\u00c5\3\2\2\2\u00c7\u00c8\3\2\2\2\u00c8\u00ca"+
-		"\3\2\2\2\u00c9\u00c7\3\2\2\2\u00ca\u00cb\7*\2\2\u00cb\u00cc\5\36\20\21"+
-		"\u00cc\u0115\3\2\2\2\u00cd\u00d6\7\r\2\2\u00ce\u00d3\5 \21\2\u00cf\u00d0"+
-		"\7\6\2\2\u00d0\u00d2\5 \21\2\u00d1\u00cf\3\2\2\2\u00d2\u00d5\3\2\2\2\u00d3"+
-		"\u00d1\3\2\2\2\u00d3\u00d4\3\2\2\2\u00d4\u00d7\3\2\2\2\u00d5\u00d3\3\2"+
-		"\2\2\u00d6\u00ce\3\2\2\2\u00d6\u00d7\3\2\2\2\u00d7\u00d8\3\2\2\2\u00d8"+
-		"\u0115\7\32\2\2\u00d9\u00e2\7\16\2\2\u00da\u00df\5\36\20\2\u00db\u00dc"+
-		"\7\6\2\2\u00dc\u00de\5\36\20\2\u00dd\u00db\3\2\2\2\u00de\u00e1\3\2\2\2"+
-		"\u00df\u00dd\3\2\2\2\u00df\u00e0\3\2\2\2\u00e0\u00e3\3\2\2\2\u00e1\u00df"+
-		"\3\2\2\2\u00e2\u00da\3\2\2\2\u00e2\u00e3\3\2\2\2\u00e3\u00e4\3\2\2\2\u00e4"+
-		"\u0115\7\33\2\2\u00e5\u00e6\7\17\2\2\u00e6\u00e7\5\36\20\2\u00e7\u00e8"+
-		"\7\34\2\2\u00e8\u0115\3\2\2\2\u00e9\u00ea\7&\2\2\u00ea\u00eb\5\36\20\2"+
-		"\u00eb\u00ec\7\37\2\2\u00ec\u00ed\5.\30\2\u00ed\u00ee\7*\2\2\u00ee\u00ef"+
-		"\5\36\20\r\u00ef\u0115\3\2\2\2\u00f0\u00f1\7/\2\2\u00f1\u00f2\5\36\20"+
-		"\2\u00f2\u00f3\7\37\2\2\u00f3\u00f4\5.\30\2\u00f4\u00f5\7*\2\2\u00f5\u00f6"+
-		"\5\36\20\f\u00f6\u0115\3\2\2\2\u00f7\u00f8\7\65\2\2\u00f8\u00f9\5\36\20"+
-		"\2\u00f9\u00fa\7*\2\2\u00fa\u00fb\5\36\20\2\u00fb\u00fc\78\2\2\u00fc\u00fd"+
-		"\7=\2\2\u00fd\u00fe\5\36\20\13\u00fe\u0115\3\2\2\2\u00ff\u0100\5,\27\2"+
-		"\u0100\u0109\7\17\2\2\u0101\u0106\5\36\20\2\u0102\u0103\7\6\2\2\u0103"+
-		"\u0105\5\36\20\2\u0104\u0102\3\2\2\2\u0105\u0108\3\2\2\2\u0106\u0104\3"+
-		"\2\2\2\u0106\u0107\3\2\2\2\u0107\u010a\3\2\2\2\u0108\u0106\3\2\2\2\u0109"+
-		"\u0101\3\2\2\2\u0109\u010a\3\2\2\2\u010a\u010b\3\2\2\2\u010b\u010c\7\34"+
-		"\2\2\u010c\u0115\3\2\2\2\u010d\u0115\5.\30\2\u010e\u0115\5*\26\2\u010f"+
-		"\u0115\7?\2\2\u0110\u0115\7@\2\2\u0111\u0115\7C\2\2\u0112\u0115\t\4\2"+
-		"\2\u0113\u0115\7\62\2\2\u0114\u00a7\3\2\2\2\u0114\u00aa\3\2\2\2\u0114"+
-		"\u00ac\3\2\2\2\u0114\u00ba\3\2\2\2\u0114\u00c1\3\2\2\2\u0114\u00cd\3\2"+
-		"\2\2\u0114\u00d9\3\2\2\2\u0114\u00e5\3\2\2\2\u0114\u00e9\3\2\2\2\u0114"+
-		"\u00f0\3\2\2\2\u0114\u00f7\3\2\2\2\u0114\u00ff\3\2\2\2\u0114\u010d\3\2"+
-		"\2\2\u0114\u010e\3\2\2\2\u0114\u010f\3\2\2\2\u0114\u0110\3\2\2\2\u0114"+
-		"\u0111\3\2\2\2\u0114\u0112\3\2\2\2\u0114\u0113\3\2\2\2\u0115\u0132\3\2"+
-		"\2\2\u0116\u0117\f\35\2\2\u0117\u0118\7\5\2\2\u0118\u0131\5\36\20\35\u0119"+
-		"\u011a\f\32\2\2\u011a\u011b\t\5\2\2\u011b\u0131\5\36\20\33\u011c\u011d"+
-		"\f\31\2\2\u011d\u011e\t\6\2\2\u011e\u0131\5\36\20\32\u011f\u0120\f\30"+
-		"\2\2\u0120\u0121\t\7\2\2\u0121\u0131\5\36\20\31\u0122\u0123\f\27\2\2\u0123"+
-		"\u0124\t\b\2\2\u0124\u0131\5\36\20\30\u0125\u0126\f\26\2\2\u0126\u0127"+
-		"\t\t\2\2\u0127\u0131\5\36\20\27\u0128\u0129\f\24\2\2\u0129\u012a\7\t\2"+
-		"\2\u012a\u0131\5\36\20\25\u012b\u012c\f\25\2\2\u012c\u012d\7\16\2\2\u012d"+
-		"\u012e\5\36\20\2\u012e\u012f\7\33\2\2\u012f\u0131\3\2\2\2\u0130\u0116"+
-		"\3\2\2\2\u0130\u0119\3\2\2\2\u0130\u011c\3\2\2\2\u0130\u011f\3\2\2\2\u0130"+
-		"\u0122\3\2\2\2\u0130\u0125\3\2\2\2\u0130\u0128\3\2\2\2\u0130\u012b\3\2"+
-		"\2\2\u0131\u0134\3\2\2\2\u0132\u0130\3\2\2\2\u0132\u0133\3\2\2\2\u0133"+
-		"\37\3\2\2\2\u0134\u0132\3\2\2\2\u0135\u0136\5(\25\2\u0136\u0137\7\4\2"+
-		"\2\u0137\u0139\3\2\2\2\u0138\u0135\3\2\2\2\u0138\u0139\3\2\2\2\u0139\u013a"+
-		"\3\2\2\2\u013a\u013b\5\36\20\2\u013b!\3\2\2\2\u013c\u013d\5.\30\2\u013d"+
-		"\u013e\7\4\2\2\u013e\u0140\3\2\2\2\u013f\u013c\3\2\2\2\u013f\u0140\3\2"+
-		"\2\2\u0140\u0141\3\2\2\2\u0141\u0142\5\36\20\2\u0142#\3\2\2\2\u0143\u0149"+
-		"\t\n\2\2\u0144\u0145\5&\24\2\u0145\u0146\7\t\2\2\u0146\u0147\t\n\2\2\u0147"+
-		"\u0149\3\2\2\2\u0148\u0143\3\2\2\2\u0148\u0144\3\2\2\2\u0149%\3\2\2\2"+
-		"\u014a\u014b\t\n\2\2\u014b\'\3\2\2\2\u014c\u0151\5*\26\2\u014d\u014e\7"+
-		"\t\2\2\u014e\u0150\5*\26\2\u014f\u014d\3\2\2\2\u0150\u0153\3\2\2\2\u0151"+
-		"\u014f\3\2\2\2\u0151\u0152\3\2\2\2\u0152)\3\2\2\2\u0153\u0151\3\2\2\2"+
-		"\u0154\u0158\7D\2\2\u0155\u0158\7E\2\2\u0156\u0158\5\60\31\2\u0157\u0154"+
-		"\3\2\2\2\u0157\u0155\3\2\2\2\u0157\u0156\3\2\2\2\u0158+\3\2\2\2\u0159"+
-		"\u015c\7E\2\2\u015a\u015c\5\60\31\2\u015b\u0159\3\2\2\2\u015b\u015a\3"+
-		"\2\2\2\u015c-\3\2\2\2\u015d\u015e\7\b\2\2\u015e\u015f\t\n\2\2\u015f/\3"+
-		"\2\2\2\u0160\u0161\t\13\2\2\u0161\61\3\2\2\2\"\67;FPXanq\u0082\u008e\u0093"+
-		"\u009d\u00a0\u00a5\u00b4\u00b8\u00c7\u00d3\u00d6\u00df\u00e2\u0106\u0109"+
-		"\u0114\u0130\u0132\u0138\u013f\u0148\u0151\u0157\u015b";
+		"\3\20\3\20\3\20\5\20\u0120\n\20\3\20\5\20\u0123\n\20\3\20\3\20\5\20\u0127"+
+		"\n\20\3\20\3\20\7\20\u012b\n\20\f\20\16\20\u012e\13\20\3\21\3\21\3\21"+
+		"\5\21\u0133\n\21\3\21\3\21\3\22\3\22\3\22\3\22\3\22\3\22\5\22\u013d\n"+
+		"\22\3\23\3\23\5\23\u0141\n\23\3\24\3\24\3\24\7\24\u0146\n\24\f\24\16\24"+
+		"\u0149\13\24\3\24\3\24\3\24\3\25\3\25\3\25\5\25\u0151\n\25\3\25\3\25\3"+
+		"\26\3\26\3\26\3\26\3\26\5\26\u015a\n\26\3\27\3\27\3\30\3\30\3\30\7\30"+
+		"\u0161\n\30\f\30\16\30\u0164\13\30\3\31\3\31\3\32\3\32\3\33\3\33\3\33"+
+		"\3\33\2\3\36\34\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,.\60\62"+
+		"\64\2\13\4\2##&&\4\2\30\30\62\62\4\2((;;\4\2\t\t\25\26\4\2\24\24\33\33"+
+		"\5\2\f\16\22\23\27\27\4\2\3\3\"\"\4\2\31\31\64\64\3\2DE\2\u0193\2\66\3"+
+		"\2\2\2\4C\3\2\2\2\6E\3\2\2\2\bT\3\2\2\2\nV\3\2\2\2\fh\3\2\2\2\16k\3\2"+
+		"\2\2\20}\3\2\2\2\22\u0080\3\2\2\2\24\u0089\3\2\2\2\26\u008c\3\2\2\2\30"+
+		"\u0095\3\2\2\2\32\u0099\3\2\2\2\34\u00a6\3\2\2\2\36\u00ff\3\2\2\2 \u0132"+
+		"\3\2\2\2\"\u013c\3\2\2\2$\u0140\3\2\2\2&\u0142\3\2\2\2(\u0150\3\2\2\2"+
+		"*\u0159\3\2\2\2,\u015b\3\2\2\2.\u015d\3\2\2\2\60\u0165\3\2\2\2\62\u0167"+
+		"\3\2\2\2\64\u0169\3\2\2\2\66;\5\4\3\2\678\7 \2\28:\5\4\3\29\67\3\2\2\2"+
+		":=\3\2\2\2;9\3\2\2\2;<\3\2\2\2<?\3\2\2\2=;\3\2\2\2>@\7 \2\2?>\3\2\2\2"+
+		"?@\3\2\2\2@A\3\2\2\2AB\7\2\2\3B\3\3\2\2\2CD\5\6\4\2D\5\3\2\2\2EF\7)\2"+
+		"\2FH\5*\26\2GI\5\b\5\2HG\3\2\2\2IJ\3\2\2\2JH\3\2\2\2JK\3\2\2\2K\7\3\2"+
+		"\2\2LU\5\n\6\2MU\5\f\7\2NU\5\16\b\2OU\5\20\t\2PU\5\22\n\2QU\5\24\13\2"+
+		"RU\5\26\f\2SU\5\32\16\2TL\3\2\2\2TM\3\2\2\2TN\3\2\2\2TO\3\2\2\2TP\3\2"+
+		"\2\2TQ\3\2\2\2TR\3\2\2\2TS\3\2\2\2U\t\3\2\2\2VW\7*\2\2W\\\5 \21\2XY\7"+
+		"\b\2\2Y[\5 \21\2ZX\3\2\2\2[^\3\2\2\2\\Z\3\2\2\2\\]\3\2\2\2]_\3\2\2\2^"+
+		"\\\3\2\2\2_`\7$\2\2`e\5\36\20\2ab\7\b\2\2bd\5\36\20\2ca\3\2\2\2dg\3\2"+
+		"\2\2ec\3\2\2\2ef\3\2\2\2f\13\3\2\2\2ge\3\2\2\2hi\7/\2\2ij\7?\2\2j\r\3"+
+		"\2\2\2ku\7\60\2\2lm\7.\2\2mr\5(\25\2no\7\b\2\2oq\5(\25\2pn\3\2\2\2qt\3"+
+		"\2\2\2rp\3\2\2\2rs\3\2\2\2sv\3\2\2\2tr\3\2\2\2ul\3\2\2\2uv\3\2\2\2vw\3"+
+		"\2\2\2wx\5.\30\2xy\7\5\2\2yz\7\21\2\2z{\5\6\4\2{|\7\37\2\2|\17\3\2\2\2"+
+		"}~\7\61\2\2~\177\5\36\20\2\177\21\3\2\2\2\u0080\u0081\7\65\2\2\u0081\u0086"+
+		"\5 \21\2\u0082\u0083\7\b\2\2\u0083\u0085\5 \21\2\u0084\u0082\3\2\2\2\u0085"+
+		"\u0088\3\2\2\2\u0086\u0084\3\2\2\2\u0086\u0087\3\2\2\2\u0087\23\3\2\2"+
+		"\2\u0088\u0086\3\2\2\2\u0089\u008a\7\66\2\2\u008a\u008b\7?\2\2\u008b\25"+
+		"\3\2\2\2\u008c\u008d\7\67\2\2\u008d\u0092\5\30\r\2\u008e\u008f\7\b\2\2"+
+		"\u008f\u0091\5\30\r\2\u0090\u008e\3\2\2\2\u0091\u0094\3\2\2\2\u0092\u0090"+
+		"\3\2\2\2\u0092\u0093\3\2\2\2\u0093\27\3\2\2\2\u0094\u0092\3\2\2\2\u0095"+
+		"\u0097\5.\30\2\u0096\u0098\t\2\2\2\u0097\u0096\3\2\2\2\u0097\u0098\3\2"+
+		"\2\2\u0098\31\3\2\2\2\u0099\u009a\7<\2\2\u009a\u00a1\5.\30\2\u009b\u009d"+
+		"\7=\2\2\u009c\u009e\5\34\17\2\u009d\u009c\3\2\2\2\u009e\u009f\3\2\2\2"+
+		"\u009f\u009d\3\2\2\2\u009f\u00a0\3\2\2\2\u00a0\u00a2\3\2\2\2\u00a1\u009b"+
+		"\3\2\2\2\u00a1\u00a2\3\2\2\2\u00a2\33\3\2\2\2\u00a3\u00a4\7-\2\2\u00a4"+
+		"\u00a7\5.\30\2\u00a5\u00a7\7>\2\2\u00a6\u00a3\3\2\2\2\u00a6\u00a5\3\2"+
+		"\2\2\u00a7\35\3\2\2\2\u00a8\u00a9\b\20\1\2\u00a9\u00aa\7\24\2\2\u00aa"+
+		"\u0100\5\36\20\32\u00ab\u00ac\t\3\2\2\u00ac\u0100\5\36\20\31\u00ad\u00b3"+
+		"\79\2\2\u00ae\u00af\7%\2\2\u00af\u00b0\5\36\20\2\u00b0\u00b1\7:\2\2\u00b1"+
+		"\u00b2\5\36\20\2\u00b2\u00b4\3\2\2\2\u00b3\u00ae\3\2\2\2\u00b4\u00b5\3"+
+		"\2\2\2\u00b5\u00b3\3\2\2\2\u00b5\u00b6\3\2\2\2\u00b6\u00b9\3\2\2\2\u00b7"+
+		"\u00b8\7\'\2\2\u00b8\u00ba\5\36\20\2\u00b9\u00b7\3\2\2\2\u00b9\u00ba\3"+
+		"\2\2\2\u00ba\u0100\3\2\2\2\u00bb\u00bc\7+\2\2\u00bc\u00bd\5\36\20\2\u00bd"+
+		"\u00be\7:\2\2\u00be\u00bf\5\36\20\2\u00bf\u00c0\7\'\2\2\u00c0\u00c1\5"+
+		"\36\20\17\u00c1\u0100\3\2\2\2\u00c2\u00c3\7.\2\2\u00c3\u00c8\5(\25\2\u00c4"+
+		"\u00c5\7\b\2\2\u00c5\u00c7\5(\25\2\u00c6\u00c4\3\2\2\2\u00c7\u00ca\3\2"+
+		"\2\2\u00c8\u00c6\3\2\2\2\u00c8\u00c9\3\2\2\2\u00c9\u00cb\3\2\2\2\u00ca"+
+		"\u00c8\3\2\2\2\u00cb\u00cc\7,\2\2\u00cc\u00cd\5\36\20\16\u00cd\u0100\3"+
+		"\2\2\2\u00ce\u00d7\7\17\2\2\u00cf\u00d4\5 \21\2\u00d0\u00d1\7\b\2\2\u00d1"+
+		"\u00d3\5 \21\2\u00d2\u00d0\3\2\2\2\u00d3\u00d6\3\2\2\2\u00d4\u00d2\3\2"+
+		"\2\2\u00d4\u00d5\3\2\2\2\u00d5\u00d8\3\2\2\2\u00d6\u00d4\3\2\2\2\u00d7"+
+		"\u00cf\3\2\2\2\u00d7\u00d8\3\2\2\2\u00d8\u00d9\3\2\2\2\u00d9\u0100\7\35"+
+		"\2\2\u00da\u00e3\7\20\2\2\u00db\u00e0\5\36\20\2\u00dc\u00dd\7\b\2\2\u00dd"+
+		"\u00df\5\36\20\2\u00de\u00dc\3\2\2\2\u00df\u00e2\3\2\2\2\u00e0\u00de\3"+
+		"\2\2\2\u00e0\u00e1\3\2\2\2\u00e1\u00e4\3\2\2\2\u00e2\u00e0\3\2\2\2\u00e3"+
+		"\u00db\3\2\2\2\u00e3\u00e4\3\2\2\2\u00e4\u00e5\3\2\2\2\u00e5\u0100\7\36"+
+		"\2\2\u00e6\u00e7\7\21\2\2\u00e7\u00e8\5\36\20\2\u00e8\u00e9\7\37\2\2\u00e9"+
+		"\u0100\3\2\2\2\u00ea\u00eb\5\62\32\2\u00eb\u00f4\7\21\2\2\u00ec\u00f1"+
+		"\5\"\22\2\u00ed\u00ee\7\b\2\2\u00ee\u00f0\5\"\22\2\u00ef\u00ed\3\2\2\2"+
+		"\u00f0\u00f3\3\2\2\2\u00f1\u00ef\3\2\2\2\u00f1\u00f2\3\2\2\2\u00f2\u00f5"+
+		"\3\2\2\2\u00f3\u00f1\3\2\2\2\u00f4\u00ec\3\2\2\2\u00f4\u00f5\3\2\2\2\u00f5"+
+		"\u00f6\3\2\2\2\u00f6\u00f7\7\37\2\2\u00f7\u0100\3\2\2\2\u00f8\u0100\5"+
+		"\64\33\2\u00f9\u0100\5\60\31\2\u00fa\u0100\7?\2\2\u00fb\u0100\7@\2\2\u00fc"+
+		"\u0100\7C\2\2\u00fd\u0100\t\4\2\2\u00fe\u0100\7\63\2\2\u00ff\u00a8\3\2"+
+		"\2\2\u00ff\u00ab\3\2\2\2\u00ff\u00ad\3\2\2\2\u00ff\u00bb\3\2\2\2\u00ff"+
+		"\u00c2\3\2\2\2\u00ff\u00ce\3\2\2\2\u00ff\u00da\3\2\2\2\u00ff\u00e6\3\2"+
+		"\2\2\u00ff\u00ea\3\2\2\2\u00ff\u00f8\3\2\2\2\u00ff\u00f9\3\2\2\2\u00ff"+
+		"\u00fa\3\2\2\2\u00ff\u00fb\3\2\2\2\u00ff\u00fc\3\2\2\2\u00ff\u00fd\3\2"+
+		"\2\2\u00ff\u00fe\3\2\2\2\u0100\u012c\3\2\2\2\u0101\u0102\f\33\2\2\u0102"+
+		"\u0103\7\6\2\2\u0103\u012b\5\36\20\33\u0104\u0105\f\30\2\2\u0105\u0106"+
+		"\t\5\2\2\u0106\u012b\5\36\20\31\u0107\u0108\f\27\2\2\u0108\u0109\t\6\2"+
+		"\2\u0109\u012b\5\36\20\30\u010a\u010b\f\26\2\2\u010b\u010c\t\7\2\2\u010c"+
+		"\u012b\5\36\20\27\u010d\u010e\f\25\2\2\u010e\u010f\t\b\2\2\u010f\u012b"+
+		"\5\36\20\26\u0110\u0111\f\24\2\2\u0111\u0112\t\t\2\2\u0112\u012b\5\36"+
+		"\20\25\u0113\u0114\f\22\2\2\u0114\u0115\7\34\2\2\u0115\u012b\5\36\20\23"+
+		"\u0116\u0117\f\21\2\2\u0117\u0118\7\13\2\2\u0118\u012b\5\36\20\22\u0119"+
+		"\u011a\f\23\2\2\u011a\u0126\7\20\2\2\u011b\u0127\5\36\20\2\u011c\u011d"+
+		"\5\36\20\2\u011d\u011f\7\7\2\2\u011e\u0120\5\36\20\2\u011f\u011e\3\2\2"+
+		"\2\u011f\u0120\3\2\2\2\u0120\u0127\3\2\2\2\u0121\u0123\5\36\20\2\u0122"+
+		"\u0121\3\2\2\2\u0122\u0123\3\2\2\2\u0123\u0124\3\2\2\2\u0124\u0125\7\7"+
+		"\2\2\u0125\u0127\5\36\20\2\u0126\u011b\3\2\2\2\u0126\u011c\3\2\2\2\u0126"+
+		"\u0122\3\2\2\2\u0127\u0128\3\2\2\2\u0128\u0129\7\36\2\2\u0129\u012b\3"+
+		"\2\2\2\u012a\u0101\3\2\2\2\u012a\u0104\3\2\2\2\u012a\u0107\3\2\2\2\u012a"+
+		"\u010a\3\2\2\2\u012a\u010d\3\2\2\2\u012a\u0110\3\2\2\2\u012a\u0113\3\2"+
+		"\2\2\u012a\u0116\3\2\2\2\u012a\u0119\3\2\2\2\u012b\u012e\3\2\2\2\u012c"+
+		"\u012a\3\2\2\2\u012c\u012d\3\2\2\2\u012d\37\3\2\2\2\u012e\u012c\3\2\2"+
+		"\2\u012f\u0130\5.\30\2\u0130\u0131\7\5\2\2\u0131\u0133\3\2\2\2\u0132\u012f"+
+		"\3\2\2\2\u0132\u0133\3\2\2\2\u0133\u0134\3\2\2\2\u0134\u0135\5\36\20\2"+
+		"\u0135!\3\2\2\2\u0136\u013d\5\36\20\2\u0137\u013d\5&\24\2\u0138\u0139"+
+		"\5\60\31\2\u0139\u013a\7\5\2\2\u013a\u013b\5\"\22\2\u013b\u013d\3\2\2"+
+		"\2\u013c\u0136\3\2\2\2\u013c\u0137\3\2\2\2\u013c\u0138\3\2\2\2\u013d#"+
+		"\3\2\2\2\u013e\u0141\5\64\33\2\u013f\u0141\7!\2\2\u0140\u013e\3\2\2\2"+
+		"\u0140\u013f\3\2\2\2\u0141%\3\2\2\2\u0142\u0147\5$\23\2\u0143\u0144\7"+
+		"\b\2\2\u0144\u0146\5$\23\2\u0145\u0143\3\2\2\2\u0146\u0149\3\2\2\2\u0147"+
+		"\u0145\3\2\2\2\u0147\u0148\3\2\2\2\u0148\u014a\3\2\2\2\u0149\u0147\3\2"+
+		"\2\2\u014a\u014b\7\4\2\2\u014b\u014c\5\36\20\2\u014c\'\3\2\2\2\u014d\u014e"+
+		"\5\64\33\2\u014e\u014f\7\5\2\2\u014f\u0151\3\2\2\2\u0150\u014d\3\2\2\2"+
+		"\u0150\u0151\3\2\2\2\u0151\u0152\3\2\2\2\u0152\u0153\5\36\20\2\u0153)"+
+		"\3\2\2\2\u0154\u015a\t\n\2\2\u0155\u0156\5,\27\2\u0156\u0157\7\13\2\2"+
+		"\u0157\u0158\t\n\2\2\u0158\u015a\3\2\2\2\u0159\u0154\3\2\2\2\u0159\u0155"+
+		"\3\2\2\2\u015a+\3\2\2\2\u015b\u015c\t\n\2\2\u015c-\3\2\2\2\u015d\u0162"+
+		"\5\60\31\2\u015e\u015f\7\13\2\2\u015f\u0161\5\60\31\2\u0160\u015e\3\2"+
+		"\2\2\u0161\u0164\3\2\2\2\u0162\u0160\3\2\2\2\u0162\u0163\3\2\2\2\u0163"+
+		"/\3\2\2\2\u0164\u0162\3\2\2\2\u0165\u0166\t\n\2\2\u0166\61\3\2\2\2\u0167"+
+		"\u0168\7E\2\2\u0168\63\3\2\2\2\u0169\u016a\7\n\2\2\u016a\u016b\t\n\2\2"+
+		"\u016b\65\3\2\2\2&;?JT\\eru\u0086\u0092\u0097\u009f\u00a1\u00a6\u00b5"+
+		"\u00b9\u00c8\u00d4\u00d7\u00e0\u00e3\u00f1\u00f4\u00ff\u011f\u0122\u0126"+
+		"\u012a\u012c\u0132\u013c\u0140\u0147\u0150\u0159\u0162";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

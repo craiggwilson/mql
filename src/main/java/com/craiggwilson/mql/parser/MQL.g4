@@ -55,7 +55,7 @@ sort_field:
 ;
 
 unwind_stage:
-  UNWIND multipart_field_name (WITH unwind_option (COMMA unwind_option)*)?
+  UNWIND multipart_field_name (WITH unwind_option+)?
 ;
 
 unwind_option:
@@ -74,7 +74,12 @@ expression:
 | expression op=(EQ | GT | GTE | LT | LTE | NEQ) expression             #comparisonExpression
 | expression (AND | AND_SYMBOL) expression                              #andExpression
 | expression (OR | OR_SYMBOL) expression                                #orExpression
-| expression LBRACK expression RBRACK                                   #arrayElementExpression
+| expression LBRACK (
+        expression
+      | expression COLON expression?
+      | expression? COLON expression
+    ) RBRACK                                                            #arrayExpression
+| expression RANGE expression                                           #rangeExpression
 | expression DOT expression                                             #memberExpression
 | SWITCH (CASE expression THEN expression)+ (ELSE expression)?          #switchExpression
 | IF expression THEN expression ELSE expression                         #conditionalExpression
@@ -82,12 +87,10 @@ expression:
 | LBRACE (field_assignment (COMMA field_assignment)*)? RBRACE           #documentExpression
 | LBRACK (expression (COMMA expression)*)? RBRACK                       #arrayExpression
 | LPAREN expression RPAREN                                              #parenthesisExpression
-| FILTER expression AS variable_name IN expression                      #filterFunctionCallExpression
-| MAP expression AS variable_name IN expression                         #mapFunctionCallExpression
-| REDUCE expression IN expression STARTING WITH expression              #reduceFunctionCallExpression
-| function_name LPAREN (expression (COMMA expression)*)? RPAREN         #functionCallExpression
+| function_name
+    LPAREN (function_argument (COMMA function_argument)*)? RPAREN       #functionCallExpression
 | variable_name                                                         #variableReferenceExpression
-| field_name                                                            #fieldExpression
+| id                                                                    #fieldExpression
 | INT                                                                   #numberExpression
 | DECIMAL                                                               #decimalExpression
 | STRING                                                                #stringExpression
@@ -98,6 +101,20 @@ expression:
 
 field_assignment:
   (multipart_field_name ASSIGN)? expression
+;
+
+function_argument:
+  expression
+| lambda_expression
+| id ASSIGN function_argument;
+
+lambda_argument:
+  variable_name
+| UNDERSCORE
+;
+
+lambda_expression:
+  lambda_argument (COMMA lambda_argument)* ARROW expression
 ;
 
 variable_assignment:
@@ -112,32 +129,28 @@ collection_name:
 
 database_name: (QUOTED_ID | UNQUOTED_ID);
 
-multipart_field_name: field_name (DOT field_name)*;
-field_name:
+multipart_field_name: id (DOT id)*;
+
+id:
   QUOTED_ID
 | UNQUOTED_ID
-| keyword_as_id
 ;
 
 function_name:
   UNQUOTED_ID
-| keyword_as_id
 ;
 
 variable_name: DOLLAR (QUOTED_ID | UNQUOTED_ID);
-
-keyword_as_id:
-  FILTER
-| MAP
-| REDUCE;
 
 /////////////
 // LEXER
 /////////////
 
 AND_SYMBOL: '&&';
+ARROW:      '=>';
 ASSIGN:     ':=';
 CARET:      '^';
+COLON:      ':';
 COMMA:      ',';
 DIV:        '/';
 DOLLAR:     '$';
@@ -158,21 +171,21 @@ NOT_SYMBOL: '!';
 OR_SYMBOL:  '||';
 PIPE:       '|';
 PLUS:       '+';
+RANGE:      '..';
 RBRACE:     '}';
 RBRACK:     ']';
 RPAREN:     ')';
 SEMI:       ';';
+UNDERSCORE: '_';
 
 // KEYWORDS
 AND:      A N D;
-AS:       A S;
 ASC:      A S C;
 BY:       B Y;
 CASE:     C A S E;
 DESC:     D E S C;
 ELSE:     E L S E;
 FALSE:    F A L S E;
-FILTER:   F I L T E R;
 FROM:     F R O M;
 GROUP:    G R O U P;
 IF:       I F;
@@ -181,13 +194,11 @@ INDEX:    I N D E X;
 LET:      L E T;
 LIMIT:    L I M I T;
 LOOKUP:   L O O K U P;
-MAP:      M A P;
 MATCH:    M A T C H;
 NOT:      N O T;
 NULL:     N U L L;
 OR:       O R;
 PROJECT:  P R O J E C T;
-REDUCE:   R E D U C E;
 SKIP_:    S K I P;
 SORT:     S O R T;
 STARTING: S T A R T I N G;
