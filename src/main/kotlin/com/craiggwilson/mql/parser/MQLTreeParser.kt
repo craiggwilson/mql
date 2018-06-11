@@ -22,6 +22,7 @@ import com.craiggwilson.mql.ast.Int32Expression
 import com.craiggwilson.mql.ast.Int64Expression
 import com.craiggwilson.mql.ast.LessThanExpression
 import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
+import com.craiggwilson.mql.ast.LetExpression
 import com.craiggwilson.mql.ast.LimitStage
 import com.craiggwilson.mql.ast.ModExpression
 import com.craiggwilson.mql.ast.MultiplyExpression
@@ -42,6 +43,8 @@ import com.craiggwilson.mql.ast.Statement
 import com.craiggwilson.mql.ast.StringExpression
 import com.craiggwilson.mql.ast.SubtractExpression
 import com.craiggwilson.mql.ast.UnwindStage
+import com.craiggwilson.mql.ast.VariableName
+import com.craiggwilson.mql.ast.VariableReferenceExpression
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.atn.PredictionMode
@@ -210,6 +213,18 @@ class MQLTreeParser {
                 ConditionalExpression(condition, then, fallback)
             }
             is MQLParser.FieldExpressionContext -> FieldReferenceExpression(null, getFieldName(ctx.id()))
+            is MQLParser.LetExpressionContext -> {
+                val variables = ctx.variable_assignment().map { va ->
+                    val name = VariableName(va.variable_name().text.substring(1))
+                    val expression = parseExpression(va.expression())
+
+                    LetExpression.Variable(name, expression)
+                }
+
+                val expression = parseExpression(ctx.expression())
+
+                LetExpression(variables, expression)
+            }
             is MQLParser.MemberExpressionContext -> {
                 val parent = parseExpression(ctx.expression())
 
@@ -297,7 +312,10 @@ class MQLTreeParser {
                     throw ParseException("minus operator not supported: ${ctx.text}")
                 }
             }
-            else -> throw ParseException("expression not supported: $ctx")
+            is MQLParser.VariableReferenceExpressionContext -> {
+                VariableReferenceExpression(VariableName(ctx.variable_name().text.substring(1)))
+            }
+            else -> throw ParseException("expression not supported: ${ctx.text}")
         }
     }
 

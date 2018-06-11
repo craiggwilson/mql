@@ -201,6 +201,24 @@ data class LessThanOrEqualsExpression(override val left: Expression, override va
     }
 }
 
+data class LetExpression(val variables: List<Variable>, val expression: Expression) : Expression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(variables: List<Variable>, expression: Expression): LetExpression {
+        return if (variables !== this.variables || expression !== this.expression) {
+            LetExpression(variables, expression)
+        } else this
+    }
+
+    data class Variable(val name: VariableName, val expression: Expression) {
+        fun update(name: VariableName, expression: Expression): Variable {
+            return if (name !== this.name || expression !== this.expression) {
+                Variable(name, expression)
+            } else this
+        }
+    }
+}
+
 data class ModExpression(override val left: Expression, override val right: Expression) : BinaryExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
@@ -320,5 +338,16 @@ data class StringExpression(val value: String) : ConstantExpression() {
         return if (value != this.value) {
             StringExpression(value)
         } else this
+    }
+}
+
+data class VariableReferenceExpression(val name: VariableName) : Expression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(name: VariableName): VariableReferenceExpression {
+        if (name !== this.name) {
+            return VariableReferenceExpression(name)
+        }
+        return this
     }
 }

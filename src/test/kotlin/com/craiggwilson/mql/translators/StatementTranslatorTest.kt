@@ -107,7 +107,10 @@ class StatementTranslatorTest() {
 
                 // conditionals
                 test("if true then false else true", "{ \"\$cond\": [ true, false, true ] }"),
-                test("switch case true then false case false then true else null", "{ \"\$switch\": { \"branches\": [ { \"case\": true, \"then\": false }, { \"case\": false, \"then\": true } ], \"default\": null } }")
+                test("switch case true then false case false then true else null", "{ \"\$switch\": { \"branches\": [ { \"case\": true, \"then\": false }, { \"case\": false, \"then\": true } ], \"default\": null } }"),
+
+                // let
+                test("let \$x := true, \$y := false in \$x and \$y", "{ \"\$let\": { \"vars\": { \"x\": true, \"y\": false }, \"in\": { \"\$and\": [ \"\$\$x\", \"\$\$y\" ] } } }")
             )
         }
 

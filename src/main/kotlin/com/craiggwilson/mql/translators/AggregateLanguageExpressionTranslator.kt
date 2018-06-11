@@ -11,6 +11,7 @@ import com.craiggwilson.mql.ast.GreaterThanExpression
 import com.craiggwilson.mql.ast.GreaterThanOrEqualsExpression
 import com.craiggwilson.mql.ast.LessThanExpression
 import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
+import com.craiggwilson.mql.ast.LetExpression
 import com.craiggwilson.mql.ast.ModExpression
 import com.craiggwilson.mql.ast.MultiplyExpression
 import com.craiggwilson.mql.ast.NewArrayExpression
@@ -22,6 +23,7 @@ import com.craiggwilson.mql.ast.OrExpression
 import com.craiggwilson.mql.ast.PowerExpression
 import com.craiggwilson.mql.ast.RangeExpression
 import com.craiggwilson.mql.ast.SubtractExpression
+import com.craiggwilson.mql.ast.VariableReferenceExpression
 
 class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : AbstractExpressionTranslator(valueTranslator) {
     override fun visit(n: AddExpression): String {
@@ -137,6 +139,18 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
         return "{ \"\$lte\": [ $left, $right ] }"
     }
 
+    override fun visit(n: LetExpression): String {
+        val variables = n.variables.joinToString { variable ->
+            var name = quote(variable.name.name)
+            var expression = visit(variable.expression)
+
+            "$name: $expression"
+        }
+
+        val expression = visit(n.expression)
+        return "{ \"\$let\": { \"vars\": { $variables }, \"in\": $expression } }"
+    }
+
     override fun visit(n: ModExpression): String {
         val left = visit(n.left)
         val right = visit(n.right)
@@ -214,5 +228,9 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
         val right = visit(n.right)
 
         return "{ \"\$subtract\": [ $left, $right ] }"
+    }
+
+    override fun visit(n: VariableReferenceExpression): String {
+        return quote("\$\$${n.name.name}")
     }
 }

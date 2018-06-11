@@ -7,3 +7,4 @@ data class FieldName(val name: String) {
         return FieldName("${this.name}.${name.name}")
     }
 }
+data class VariableName(val name: String)

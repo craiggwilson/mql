@@ -27,6 +27,7 @@ abstract class Visitor<T> {
     open fun visit(n: Int64Expression): T = throw NotImplementedError()
     open fun visit(n: LessThanExpression): T = throw NotImplementedError()
     open fun visit(n: LessThanOrEqualsExpression): T = throw NotImplementedError()
+    open fun visit(n: LetExpression): T = throw NotImplementedError()
     open fun visit(n: MultiplyExpression): T = throw NotImplementedError()
     open fun visit(n: ModExpression): T = throw NotImplementedError()
     open fun visit(n: NewArrayExpression): T = throw NotImplementedError()
@@ -39,6 +40,7 @@ abstract class Visitor<T> {
     open fun visit(n: RangeExpression): T = throw NotImplementedError()
     open fun visit(n: SubtractExpression): T = throw NotImplementedError()
     open fun visit(n: StringExpression): T = throw NotImplementedError()
+    open fun visit(n: VariableReferenceExpression): T = throw NotImplementedError()
 
     // Nodes
 
@@ -131,6 +133,16 @@ abstract class NodeVisitor : Visitor<Node>() {
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
+
+    override fun visit(n: LetExpression): Node = n.update(
+        visit(n.variables) { variable ->
+            variable.update(
+                variable.name,
+                visit(variable.expression) as Expression
+            )
+        },
+        visit(n.expression) as Expression
+    )
     override fun visit(n: ModExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
@@ -176,6 +188,7 @@ abstract class NodeVisitor : Visitor<Node>() {
         visit(n.right) as Expression
     )
     override fun visit(n: StringExpression): Node = n
+    override fun visit(n: VariableReferenceExpression): Node = n
 
     // Nodes
 

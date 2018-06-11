@@ -16,6 +16,7 @@ import com.craiggwilson.mql.ast.Int32Expression
 import com.craiggwilson.mql.ast.Int64Expression
 import com.craiggwilson.mql.ast.LessThanExpression
 import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
+import com.craiggwilson.mql.ast.LetExpression
 import com.craiggwilson.mql.ast.ModExpression
 import com.craiggwilson.mql.ast.MultiplyExpression
 import com.craiggwilson.mql.ast.NewArrayExpression
@@ -28,6 +29,7 @@ import com.craiggwilson.mql.ast.PowerExpression
 import com.craiggwilson.mql.ast.RangeExpression
 import com.craiggwilson.mql.ast.StringExpression
 import com.craiggwilson.mql.ast.SubtractExpression
+import com.craiggwilson.mql.ast.VariableReferenceExpression
 
 interface ExpressionTranslator {
 
@@ -42,6 +44,7 @@ interface ExpressionTranslator {
     fun visit(n: GreaterThanOrEqualsExpression): String
     fun visit(n: LessThanExpression): String
     fun visit(n: LessThanOrEqualsExpression): String
+    fun visit(n: LetExpression): String
     fun visit(n: ModExpression): String
     fun visit(n: MultiplyExpression): String
     fun visit(n: NewArrayExpression): String
@@ -52,6 +55,7 @@ interface ExpressionTranslator {
     fun visit(n: PowerExpression): String
     fun visit(n: RangeExpression): String
     fun visit(n: SubtractExpression): String
+    fun visit(n: VariableReferenceExpression): String
 
     // Values
     fun visit(n: BooleanExpression): String

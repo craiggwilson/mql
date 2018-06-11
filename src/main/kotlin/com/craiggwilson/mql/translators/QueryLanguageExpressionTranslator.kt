@@ -11,6 +11,7 @@ import com.craiggwilson.mql.ast.GreaterThanExpression
 import com.craiggwilson.mql.ast.GreaterThanOrEqualsExpression
 import com.craiggwilson.mql.ast.LessThanExpression
 import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
+import com.craiggwilson.mql.ast.LetExpression
 import com.craiggwilson.mql.ast.ModExpression
 import com.craiggwilson.mql.ast.MultiplyExpression
 import com.craiggwilson.mql.ast.NewArrayExpression
@@ -21,6 +22,7 @@ import com.craiggwilson.mql.ast.OrExpression
 import com.craiggwilson.mql.ast.PowerExpression
 import com.craiggwilson.mql.ast.RangeExpression
 import com.craiggwilson.mql.ast.SubtractExpression
+import com.craiggwilson.mql.ast.VariableReferenceExpression
 
 class QueryLanguageExpressionTranslator(valueTranslator: ValueTranslator) : AbstractExpressionTranslator(valueTranslator) {
     override fun visit(n: FieldReferenceExpression): String {
@@ -69,6 +71,10 @@ class QueryLanguageExpressionTranslator(valueTranslator: ValueTranslator) : Abst
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    override fun visit(n: LetExpression): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun visit(n: ModExpression): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -106,6 +112,10 @@ class QueryLanguageExpressionTranslator(valueTranslator: ValueTranslator) : Abst
     }
 
     override fun visit(n: SubtractExpression): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun visit(n: VariableReferenceExpression): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

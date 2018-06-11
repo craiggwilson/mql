@@ -127,7 +127,7 @@ switch_case:
 ;
 
 variable_assignment:
-  (variable_name ASSIGN)? expression
+  variable_name ASSIGN expression
 ;
 
 // NAMING

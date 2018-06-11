@@ -16,6 +16,7 @@ import com.craiggwilson.mql.ast.Int32Expression
 import com.craiggwilson.mql.ast.Int64Expression
 import com.craiggwilson.mql.ast.LessThanExpression
 import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
+import com.craiggwilson.mql.ast.LetExpression
 import com.craiggwilson.mql.ast.ModExpression
 import com.craiggwilson.mql.ast.MultiplyExpression
 import com.craiggwilson.mql.ast.NewArrayExpression
@@ -28,6 +29,7 @@ import com.craiggwilson.mql.ast.PowerExpression
 import com.craiggwilson.mql.ast.RangeExpression
 import com.craiggwilson.mql.ast.StringExpression
 import com.craiggwilson.mql.ast.SubtractExpression
+import com.craiggwilson.mql.ast.VariableReferenceExpression
 
 abstract class AbstractExpressionTranslator(private val valueTranslator: ValueTranslator): AbstractTranslator(), ExpressionTranslator {
     // Expressions
@@ -43,6 +45,7 @@ abstract class AbstractExpressionTranslator(private val valueTranslator: ValueTr
     abstract override fun visit(n: GreaterThanOrEqualsExpression): String
     abstract override fun visit(n: LessThanExpression): String
     abstract override fun visit(n: LessThanOrEqualsExpression): String
+    abstract override fun visit(n: LetExpression): String
     abstract override fun visit(n: ModExpression): String
     abstract override fun visit(n: MultiplyExpression): String
     abstract override fun visit(n: NewArrayExpression): String
@@ -53,6 +56,7 @@ abstract class AbstractExpressionTranslator(private val valueTranslator: ValueTr
     abstract override fun visit(n: PowerExpression): String
     abstract override fun visit(n: RangeExpression): String
     abstract override fun visit(n: SubtractExpression): String
+    abstract override fun visit(n: VariableReferenceExpression): String
 
     // Values
 
