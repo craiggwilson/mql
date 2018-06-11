@@ -15,6 +15,7 @@ import com.craiggwilson.mql.ast.MultiplyExpression
 import com.craiggwilson.mql.ast.NotEqualsExpression
 import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.OrExpression
+import com.craiggwilson.mql.ast.PowerExpression
 import com.craiggwilson.mql.ast.RangeExpression
 import com.craiggwilson.mql.ast.SubtractExpression
 
@@ -78,6 +79,10 @@ class QueryLanguageExpressionTranslator(valueTranslator: ValueTranslator) : Abst
     }
 
     override fun visit(n: OrExpression): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun visit(n: PowerExpression): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

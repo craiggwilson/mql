@@ -235,6 +235,16 @@ data class OrExpression(override val left: Expression, override val right: Expre
     }
 }
 
+data class PowerExpression(override val left: Expression, override val right: Expression) : BinaryExpression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(left: Expression, right: Expression): PowerExpression {
+        return if (left !== this.left || right !== this.right) {
+            PowerExpression(left, right)
+        } else this
+    }
+}
+
 data class RangeExpression(val start: Expression, val end: Expression, val step: Expression? = null) : Expression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 

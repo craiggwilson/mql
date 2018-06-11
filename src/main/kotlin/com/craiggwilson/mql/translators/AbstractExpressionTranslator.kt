@@ -21,6 +21,7 @@ import com.craiggwilson.mql.ast.NotEqualsExpression
 import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.NullExpression
 import com.craiggwilson.mql.ast.OrExpression
+import com.craiggwilson.mql.ast.PowerExpression
 import com.craiggwilson.mql.ast.RangeExpression
 import com.craiggwilson.mql.ast.StringExpression
 import com.craiggwilson.mql.ast.SubtractExpression
@@ -41,6 +42,7 @@ abstract class AbstractExpressionTranslator(private val valueTranslator: ValueTr
     abstract override fun visit(n: NotEqualsExpression): String
     abstract override fun visit(n: NotExpression): String
     abstract override fun visit(n: OrExpression): String
+    abstract override fun visit(n: PowerExpression): String
     abstract override fun visit(n: RangeExpression): String
     abstract override fun visit(n: SubtractExpression): String
 

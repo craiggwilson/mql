@@ -16,6 +16,7 @@ import com.craiggwilson.mql.ast.NotEqualsExpression
 import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.NullExpression
 import com.craiggwilson.mql.ast.OrExpression
+import com.craiggwilson.mql.ast.PowerExpression
 import com.craiggwilson.mql.ast.RangeExpression
 import com.craiggwilson.mql.ast.SubtractExpression
 
@@ -132,6 +133,13 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
         val right = visit(n.right)
 
         return "{ \"\$or\": [ $left, $right ] }"
+    }
+
+    override fun visit(n: PowerExpression): String {
+        val left = visit(n.left)
+        val right = visit(n.right)
+
+        return "{ \"\$pow\": [ $left, $right ] }"
     }
 
     override fun visit(n: RangeExpression): String {

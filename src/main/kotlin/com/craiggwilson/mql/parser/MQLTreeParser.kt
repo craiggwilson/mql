@@ -29,6 +29,7 @@ import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.NullExpression
 import com.craiggwilson.mql.ast.NumberExpression
 import com.craiggwilson.mql.ast.OrExpression
+import com.craiggwilson.mql.ast.PowerExpression
 import com.craiggwilson.mql.ast.ProjectStage
 import com.craiggwilson.mql.ast.RangeExpression
 import com.craiggwilson.mql.ast.SkipStage
@@ -231,6 +232,12 @@ class MQLTreeParser {
                 val right = parseExpression(ctx.expression(1))
 
                 OrExpression(left, right)
+            }
+            is MQLParser.PowerExpressionContext -> {
+                val left = parseExpression(ctx.expression(0))
+                val right = parseExpression(ctx.expression(1))
+
+                PowerExpression(left, right)
             }
             is MQLParser.RangeExpressionContext -> {
                 val start = parseExpression(ctx.expression(0))

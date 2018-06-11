@@ -21,6 +21,7 @@ import com.craiggwilson.mql.ast.NotEqualsExpression
 import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.NullExpression
 import com.craiggwilson.mql.ast.OrExpression
+import com.craiggwilson.mql.ast.PowerExpression
 import com.craiggwilson.mql.ast.RangeExpression
 import com.craiggwilson.mql.ast.StringExpression
 import com.craiggwilson.mql.ast.SubtractExpression
@@ -42,6 +43,7 @@ interface ExpressionTranslator {
     fun visit(n: NotEqualsExpression): String
     fun visit(n: NotExpression): String
     fun visit(n: OrExpression): String
+    fun visit(n: PowerExpression): String
     fun visit(n: RangeExpression): String
     fun visit(n: SubtractExpression): String
 

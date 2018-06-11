@@ -74,6 +74,7 @@ class StatementTranslatorTest() {
                 test("1.0 != 2.0", "{ \"\$ne\": [ 1.0, 2.0 ] }"),
                 test("1.0 or 2.0", "{ \"\$or\": [ 1.0, 2.0 ] }"),
                 test("1.0 || 2.0", "{ \"\$or\": [ 1.0, 2.0 ] }"),
+                test("1.0^2.0", "{ \"\$pow\": [ 1.0, 2.0 ] }"),
                 test("1.0 - 2.0", "{ \"\$subtract\": [ 1.0, 2.0 ] }"),
 
                 // unary expression
