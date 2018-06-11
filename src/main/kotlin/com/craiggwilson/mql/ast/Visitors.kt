@@ -12,6 +12,13 @@ abstract class Visitor<T> {
     // Expressions
 
     open fun visit(n: FieldReferenceExpression): T = throw NotImplementedError()
+    open fun visit(n: BooleanExpression): T = throw NotImplementedError()
+    open fun visit(n: DecimalExpression): T = throw NotImplementedError()
+    open fun visit(n: DoubleExpression): T = throw NotImplementedError()
+    open fun visit(n: Int32Expression): T = throw NotImplementedError()
+    open fun visit(n: Int64Expression): T = throw NotImplementedError()
+    open fun visit(n: NullExpression): T = throw NotImplementedError()
+    open fun visit(n: StringExpression): T = throw NotImplementedError()
 
     // Nodes
 
@@ -54,6 +61,14 @@ abstract class NodeVisitor : Visitor<Node>() {
     override fun visit(n: FieldReferenceExpression): Node = n.update(
         visit(n.parent) as Expression?,
         n.name)
+
+    override fun visit(n: BooleanExpression): Node = n
+    override fun visit(n: DecimalExpression): Node = n
+    override fun visit(n: DoubleExpression): Node = n
+    override fun visit(n: Int32Expression): Node = n
+    override fun visit(n: Int64Expression): Node = n
+    override fun visit(n: NullExpression): Node = n
+    override fun visit(n: StringExpression): Node = n
 
     // Nodes
 

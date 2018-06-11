@@ -8,8 +8,19 @@ import kotlin.test.assertEquals
 class ShellTranslatorTest() {
 
     @ParameterizedTest(name = "{0}")
-    @MethodSource("data")
-    fun visit(mql: String, expected: String) {
+    @MethodSource("expressions")
+    fun testExpressions(mql: String, expected: String) {
+        val actualExpected = "db.bar.aggregate([{ \$project: { \"test\": $expected } }])"
+
+        val parsed = parseMQL("FROM bar PROJECT test := $mql")[0]
+        val actual = parsed.toShell()
+
+        assertEquals(actualExpected, actual)
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("stages")
+    fun testStages(mql: String, expected: String) {
         val parsed = parseMQL(mql)[0]
         val actual = parsed.toShell()
 
@@ -23,7 +34,53 @@ class ShellTranslatorTest() {
         }
 
         @JvmStatic
-        fun data(): Collection<Array<String>> {
+        private fun expressions(): Collection<Array<String>> {
+            return listOf (
+                test(
+                    "a",
+                    "\"\$a\""
+                ),
+                test(
+                    "1",
+                    "NumberInt(\"1\")"
+                ),
+                test(
+                    "1L",
+                    "NumberLong(\"1\")"
+                ),
+                test(
+                    "1M",
+                    "NumberDecimal(\"1\")"
+                ),
+                test(
+                    "1.234E12",
+                    "NumberDecimal(\"1.234E+12\")"
+                ),
+                test(
+                    "1.234",
+                    "1.234"
+                ),
+                test(
+                    "1.234M",
+                    "NumberDecimal(\"1.234\")"
+                ),
+                test(
+                    "1000000000000000000",
+                    "NumberLong(\"1000000000000000000\")"
+                ),
+                test(
+                    "null",
+                    "null"
+                ),
+                test(
+                    "'one'",
+                    "\"one\""
+                )
+            )
+        }
+
+        @JvmStatic
+        private fun stages(): Collection<Array<String>> {
             return listOf(
                 // LIMIT
                 test(

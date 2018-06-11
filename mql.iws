@@ -2,15 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8a06b168-40ec-462c-af76-4cde3d8c447f" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/gen/com/craiggwilson/mql/parser/MQL.tokens" beforeDir="false" afterPath="$PROJECT_DIR$/gen/com/craiggwilson/mql/parser/MQL.tokens" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/com/craiggwilson/mql/parser/MQLLexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/com/craiggwilson/mql/parser/MQLLexer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen/com/craiggwilson/mql/parser/MQLLexer.tokens" beforeDir="false" afterPath="$PROJECT_DIR$/gen/com/craiggwilson/mql/parser/MQLLexer.tokens" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gen/com/craiggwilson/mql/parser/MQLParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/gen/com/craiggwilson/mql/parser/MQLParser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mql.iws" beforeDir="false" afterPath="$PROJECT_DIR$/mql.iws" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/craiggwilson/mql/parser/MQL.g4" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/craiggwilson/mql/parser/MQL.g4" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ShellTranslator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ShellTranslator.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/FieldDeclaration.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/FieldDeclaration.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Names.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Names.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/NodeVisitor.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Stages.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Stages.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Visitor.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Visitors.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Expressions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Expressions.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Visitors.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Visitors.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/parser/MQLTreeParser.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/parser/MQLTreeParser.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/kotlin/com/craiggwilson/mql/ShellTranslatorTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/com/craiggwilson/mql/ShellTranslatorTest.kt" afterDir="false" />
     </list>
@@ -65,8 +65,8 @@
       <file leaf-file-name="ShellTranslatorTest.kt" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test/kotlin/com/craiggwilson/mql/ShellTranslatorTest.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="42" column="18" lean-forward="true" selection-start-line="42" selection-start-column="18" selection-end-line="42" selection-end-column="18" />
+            <state relative-caret-position="264">
+              <caret line="54" column="21" lean-forward="true" selection-start-line="54" selection-start-column="21" selection-end-line="54" selection-end-column="21" />
               <folding>
                 <element signature="e#30#209#0" expanded="true" />
               </folding>
@@ -86,8 +86,8 @@
       <file leaf-file-name="Expressions.kt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Expressions.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="11" selection-start-line="5" selection-start-column="11" selection-end-line="5" selection-end-column="11" />
+            <state relative-caret-position="345">
+              <caret line="23" column="34" lean-forward="true" selection-start-line="23" selection-start-column="34" selection-end-line="23" selection-end-column="34" />
             </state>
           </provider>
         </entry>
@@ -95,8 +95,8 @@
       <file leaf-file-name="Visitors.kt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Visitors.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="343">
-              <caret line="74" column="54" lean-forward="true" selection-start-line="74" selection-start-column="54" selection-end-line="74" selection-end-column="54" />
+            <state relative-caret-position="240">
+              <caret line="16" column="38" selection-start-line="16" selection-start-column="38" selection-end-line="16" selection-end-column="38" />
             </state>
           </provider>
         </entry>
@@ -104,10 +104,10 @@
       <file leaf-file-name="ShellTranslator.kt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ShellTranslator.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="60" column="5" lean-forward="true" selection-start-line="60" selection-start-column="5" selection-end-line="60" selection-end-column="5" />
+            <state relative-caret-position="150">
+              <caret line="32" column="46" lean-forward="true" selection-start-line="32" selection-start-column="46" selection-end-line="32" selection-end-column="46" />
               <folding>
-                <element signature="e#30#430#0" expanded="true" />
+                <element signature="e#30#670#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -116,38 +116,11 @@
       <file leaf-file-name="MQLTreeParser.kt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/parser/MQLTreeParser.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="339">
-              <caret line="93" column="5" lean-forward="true" selection-start-line="93" selection-start-column="5" selection-end-line="93" selection-end-column="5" />
+            <state relative-caret-position="613">
+              <caret line="186" column="5" lean-forward="true" selection-start-line="186" selection-start-column="5" selection-end-line="186" selection-end-column="5" />
               <folding>
-                <element signature="e#37#790#0" expanded="true" />
+                <element signature="e#37#1032#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FieldDeclaration.kt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/FieldDeclaration.kt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="50" lean-forward="true" selection-start-line="5" selection-start-column="50" selection-end-line="5" selection-end-column="50" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Names.kt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Names.kt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="8" column="1" lean-forward="true" selection-start-line="8" selection-start-column="1" selection-end-line="8" selection-end-column="1" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MQLParser.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/gen/com/craiggwilson/mql/parser/MQLParser.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="13463">
-              <caret line="1742" column="19" lean-forward="true" selection-start-line="1742" selection-start-column="19" selection-end-line="1742" selection-end-column="19" />
             </state>
           </provider>
         </entry>
@@ -155,8 +128,8 @@
       <file leaf-file-name="MQL.g4" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/craiggwilson/mql/parser/MQL.g4">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="452">
-              <caret line="97" column="1" lean-forward="true" selection-start-line="97" selection-start-column="1" selection-end-line="97" selection-end-column="1" />
+            <state relative-caret-position="-1641">
+              <caret line="92" column="72" lean-forward="true" selection-start-line="92" selection-start-column="72" selection-end-line="92" selection-end-column="72" />
             </state>
           </provider>
         </entry>
@@ -185,6 +158,8 @@
       <find>IN</find>
       <find>fieldRef</find>
       <find>FieldDeclaration(null</find>
+      <find>INT</find>
+      <find>EXPONEN</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -708,7 +683,6 @@
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Nodes.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Node.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Stage.kt" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Expressions.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/AggregationFrameworkTranslatingVisitor.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Node.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/names.kt" />
@@ -728,14 +702,15 @@
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Visitor.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/FieldAssignment.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Stages.kt" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Visitors.kt" />
-        <option value="$PROJECT_DIR$/src/main/java/com/craiggwilson/mql/parser/MQL.g4" />
-        <option value="$PROJECT_DIR$/src/main/java/com/craiggwilson/mql/parser/MQL.g4" />
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/FieldDeclaration.kt" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/parser/MQLTreeParser.kt" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/parser/MQLTreeParser.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Names.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Visitors.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Expressions.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ShellTranslator.kt" />
+        <option value="$PROJECT_DIR$/src/main/java/com/craiggwilson/mql/parser/MQL.g4" />
+        <option value="$PROJECT_DIR$/src/main/java/com/craiggwilson/mql/parser/MQL.g4" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/parser/MQLTreeParser.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/parser/MQLTreeParser.kt" />
         <option value="$PROJECT_DIR$/src/test/kotlin/com/craiggwilson/mql/ShellTranslatorTest.kt" />
       </list>
     </option>
@@ -937,6 +912,29 @@
       </option>
       <patterns />
     </configuration>
+    <configuration name="ShellTranslatorTest.testStages" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="mql" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.craiggwilson.mql.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="com.craiggwilson.mql" />
+      <option name="MAIN_CLASS_NAME" value="com.craiggwilson.mql.ShellTranslatorTest" />
+      <option name="METHOD_NAME" value="testStages(java.lang.String,java.lang.String)" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <patterns />
+    </configuration>
     <configuration name="ShellTranslatorTest.visit (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="mql" />
       <extension name="coverage">
@@ -1063,10 +1061,12 @@
       <item itemvalue="JUnit.ShellTranslatorTest.visit" />
       <item itemvalue="JUnit.ShellTranslatorTest.visit (1)" />
       <item itemvalue="JUnit.ShellTranslatorTest" />
+      <item itemvalue="JUnit.ShellTranslatorTest.testStages" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.ShellTranslatorTest" />
+        <item itemvalue="JUnit.ShellTranslatorTest.testStages" />
         <item itemvalue="JUnit.ShellTranslatorTest.visit (1)" />
         <item itemvalue="JUnit.ShellTranslatorTest.visit" />
         <item itemvalue="JUnit.ShellTranslatorTest.visit" />
@@ -1090,34 +1090,34 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="ShellTranslatorTest - 2018.06.10 at 20h 05m 40s.xml">
+    <history-entry file="ShellTranslatorTest - 2018.06.10 at 21h 00m 55s.xml">
       <configuration name="ShellTranslatorTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="ShellTranslatorTest - 2018.06.10 at 20h 06m 42s.xml">
+    <history-entry file="ShellTranslatorTest - 2018.06.10 at 21h 53m 41s.xml">
       <configuration name="ShellTranslatorTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="ShellTranslatorTest - 2018.06.10 at 20h 06m 58s.xml">
+    <history-entry file="ShellTranslatorTest - 2018.06.10 at 21h 54m 02s.xml">
       <configuration name="ShellTranslatorTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="ShellTranslatorTest - 2018.06.10 at 20h 08m 04s.xml">
+    <history-entry file="ShellTranslatorTest - 2018.06.10 at 21h 59m 31s.xml">
       <configuration name="ShellTranslatorTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="ShellTranslatorTest - 2018.06.10 at 20h 19m 44s.xml">
+    <history-entry file="ShellTranslatorTest - 2018.06.10 at 22h 00m 59s.xml">
       <configuration name="ShellTranslatorTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="ShellTranslatorTest - 2018.06.10 at 20h 20m 12s.xml">
+    <history-entry file="ShellTranslatorTest - 2018.06.10 at 22h 01m 22s.xml">
       <configuration name="ShellTranslatorTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="ShellTranslatorTest - 2018.06.10 at 20h 21m 42s.xml">
+    <history-entry file="ShellTranslatorTest - 2018.06.10 at 22h 02m 32s.xml">
       <configuration name="ShellTranslatorTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="ShellTranslatorTest - 2018.06.10 at 20h 22m 23s.xml">
+    <history-entry file="ShellTranslatorTest - 2018.06.10 at 22h 03m 57s.xml">
       <configuration name="ShellTranslatorTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="ShellTranslatorTest - 2018.06.10 at 20h 25m 24s.xml">
+    <history-entry file="ShellTranslatorTest - 2018.06.10 at 22h 07m 44s.xml">
       <configuration name="ShellTranslatorTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="ShellTranslatorTest - 2018.06.10 at 20h 26m 25s.xml">
+    <history-entry file="ShellTranslatorTest - 2018.06.10 at 22h 08m 05s.xml">
       <configuration name="ShellTranslatorTest" configurationId="JUnit" />
     </history-entry>
   </component>
@@ -1128,7 +1128,7 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Tool Output" order="7" weight="0.32897604" />
       <window_info id="DB Browser" order="2" />
-      <window_info anchor="bottom" id="Messages" order="8" weight="0.32900432" />
+      <window_info anchor="bottom" id="Messages" order="8" weight="0.32897604" />
       <window_info anchor="right" id="Palette&#9;" order="3" />
       <window_info id="Image Layers" order="2" />
       <window_info anchor="bottom" id="DB Execution Console" order="7" />
@@ -1140,11 +1140,11 @@
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Designer" order="2" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18017058" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.18017058" />
       <window_info anchor="bottom" id="Build" order="8" weight="0.4324619" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="ANTLR Preview" order="7" weight="0.30392158" />
-      <window_info anchor="right" id="Gradle" order="3" visible="true" weight="0.22921109" />
+      <window_info anchor="right" id="Gradle" order="3" weight="0.22921109" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Theme Preview" order="3" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39978212" />
@@ -1156,6 +1156,38 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
+    <layout-to-restore>
+      <window_info anchor="bottom" id="DB Execution Console" order="7" />
+      <window_info id="Designer" order="2" />
+      <window_info id="Image Layers" order="3" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32897604" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info id="DB Browser" order="4" />
+      <window_info id="Favorites" order="5" side_tool="true" />
+      <window_info anchor="bottom" id="Terminal" order="8" />
+      <window_info id="Capture Tool" order="6" />
+      <window_info anchor="right" id="Capture Analysis" order="3" />
+      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="bottom" id="Tool Output" order="9" visible="true" weight="0.32897604" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" weight="0.32897604" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Build" order="13" weight="0.4324619" />
+      <window_info anchor="bottom" id="Version Control" order="11" />
+      <window_info anchor="right" id="Maven Projects" order="4" />
+      <window_info anchor="bottom" id="ANTLR Preview" order="12" weight="0.30392158" />
+      <window_info anchor="right" id="Gradle" order="5" visible="true" weight="0.22921109" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18017058" />
+      <window_info anchor="bottom" id="Messages" order="14" weight="0.32897604" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="right" id="Palette&#9;" order="6" />
+      <window_info anchor="right" id="Theme Preview" order="7" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39978212" />
+    </layout-to-restore>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
@@ -1166,13 +1198,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.1.51/b44aed5fe16fe27bb75488a2274d435e875fdb44/kotlin-stdlib-1.1.51-sources.jar!/generated/_Collections.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="28781">
-          <caret line="1693" column="40" selection-start-line="1693" selection-start-column="40" selection-end-line="1693" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Node.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
@@ -1403,13 +1428,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Visitors.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="343">
-          <caret line="74" column="54" lean-forward="true" selection-start-line="74" selection-start-column="54" selection-end-line="74" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Stages.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="480">
@@ -1424,34 +1442,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/craiggwilson/mql/parser/MQL.g4">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="452">
-          <caret line="97" column="1" lean-forward="true" selection-start-line="97" selection-start-column="1" selection-end-line="97" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/FieldDeclaration.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
           <caret line="5" column="50" lean-forward="true" selection-start-line="5" selection-start-column="50" selection-end-line="5" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/parser/MQLTreeParser.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="339">
-          <caret line="93" column="5" lean-forward="true" selection-start-line="93" selection-start-column="5" selection-end-line="93" selection-end-column="5" />
-          <folding>
-            <element signature="e#37#790#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Expressions.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="11" selection-start-line="5" selection-start-column="11" selection-end-line="5" selection-end-column="11" />
         </state>
       </provider>
     </entry>
@@ -1462,20 +1456,58 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Visitors.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="38" selection-start-line="16" selection-start-column="38" selection-end-line="16" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.2.41/dc11619be6c45157a142d3753017544896da8e69/kotlin-stdlib-1.2.41-sources.jar!/kotlin/text/StringNumberConversions.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="297">
+          <caret line="140" column="25" selection-start-line="140" selection-start-column="25" selection-end-line="140" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Expressions.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="23" column="34" lean-forward="true" selection-start-line="23" selection-start-column="34" selection-end-line="23" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ShellTranslator.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="60" column="5" lean-forward="true" selection-start-line="60" selection-start-column="5" selection-end-line="60" selection-end-column="5" />
+        <state relative-caret-position="150">
+          <caret line="32" column="46" lean-forward="true" selection-start-line="32" selection-start-column="46" selection-end-line="32" selection-end-column="46" />
           <folding>
-            <element signature="e#30#430#0" expanded="true" />
+            <element signature="e#30#670#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/craiggwilson/mql/parser/MQL.g4">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1641">
+          <caret line="92" column="72" lean-forward="true" selection-start-line="92" selection-start-column="72" selection-end-line="92" selection-end-column="72" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/parser/MQLTreeParser.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="613">
+          <caret line="186" column="5" lean-forward="true" selection-start-line="186" selection-start-column="5" selection-end-line="186" selection-end-column="5" />
+          <folding>
+            <element signature="e#37#1032#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/kotlin/com/craiggwilson/mql/ShellTranslatorTest.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="42" column="18" lean-forward="true" selection-start-line="42" selection-start-column="18" selection-end-line="42" selection-end-column="18" />
+        <state relative-caret-position="264">
+          <caret line="54" column="21" lean-forward="true" selection-start-line="54" selection-start-column="21" selection-end-line="54" selection-end-column="21" />
           <folding>
             <element signature="e#30#209#0" expanded="true" />
           </folding>

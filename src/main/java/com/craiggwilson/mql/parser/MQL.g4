@@ -90,8 +90,7 @@ expression:
 | function                                                              #functionCallExpression
 | variable_name                                                         #variableReferenceExpression
 | id                                                                    #fieldExpression
-| INT                                                                   #numberExpression
-| DECIMAL                                                               #decimalExpression
+| (INT | LONG | DECIMAL | BIN | HEX)                                    #numberExpression
 | STRING                                                                #stringExpression
 | (TRUE | FALSE)                                                        #boolExpression
 | NULL                                                                  #nullExpression
@@ -214,16 +213,18 @@ PRESERVE_NULL_AND_EMPTY: P R E S E R V E '_' N U L L '_' A N D '_' E M P T Y;
 
 
 // TYPES
-INT: DEC_DIGIT+;
+INT: DEC_DIGIT DEC_DIGIT_OR_SEPARATOR*;
 DECIMAL:
-  (DEC_DIGIT+)? '.' DEC_DIGIT+
-| (DEC_DIGIT+)? '.' (DEC_DIGIT+ EXPONENT_NUM_PART)
-| DEC_DIGIT+ '.' EXPONENT_NUM_PART
-| DEC_DIGIT+ EXPONENT_NUM_PART
+  INT M
+| INT? '.' INT M?
+| INT? '.' INT EXPONENT_NUM_PART M?
+| INT '.' EXPONENT_NUM_PART M?
+| INT EXPONENT_NUM_PART M?
 ;
+LONG: INT L;
 
-BIN: '0' B BIN_DIGIT+;
-HEX: '0' X HEX_DIGIT+;
+BIN: '0' B BIN_DIGIT BIN_DIGIT_OR_SEPARATOR* L?;
+HEX: '0' X HEX_DIGIT HEX_DIGIT_OR_SEPARATOR* L?;
 
 STRING: '\'' ('\\'. | '\'\'' | ~('\'' | '\\'))* '\'';
 QUOTED_ID: '`' ('\\'. | '\'\'' | ~('`' | '\\'))* '`';
@@ -231,10 +232,12 @@ UNQUOTED_ID: [_a-zA-Z]+;
 WS: ( ' ' | '\t' | '\r' | '\n' )+ -> skip;
 
 fragment BIN_DIGIT:             [01];
+fragment BIN_DIGIT_OR_SEPARATOR: BIN_DIGIT | UNDERSCORE;
 fragment DEC_DIGIT:             [0-9];
-fragment EXPONENT_NUM_PART:     E '-'? DEC_DIGIT+;
+fragment EXPONENT_NUM_PART:     E '-'? DEC_DIGIT DEC_DIGIT_OR_SEPARATOR*;
 fragment HEX_DIGIT:             [0-9a-fA-F];
-
+fragment HEX_DIGIT_OR_SEPARATOR: HEX_DIGIT | UNDERSCORE;
+fragment DEC_DIGIT_OR_SEPARATOR: DEC_DIGIT | UNDERSCORE;
 
 // CASE-INSENSITIVE LETTERS
 fragment A:('a'|'A');

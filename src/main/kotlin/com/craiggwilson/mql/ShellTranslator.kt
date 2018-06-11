@@ -1,13 +1,20 @@
 package com.craiggwilson.mql
 
+import com.craiggwilson.mql.ast.BooleanExpression
+import com.craiggwilson.mql.ast.DecimalExpression
 import com.craiggwilson.mql.ast.Direction
+import com.craiggwilson.mql.ast.DoubleExpression
 import com.craiggwilson.mql.ast.FieldDeclaration
 import com.craiggwilson.mql.ast.FieldReferenceExpression
+import com.craiggwilson.mql.ast.Int32Expression
+import com.craiggwilson.mql.ast.Int64Expression
 import com.craiggwilson.mql.ast.LimitStage
+import com.craiggwilson.mql.ast.NullExpression
 import com.craiggwilson.mql.ast.ProjectStage
 import com.craiggwilson.mql.ast.SkipStage
 import com.craiggwilson.mql.ast.SortStage
 import com.craiggwilson.mql.ast.Statement
+import com.craiggwilson.mql.ast.StringExpression
 import com.craiggwilson.mql.ast.UnwindStage
 import com.craiggwilson.mql.ast.Visitor
 
@@ -18,7 +25,18 @@ fun Statement.toShell(): String {
 class ShellTranslator : Visitor<String>() {
     private var dollarReference = false
 
-    // Expressions
+    override fun visit(n: BooleanExpression): String {
+        return n.toString()
+    }
+
+    override fun visit(n: DecimalExpression): String {
+        return "NumberDecimal(\"${n.value}\")"
+    }
+
+    override fun visit(n: DoubleExpression): String {
+        return n.value.toString()
+    }
+
     override fun visit(n: FieldReferenceExpression): String {
         val flattened = flatten(n)
         return quote(if (dollarReference) {
@@ -26,6 +44,22 @@ class ShellTranslator : Visitor<String>() {
         } else {
             flattened.name.name
         })
+    }
+
+    override fun visit(n: Int32Expression): String {
+        return "NumberInt(\"${n.value}\")"
+    }
+
+    override fun visit(n: Int64Expression): String {
+        return "NumberLong(\"${n.value}\")"
+    }
+
+    override fun visit(n: NullExpression): String {
+        return "null"
+    }
+
+    override fun visit(n: StringExpression): String {
+        return quote(n.value)
     }
 
     // Nodes

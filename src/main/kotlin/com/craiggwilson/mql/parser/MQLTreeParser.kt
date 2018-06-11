@@ -1,18 +1,26 @@
 package com.craiggwilson.mql.parser
 
+import com.craiggwilson.mql.ast.BooleanExpression
 import com.craiggwilson.mql.ast.CollectionName
 import com.craiggwilson.mql.ast.DatabaseName
+import com.craiggwilson.mql.ast.DecimalExpression
 import com.craiggwilson.mql.ast.Direction
+import com.craiggwilson.mql.ast.DoubleExpression
 import com.craiggwilson.mql.ast.Expression
 import com.craiggwilson.mql.ast.FieldDeclaration
 import com.craiggwilson.mql.ast.FieldName
 import com.craiggwilson.mql.ast.FieldReferenceExpression
+import com.craiggwilson.mql.ast.Int32Expression
+import com.craiggwilson.mql.ast.Int64Expression
 import com.craiggwilson.mql.ast.LimitStage
+import com.craiggwilson.mql.ast.NullExpression
+import com.craiggwilson.mql.ast.NumberExpression
 import com.craiggwilson.mql.ast.ProjectStage
 import com.craiggwilson.mql.ast.SkipStage
 import com.craiggwilson.mql.ast.SortStage
 import com.craiggwilson.mql.ast.Stage
 import com.craiggwilson.mql.ast.Statement
+import com.craiggwilson.mql.ast.StringExpression
 import com.craiggwilson.mql.ast.UnwindStage
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -132,6 +140,7 @@ class MQLTreeParser {
 
     private fun parseExpression(ctx: MQLParser.ExpressionContext): Expression {
         return when (ctx) {
+            is MQLParser.BoolExpressionContext -> BooleanExpression(ctx.TRUE() != null)
             is MQLParser.FieldExpressionContext -> FieldReferenceExpression(null, getFieldName(ctx.id()))
             is MQLParser.MemberExpressionContext -> {
                 val parent = parseExpression(ctx.expression())
@@ -143,7 +152,53 @@ class MQLTreeParser {
                     throw ParseException("function not yet supported")
                 }
             }
+            is MQLParser.NullExpressionContext -> NullExpression
+            is MQLParser.NumberExpressionContext -> {
+                when {
+                    ctx.BIN() != null -> {
+                        parseIntegralExpression(ctx.text.substring(2), 2)
+                    }
+                    ctx.HEX() != null -> {
+                        parseIntegralExpression(ctx.text.substring(2), 16)
+                    }
+                    ctx.INT() != null -> {
+                        parseIntegralExpression(ctx.text, 10)
+                    }
+                    ctx.LONG() != null -> {
+                        parseIntegralExpression(ctx.text, 10, true)
+                    }
+                    ctx.DECIMAL() != null -> {
+                        val forceDecimal = ctx.text.endsWith("M", true) || ctx.text.contains("E", true)
+                        val text = ctx.text.let { if (it.endsWith("M", true)) it.substring(0, it.length - 1) else it }
+                        if (forceDecimal) {
+                            val value = text.toBigDecimal()
+                            DecimalExpression(value)
+                        } else {
+                            val value = text.toDouble()
+                            DoubleExpression(value)
+                        }
+                    }
+                    else -> throw ParseException("aha")
+                }
+            }
+            is MQLParser.StringExpressionContext -> StringExpression(unquote(ctx.text))
             else -> throw ParseException("expression not supported: $ctx")
+        }
+    }
+
+    private fun generateFieldDeclaration(expression: Expression): FieldDeclaration {
+        return when (expression) {
+            is FieldReferenceExpression -> {
+                val parent = if (expression.parent != null) {
+                    generateFieldDeclaration(expression.parent)
+                } else null
+
+                FieldDeclaration(parent, expression.name)
+            }
+            else -> {
+                generatedIdNum++
+                FieldDeclaration(FieldName("__fld$generatedIdNum"))
+            }
         }
     }
 
@@ -192,19 +247,18 @@ class MQLTreeParser {
         return fre as FieldReferenceExpression
     }
 
-    private fun generateFieldDeclaration(expression: Expression): FieldDeclaration {
-        return when (expression) {
-            is FieldReferenceExpression -> {
-                val parent = if (expression.parent != null) {
-                    generateFieldDeclaration(expression.parent)
-                } else null
-
-                FieldDeclaration(parent, expression.name)
-            }
-            else -> {
-                generatedIdNum++
-                FieldDeclaration(FieldName("__fld$generatedIdNum"))
-            }
+    private fun parseIntegralExpression(text: String, radix: Int, forceLong: Boolean = false): NumberExpression {
+        var parseText = text
+        var parseForceLong = forceLong
+        if (text.endsWith("L", true)) {
+            parseForceLong = true
+            parseText = text.substring(0, text.length-1)
+        }
+        val num = parseText.toLong(radix)
+        if (parseForceLong || num > Int.MAX_VALUE) {
+            return Int64Expression(num)
+        } else {
+            return Int32Expression(num.toInt())
         }
     }
 
