@@ -15,6 +15,7 @@ abstract class Visitor<T> {
     open fun visit(n: AndExpression): T = throw NotImplementedError()
     open fun visit(n: ArrayAccessExpression): T = throw NotImplementedError()
     open fun visit(n: BooleanExpression): T = throw NotImplementedError()
+    open fun visit(n: ConditionalExpression): T = throw NotImplementedError()
     open fun visit(n: DecimalExpression): T = throw NotImplementedError()
     open fun visit(n: DivideExpression): T = throw NotImplementedError()
     open fun visit(n: DoubleExpression): T = throw NotImplementedError()
@@ -90,6 +91,15 @@ abstract class NodeVisitor : Visitor<Node>() {
         visit(n.accessor) as Expression
     )
     override fun visit(n: BooleanExpression): Node = n
+    override fun visit(n: ConditionalExpression): Node = n.update(
+        visit(n.cases) { case ->
+            case.update(
+                visit(case.condition) as Expression,
+                visit(case.then ) as Expression
+            )
+        },
+        visit(n.fallback) as Expression?
+    )
     override fun visit(n: DecimalExpression): Node = n
     override fun visit(n: DivideExpression): Node = n.update(
         visit(n.left) as Expression,

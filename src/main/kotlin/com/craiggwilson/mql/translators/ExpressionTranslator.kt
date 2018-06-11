@@ -4,6 +4,7 @@ import com.craiggwilson.mql.ast.AddExpression
 import com.craiggwilson.mql.ast.AndExpression
 import com.craiggwilson.mql.ast.ArrayAccessExpression
 import com.craiggwilson.mql.ast.BooleanExpression
+import com.craiggwilson.mql.ast.ConditionalExpression
 import com.craiggwilson.mql.ast.DecimalExpression
 import com.craiggwilson.mql.ast.DivideExpression
 import com.craiggwilson.mql.ast.DoubleExpression
@@ -33,6 +34,7 @@ interface ExpressionTranslator {
     fun visit(n: AddExpression): String
     fun visit(n: AndExpression): String
     fun visit(n: ArrayAccessExpression): String
+    fun visit(n: ConditionalExpression): String
     fun visit(n: DivideExpression): String
     fun visit(n: EqualsExpression): String
     fun visit(n: FieldReferenceExpression): String

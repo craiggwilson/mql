@@ -8,8 +8,8 @@ import kotlin.test.assertEquals
 class StatementTranslatorTest() {
 
     @ParameterizedTest(name = "{0}")
-    @MethodSource("expressions")
-    fun testExpressions(mql: String, expected: String) {
+    @MethodSource("aggExpressions")
+    fun testAggExpressions(mql: String, expected: String) {
         val actualExpected = "db.bar.aggregate([{ \$project: { \"test\": $expected } }])"
 
         val parsed = parseMQL("FROM bar PROJECT test := $mql")[0]
@@ -34,7 +34,7 @@ class StatementTranslatorTest() {
         }
 
         @JvmStatic
-        private fun expressions(): Collection<Array<String>> {
+        private fun aggExpressions(): Collection<Array<String>> {
             return listOf(
                 // order of operations
                 test("true AND false", "{ \"\$and\": [ true, false ] }"),
@@ -103,7 +103,11 @@ class StatementTranslatorTest() {
 
                 // range expression
                 test("1..4", "{ \"\$range\": [ NumberInt(\"1\"), NumberInt(\"4\") ] }"),
-                test("1..4 step 2", "{ \"\$range\": [ NumberInt(\"1\"), NumberInt(\"4\"), NumberInt(\"2\") ] }")
+                test("1..4 step 2", "{ \"\$range\": [ NumberInt(\"1\"), NumberInt(\"4\"), NumberInt(\"2\") ] }"),
+
+                // conditionals
+                test("if true then false else true", "{ \"\$cond\": [ true, false, true ] }"),
+                test("switch case true then false case false then true else null", "{ \"\$switch\": { \"branches\": [ { \"case\": true, \"then\": false }, { \"case\": false, \"then\": true } ], \"default\": null } }")
             )
         }
 

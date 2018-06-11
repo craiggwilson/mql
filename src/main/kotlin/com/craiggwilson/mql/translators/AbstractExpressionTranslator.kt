@@ -4,6 +4,7 @@ import com.craiggwilson.mql.ast.AddExpression
 import com.craiggwilson.mql.ast.AndExpression
 import com.craiggwilson.mql.ast.ArrayAccessExpression
 import com.craiggwilson.mql.ast.BooleanExpression
+import com.craiggwilson.mql.ast.ConditionalExpression
 import com.craiggwilson.mql.ast.DecimalExpression
 import com.craiggwilson.mql.ast.DivideExpression
 import com.craiggwilson.mql.ast.DoubleExpression
@@ -29,9 +30,12 @@ import com.craiggwilson.mql.ast.StringExpression
 import com.craiggwilson.mql.ast.SubtractExpression
 
 abstract class AbstractExpressionTranslator(private val valueTranslator: ValueTranslator): AbstractTranslator(), ExpressionTranslator {
+    // Expressions
+
     abstract override fun visit(n: AddExpression): String
     abstract override fun visit(n: AndExpression): String
     abstract override fun visit(n: ArrayAccessExpression): String
+    abstract override fun visit(n: ConditionalExpression): String
     abstract override fun visit(n: DivideExpression): String
     abstract override fun visit(n: EqualsExpression): String
     abstract override fun visit(n: FieldReferenceExpression): String
@@ -51,6 +55,7 @@ abstract class AbstractExpressionTranslator(private val valueTranslator: ValueTr
     abstract override fun visit(n: SubtractExpression): String
 
     // Values
+
     override fun visit(n: BooleanExpression): String {
         return valueTranslator.visit(n)
     }

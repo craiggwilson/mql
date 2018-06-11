@@ -3,6 +3,7 @@ package com.craiggwilson.mql.translators
 import com.craiggwilson.mql.ast.AddExpression
 import com.craiggwilson.mql.ast.AndExpression
 import com.craiggwilson.mql.ast.ArrayAccessExpression
+import com.craiggwilson.mql.ast.ConditionalExpression
 import com.craiggwilson.mql.ast.DivideExpression
 import com.craiggwilson.mql.ast.EqualsExpression
 import com.craiggwilson.mql.ast.FieldReferenceExpression
@@ -37,6 +38,10 @@ class QueryLanguageExpressionTranslator(valueTranslator: ValueTranslator) : Abst
     }
 
     override fun visit(n: ArrayAccessExpression): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun visit(n: ConditionalExpression): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

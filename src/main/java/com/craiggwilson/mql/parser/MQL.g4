@@ -81,7 +81,7 @@ expression:
     ) RBRACK                                                            #arrayAccessExpression
 | expression RANGE expression (STEP expression)?                        #rangeExpression
 | expression DOT (id | function)                                        #memberExpression
-| SWITCH (CASE expression THEN expression)+ (ELSE expression)?          #switchExpression
+| SWITCH switch_case+ (ELSE expression)?                                #switchExpression
 | IF expression THEN expression ELSE expression                         #conditionalExpression
 | LET variable_assignment (COMMA variable_assignment)* IN expression    #letExpression
 | LBRACE (field_assignment (COMMA field_assignment)*)? RBRACE           #newDocumentExpression
@@ -120,6 +120,10 @@ lambda_expression:
 
 number:
   (INT | LONG | DECIMAL | BIN | HEX)
+;
+
+switch_case:
+  CASE expression THEN expression
 ;
 
 variable_assignment:

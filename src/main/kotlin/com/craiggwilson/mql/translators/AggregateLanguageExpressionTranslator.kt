@@ -3,6 +3,7 @@ package com.craiggwilson.mql.translators
 import com.craiggwilson.mql.ast.AddExpression
 import com.craiggwilson.mql.ast.AndExpression
 import com.craiggwilson.mql.ast.ArrayAccessExpression
+import com.craiggwilson.mql.ast.ConditionalExpression
 import com.craiggwilson.mql.ast.DivideExpression
 import com.craiggwilson.mql.ast.EqualsExpression
 import com.craiggwilson.mql.ast.FieldReferenceExpression
@@ -54,6 +55,32 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
         } else {
             val index = visit(n.accessor)
             return "{ \"\$arrayElemAt\": [ $array, $index ] }"
+        }
+    }
+
+    override fun visit(n: ConditionalExpression): String {
+        if (n.cases.size == 1 && n.fallback != null) {
+            val condition = visit(n.cases[0].condition)
+            val then = visit(n.cases[0].then)
+            val fallback = visit(n.fallback)
+
+            return "{ \"\$cond\": [ $condition, $then, $fallback ] }"
+        } else {
+            val branches = n.cases.joinToString { case ->
+                val condition = visit(case.condition)
+                val then = visit(case.then)
+
+                "{ \"case\": $condition, \"then\": $then }"
+            }
+
+            var body = "\"branches\": [ $branches ]"
+
+            if (n.fallback != null) {
+                val fallback = visit(n.fallback)
+                body += ", \"default\": $fallback"
+            }
+
+            return "{ \"\$switch\": { $body } }"
         }
     }
 

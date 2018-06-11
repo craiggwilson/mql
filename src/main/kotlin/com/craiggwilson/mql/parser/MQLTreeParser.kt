@@ -5,6 +5,7 @@ import com.craiggwilson.mql.ast.AndExpression
 import com.craiggwilson.mql.ast.ArrayAccessExpression
 import com.craiggwilson.mql.ast.BooleanExpression
 import com.craiggwilson.mql.ast.CollectionName
+import com.craiggwilson.mql.ast.ConditionalExpression
 import com.craiggwilson.mql.ast.DatabaseName
 import com.craiggwilson.mql.ast.DecimalExpression
 import com.craiggwilson.mql.ast.Direction
@@ -201,6 +202,13 @@ class MQLTreeParser {
                     else -> throw ParseException("unknown multiplication operator: ${ctx.op.text}")
                 }
             }
+            is MQLParser.ConditionalExpressionContext -> {
+                val condition = parseExpression(ctx.expression(0))
+                val then = parseExpression(ctx.expression(1))
+                val fallback = parseExpression(ctx.expression(2))
+
+                ConditionalExpression(condition, then, fallback)
+            }
             is MQLParser.FieldExpressionContext -> FieldReferenceExpression(null, getFieldName(ctx.id()))
             is MQLParser.MemberExpressionContext -> {
                 val parent = parseExpression(ctx.expression())
@@ -267,6 +275,20 @@ class MQLTreeParser {
                 RangeExpression(start, end, step)
             }
             is MQLParser.StringExpressionContext -> StringExpression(unquote(ctx.text))
+            is MQLParser.SwitchExpressionContext -> {
+                val cases = ctx.switch_case().map { case ->
+                    val condition = parseExpression(case.expression(0))
+                    val then = parseExpression(case.expression(1))
+
+                    ConditionalExpression.Case(condition, then)
+                }
+
+                val fallback = if (ctx.expression() != null) {
+                    parseExpression(ctx.expression())
+                } else null
+
+                ConditionalExpression(cases, fallback)
+            }
             is MQLParser.UnaryMinusExpressionContext -> {
                 val expression = parseExpression(ctx.expression())
                 if (expression is NumberExpression) {

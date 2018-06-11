@@ -54,6 +54,26 @@ data class BooleanExpression(val value: Boolean) : ConstantExpression() {
     }
 }
 
+data class ConditionalExpression(val cases: List<Case>, val fallback: Expression? = null) : Expression() {
+    constructor(condition: Expression, then: Expression, fallback: Expression): this(listOf(Case(condition, then)), fallback)
+
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(cases: List<Case>, fallback: Expression?): ConditionalExpression {
+        return if (cases !== this.cases || fallback !== this.fallback) {
+            ConditionalExpression(cases, fallback)
+        } else this
+    }
+
+    data class Case(val condition: Expression, val then: Expression) {
+        fun update(condition: Expression, then: Expression): Case {
+            return if (condition !== this.condition || then !== this.then) {
+                Case(condition, then)
+            } else this
+        }
+    }
+}
+
 data class DecimalExpression(val value: BigDecimal) : NumberExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
