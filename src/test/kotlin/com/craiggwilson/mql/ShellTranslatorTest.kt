@@ -36,7 +36,7 @@ class ShellTranslatorTest() {
         @JvmStatic
         private fun expressions(): Collection<Array<String>> {
             return listOf(
-                test("a", "\"\$a\""),
+                // constants
                 test("false", "false"),
                 test("true", "true"),
                 test("1", "NumberInt(\"1\")"),
@@ -54,7 +54,14 @@ class ShellTranslatorTest() {
                 test("1000000000000000000", "NumberLong(\"1000000000000000000\")"),
                 test("-1000000000000000000", "NumberLong(\"-1000000000000000000\")"),
                 test("null", "null"),
-                test("'one'", "\"one\"")
+                test("'one'", "\"one\""),
+
+                // field references
+                test("a", "\"\$a\""),
+
+                // expressions
+                test("NOT true", "{ \"\$not\": [ true ] }"),
+                test("NOT a", "{ \"\$not\": [ \"\$a\" ] }")
             )
         }
 

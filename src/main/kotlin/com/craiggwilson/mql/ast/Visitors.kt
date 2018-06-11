@@ -11,13 +11,16 @@ abstract class Visitor<T> {
 
     // Expressions
 
-    open fun visit(n: FieldReferenceExpression): T = throw NotImplementedError()
+    open fun visit(n: AndExpression): T = throw NotImplementedError()
     open fun visit(n: BooleanExpression): T = throw NotImplementedError()
     open fun visit(n: DecimalExpression): T = throw NotImplementedError()
     open fun visit(n: DoubleExpression): T = throw NotImplementedError()
+    open fun visit(n: FieldReferenceExpression): T = throw NotImplementedError()
     open fun visit(n: Int32Expression): T = throw NotImplementedError()
     open fun visit(n: Int64Expression): T = throw NotImplementedError()
+    open fun visit(n: NotExpression): T = throw NotImplementedError()
     open fun visit(n: NullExpression): T = throw NotImplementedError()
+    open fun visit(n: OrExpression): T = throw NotImplementedError()
     open fun visit(n: StringExpression): T = throw NotImplementedError()
 
     // Nodes
@@ -58,16 +61,26 @@ abstract class Visitor<T> {
 abstract class NodeVisitor : Visitor<Node>() {
     // Expressions
 
-    override fun visit(n: FieldReferenceExpression): Node = n.update(
-        visit(n.parent) as Expression?,
-        n.name)
-
+    override fun visit(n: AndExpression): Node = n.update(
+        visit(n.left) as Expression,
+        visit(n.right) as Expression
+    )
     override fun visit(n: BooleanExpression): Node = n
     override fun visit(n: DecimalExpression): Node = n
     override fun visit(n: DoubleExpression): Node = n
+    override fun visit(n: FieldReferenceExpression): Node = n.update(
+        visit(n.parent) as Expression?,
+        n.name)
     override fun visit(n: Int32Expression): Node = n
     override fun visit(n: Int64Expression): Node = n
+    override fun visit(n: NotExpression): Node = n.update(
+        visit(n.expression) as Expression
+    )
     override fun visit(n: NullExpression): Node = n
+    override fun visit(n: OrExpression): Node = n.update(
+        visit(n.left) as Expression,
+        visit(n.right) as Expression
+    )
     override fun visit(n: StringExpression): Node = n
 
     // Nodes

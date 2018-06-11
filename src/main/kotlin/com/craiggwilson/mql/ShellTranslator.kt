@@ -9,6 +9,7 @@ import com.craiggwilson.mql.ast.FieldReferenceExpression
 import com.craiggwilson.mql.ast.Int32Expression
 import com.craiggwilson.mql.ast.Int64Expression
 import com.craiggwilson.mql.ast.LimitStage
+import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.NullExpression
 import com.craiggwilson.mql.ast.ProjectStage
 import com.craiggwilson.mql.ast.SkipStage
@@ -52,6 +53,11 @@ class ShellTranslator : Visitor<String>() {
 
     override fun visit(n: Int64Expression): String {
         return "NumberLong(\"${n.value}\")"
+    }
+
+    override fun visit(n: NotExpression): String {
+        val not = visit(n.expression)
+        return "{ \"\$not\": [ $not ] }"
     }
 
     override fun visit(n: NullExpression): String {

@@ -9,13 +9,23 @@ sealed class NumberExpression : ConstantExpression() {
 }
 
 // Expressions
+data class AndExpression(val left: Expression, val right: Expression) : Expression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(left: Expression, right: Expression): AndExpression {
+        return if (left !== this.left || right !== this.right) {
+            AndExpression(left, right)
+        } else this
+    }
+}
+
 data class BooleanExpression(val value: Boolean) : ConstantExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
     fun update(value: Boolean): BooleanExpression {
-        if (value != this.value) {
-            return BooleanExpression(value)
-        } else return this
+        return if (value != this.value) {
+            BooleanExpression(value)
+        } else this
     }
 }
 
@@ -27,9 +37,9 @@ data class DecimalExpression(val value: BigDecimal) : NumberExpression() {
     }
 
     fun update(value: BigDecimal): DecimalExpression {
-        if (value != this.value) {
-            return DecimalExpression(value)
-        } else return this
+        return if (value != this.value) {
+            DecimalExpression(value)
+        } else this
     }
 }
 
@@ -41,9 +51,9 @@ data class DoubleExpression(val value: Double) : NumberExpression() {
     }
 
     fun update(value: Double): DoubleExpression {
-        if (value != this.value) {
-            return DoubleExpression(value)
-        } else return this
+        return if (value != this.value) {
+            DoubleExpression(value)
+        } else this
     }
 }
 
@@ -66,9 +76,9 @@ data class Int32Expression(val value: Int) : NumberExpression() {
     }
 
     fun update(value: Int): Int32Expression {
-        if (value != this.value) {
-            return Int32Expression(value)
-        } else return this
+        return if (value != this.value) {
+            Int32Expression(value)
+        } else this
     }
 }
 
@@ -80,9 +90,19 @@ data class Int64Expression(val value: Long) : NumberExpression() {
     }
 
     fun update(value: Long): Int64Expression {
-        if (value != this.value) {
-            return Int64Expression(value)
-        } else return this
+        return if (value != this.value) {
+            Int64Expression(value)
+        } else this
+    }
+}
+
+data class NotExpression(val expression: Expression) : Expression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(expression: Expression): NotExpression {
+        return if (expression !== this.expression) {
+            NotExpression(expression)
+        } else this
     }
 }
 
@@ -90,12 +110,22 @@ object NullExpression : ConstantExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 }
 
+data class OrExpression(val left: Expression, val right: Expression) : Expression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(left: Expression, right: Expression): OrExpression {
+        return if (left !== this.left || right !== this.right) {
+            OrExpression(left, right)
+        } else this
+    }
+}
+
 data class StringExpression(val value: String) : ConstantExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
     fun update(value: String): StringExpression {
-        if (value != this.value) {
-            return StringExpression(value)
-        } else return this
+        return if (value != this.value) {
+            StringExpression(value)
+        } else this
     }
 }

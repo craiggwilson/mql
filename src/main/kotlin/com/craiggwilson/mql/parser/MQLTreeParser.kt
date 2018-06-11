@@ -13,6 +13,7 @@ import com.craiggwilson.mql.ast.FieldReferenceExpression
 import com.craiggwilson.mql.ast.Int32Expression
 import com.craiggwilson.mql.ast.Int64Expression
 import com.craiggwilson.mql.ast.LimitStage
+import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.NullExpression
 import com.craiggwilson.mql.ast.NumberExpression
 import com.craiggwilson.mql.ast.ProjectStage
@@ -152,6 +153,13 @@ class MQLTreeParser {
                     throw ParseException("function not yet supported")
                 }
             }
+            is MQLParser.NotExpressionContext -> {
+                val expression = parseExpression(ctx.expression())
+                return NotExpression(expression)
+            }
+            is MQLParser.NullExpressionContext -> NullExpression
+            is MQLParser.NumberExpressionContext -> parseNumber(ctx.number())
+            is MQLParser.StringExpressionContext -> StringExpression(unquote(ctx.text))
             is MQLParser.UnaryMinusExpressionContext -> {
                 val expression = parseExpression(ctx.expression())
                 if (expression is NumberExpression) {
@@ -160,9 +168,6 @@ class MQLTreeParser {
                     throw ParseException("minus operator not supported: ${ctx.text}")
                 }
             }
-            is MQLParser.NullExpressionContext -> NullExpression
-            is MQLParser.NumberExpressionContext -> parseNumber(ctx.number())
-            is MQLParser.StringExpressionContext -> StringExpression(unquote(ctx.text))
             else -> throw ParseException("expression not supported: $ctx")
         }
     }
