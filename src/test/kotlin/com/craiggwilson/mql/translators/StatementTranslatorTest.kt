@@ -59,7 +59,7 @@ class StatementTranslatorTest() {
                 // field references
                 test("a", "\"\$a\""),
 
-                // expressions
+                // binary expression
                 test("1.0 + 2.0", "{ \"\$add\": [ 1.0, 2.0 ] }"),
                 test("1.0 and 2.0", "{ \"\$and\": [ 1.0, 2.0 ] }"),
                 test("1.0 && 2.0", "{ \"\$and\": [ 1.0, 2.0 ] }"),
@@ -71,11 +71,25 @@ class StatementTranslatorTest() {
                 test("1.0 <= 2.0", "{ \"\$lte\": [ 1.0, 2.0 ] }"),
                 test("1.0 % 2.0", "{ \"\$mod\": [ 1.0, 2.0 ] }"),
                 test("1.0 * 2.0", "{ \"\$multiply\": [ 1.0, 2.0 ] }"),
-                test("NOT true", "{ \"\$not\": [ true ] }"),
                 test("1.0 != 2.0", "{ \"\$ne\": [ 1.0, 2.0 ] }"),
                 test("1.0 or 2.0", "{ \"\$or\": [ 1.0, 2.0 ] }"),
                 test("1.0 || 2.0", "{ \"\$or\": [ 1.0, 2.0 ] }"),
-                test("1.0 - 2.0", "{ \"\$subtract\": [ 1.0, 2.0 ] }")
+                test("1.0 - 2.0", "{ \"\$subtract\": [ 1.0, 2.0 ] }"),
+
+                // unary expression
+                test("NOT true", "{ \"\$not\": [ true ] }"),
+
+                // array access expression
+                test("a[0]", "{ \"\$arrayElemAt\": [ \"\$a\", NumberInt(\"0\") ] }"),
+                test("a[-4]", "{ \"\$arrayElemAt\": [ \"\$a\", NumberInt(\"-4\") ] }"),
+                test("a[2..4]", "{ \"\$slice\": [ \"\$a\", NumberInt(\"2\"), { \"\$subtract\": [ NumberInt(\"4\"), NumberInt(\"2\") ] } ] }"),
+                test("a[2:4]", "{ \"\$slice\": [ \"\$a\", NumberInt(\"2\"), { \"\$subtract\": [ NumberInt(\"4\"), NumberInt(\"2\") ] } ] }"),
+                test("a[2:]", "{ \"\$let\": { \"vars\": { \"array\": \"\$a\" }, \"in\": { \"\$slice\": [ \"\$\$array\", { \"\$subtract\": [ NumberInt(\"2\"), { \"\$size\": \"\$\$array\" } ] } ] } } }"),
+                test("a[:8]", "{ \"\$slice\": [ \"\$a\", NumberInt(\"8\") ] }"),
+
+                // range expression
+                test("1..4", "{ \"\$range\": [ NumberInt(\"1\"), NumberInt(\"4\") ] }"),
+                test("1..4 step 2", "{ \"\$range\": [ NumberInt(\"1\"), NumberInt(\"4\"), NumberInt(\"2\") ] }")
             )
         }
 

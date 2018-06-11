@@ -34,6 +34,16 @@ data class AndExpression(override val left: Expression, override val right: Expr
     }
 }
 
+data class ArrayAccessExpression(val array: Expression, val accessor: Expression) : Expression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(array: Expression, accessor: Expression): ArrayAccessExpression {
+        return if (array !== this.array || accessor !== this.accessor) {
+            ArrayAccessExpression(array, accessor)
+        } else this
+    }
+}
+
 data class BooleanExpression(val value: Boolean) : ConstantExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
@@ -221,6 +231,16 @@ data class OrExpression(override val left: Expression, override val right: Expre
     fun update(left: Expression, right: Expression): OrExpression {
         return if (left !== this.left || right !== this.right) {
             OrExpression(left, right)
+        } else this
+    }
+}
+
+data class RangeExpression(val start: Expression, val end: Expression, val step: Expression? = null) : Expression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(start: Expression, end: Expression, step: Expression?): RangeExpression {
+        return if (start !== this.start || end !== this.end || step !== this.step) {
+            RangeExpression(start, end, step)
         } else this
     }
 }

@@ -13,6 +13,7 @@ abstract class Visitor<T> {
 
     open fun visit(n: AddExpression): T = throw NotImplementedError()
     open fun visit(n: AndExpression): T = throw NotImplementedError()
+    open fun visit(n: ArrayAccessExpression): T = throw NotImplementedError()
     open fun visit(n: BooleanExpression): T = throw NotImplementedError()
     open fun visit(n: DecimalExpression): T = throw NotImplementedError()
     open fun visit(n: DivideExpression): T = throw NotImplementedError()
@@ -31,6 +32,7 @@ abstract class Visitor<T> {
     open fun visit(n: NotExpression): T = throw NotImplementedError()
     open fun visit(n: NullExpression): T = throw NotImplementedError()
     open fun visit(n: OrExpression): T = throw NotImplementedError()
+    open fun visit(n: RangeExpression): T = throw NotImplementedError()
     open fun visit(n: SubtractExpression): T = throw NotImplementedError()
     open fun visit(n: StringExpression): T = throw NotImplementedError()
 
@@ -79,6 +81,10 @@ abstract class NodeVisitor : Visitor<Node>() {
     override fun visit(n: AndExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
+    )
+    override fun visit(n: ArrayAccessExpression): Node = n.update(
+        visit(n.array) as Expression,
+        visit(n.accessor) as Expression
     )
     override fun visit(n: BooleanExpression): Node = n
     override fun visit(n: DecimalExpression): Node = n
@@ -131,6 +137,11 @@ abstract class NodeVisitor : Visitor<Node>() {
     override fun visit(n: OrExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
+    )
+    override fun visit(n: RangeExpression): Node = n.update(
+        visit(n.start) as Expression,
+        visit(n.end) as Expression,
+        visit(n.step) as Expression
     )
     override fun visit(n: SubtractExpression): Node = n.update(
         visit(n.left) as Expression,

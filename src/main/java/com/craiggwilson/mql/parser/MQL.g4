@@ -75,17 +75,17 @@ expression:
 | expression (AND | AND_SYMBOL) expression                              #andExpression
 | expression (OR | OR_SYMBOL) expression                                #orExpression
 | expression LBRACK (
-        expression
-      | expression COLON expression?
-      | expression? COLON expression
-    ) RBRACK                                                            #arrayExpression
-| expression RANGE expression                                           #rangeExpression
+        start=expression
+      | start=expression COLON end=expression?
+      | start=expression? COLON end=expression
+    ) RBRACK                                                            #arrayAccessExpression
+| expression RANGE expression (STEP expression)?                        #rangeExpression
 | expression DOT (id | function)                                        #memberExpression
 | SWITCH (CASE expression THEN expression)+ (ELSE expression)?          #switchExpression
 | IF expression THEN expression ELSE expression                         #conditionalExpression
 | LET variable_assignment (COMMA variable_assignment)* IN expression    #letExpression
-| LBRACE (field_assignment (COMMA field_assignment)*)? RBRACE           #documentExpression
-| LBRACK (expression (COMMA expression)*)? RBRACK                       #arrayExpression
+| LBRACE (field_assignment (COMMA field_assignment)*)? RBRACE           #newDocumentExpression
+| LBRACK (expression (COMMA expression)*)? RBRACK                       #newArrayExpression
 | LPAREN expression RPAREN                                              #parenthesisExpression
 | function                                                              #functionCallExpression
 | variable_name                                                         #variableReferenceExpression
@@ -207,6 +207,7 @@ PROJECT:  P R O J E C T;
 SKIP_:    S K I P;
 SORT:     S O R T;
 STARTING: S T A R T I N G;
+STEP:     S T E P;
 SWITCH:   S W I T C H;
 THEN:     T H E N;
 TRUE:     T R U E;

@@ -2,6 +2,7 @@ package com.craiggwilson.mql.translators
 
 import com.craiggwilson.mql.ast.AddExpression
 import com.craiggwilson.mql.ast.AndExpression
+import com.craiggwilson.mql.ast.ArrayAccessExpression
 import com.craiggwilson.mql.ast.BooleanExpression
 import com.craiggwilson.mql.ast.DecimalExpression
 import com.craiggwilson.mql.ast.DivideExpression
@@ -20,6 +21,7 @@ import com.craiggwilson.mql.ast.NotEqualsExpression
 import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.NullExpression
 import com.craiggwilson.mql.ast.OrExpression
+import com.craiggwilson.mql.ast.RangeExpression
 import com.craiggwilson.mql.ast.StringExpression
 import com.craiggwilson.mql.ast.SubtractExpression
 
@@ -27,6 +29,7 @@ interface ExpressionTranslator {
 
     fun visit(n: AddExpression): String
     fun visit(n: AndExpression): String
+    fun visit(n: ArrayAccessExpression): String
     fun visit(n: DivideExpression): String
     fun visit(n: EqualsExpression): String
     fun visit(n: FieldReferenceExpression): String
@@ -39,6 +42,7 @@ interface ExpressionTranslator {
     fun visit(n: NotEqualsExpression): String
     fun visit(n: NotExpression): String
     fun visit(n: OrExpression): String
+    fun visit(n: RangeExpression): String
     fun visit(n: SubtractExpression): String
 
     // Values

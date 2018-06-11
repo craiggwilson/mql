@@ -2,6 +2,7 @@ package com.craiggwilson.mql.translators
 
 import com.craiggwilson.mql.ast.AddExpression
 import com.craiggwilson.mql.ast.AndExpression
+import com.craiggwilson.mql.ast.ArrayAccessExpression
 import com.craiggwilson.mql.ast.DivideExpression
 import com.craiggwilson.mql.ast.EqualsExpression
 import com.craiggwilson.mql.ast.FieldReferenceExpression
@@ -13,7 +14,9 @@ import com.craiggwilson.mql.ast.ModExpression
 import com.craiggwilson.mql.ast.MultiplyExpression
 import com.craiggwilson.mql.ast.NotEqualsExpression
 import com.craiggwilson.mql.ast.NotExpression
+import com.craiggwilson.mql.ast.NullExpression
 import com.craiggwilson.mql.ast.OrExpression
+import com.craiggwilson.mql.ast.RangeExpression
 import com.craiggwilson.mql.ast.SubtractExpression
 
 class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : AbstractExpressionTranslator(valueTranslator) {
@@ -29,6 +32,26 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
         val right = visit(n.right)
 
         return "{ \"\$and\": [ $left, $right ] }"
+    }
+
+    override fun visit(n: ArrayAccessExpression): String {
+        val array = visit(n.array)
+        if (n.accessor is RangeExpression) {
+            return if (n.accessor.end === NullExpression) {
+                val start = visit(n.accessor.start)
+                "{ \"\$let\": { \"vars\": { \"array\": $array }, \"in\": { \"\$slice\": [ \"\$\$array\", { \"\$subtract\": [ $start, { \"\$size\": \"\$\$array\" } ] } ] } } }"
+            } else if (n.accessor.start === NullExpression) {
+                val end = visit(n.accessor.end)
+                "{ \"\$slice\": [ $array, $end ] }"
+            } else {
+                val start = visit(n.accessor.start)
+                val end = visit(SubtractExpression(n.accessor.end, n.accessor.start))
+                "{ \"\$slice\": [ $array, $start, $end ] }"
+            }
+        } else {
+            val index = visit(n.accessor)
+            return "{ \"\$arrayElemAt\": [ $array, $index ] }"
+        }
     }
 
     override fun visit(n: DivideExpression): String {
@@ -92,11 +115,6 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
         return "{ \"\$multiply\": [ $left, $right ] }"
     }
 
-    override fun visit(n: NotExpression): String {
-        val expression = visit(n.expression)
-        return "{ \"\$not\": [ $expression ] }"
-    }
-
     override fun visit(n: NotEqualsExpression): String {
         val left = visit(n.left)
         val right = visit(n.right)
@@ -104,11 +122,31 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
         return "{ \"\$ne\": [ $left, $right ] }"
     }
 
+    override fun visit(n: NotExpression): String {
+        val expression = visit(n.expression)
+        return "{ \"\$not\": [ $expression ] }"
+    }
+
     override fun visit(n: OrExpression): String {
         val left = visit(n.left)
         val right = visit(n.right)
 
         return "{ \"\$or\": [ $left, $right ] }"
+    }
+
+    override fun visit(n: RangeExpression): String {
+        val start = visit(n.start)
+        val end = visit(n.end)
+
+        var body = "[ $start, $end"
+        if (n.step != null) {
+            val step = visit(n.step)
+            body += ", $step"
+        }
+
+        body += " ]"
+
+        return "{ \"\$range\": $body }"
     }
 
     override fun visit(n: SubtractExpression): String {

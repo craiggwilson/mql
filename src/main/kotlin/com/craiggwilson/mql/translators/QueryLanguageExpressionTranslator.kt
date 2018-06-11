@@ -2,6 +2,7 @@ package com.craiggwilson.mql.translators
 
 import com.craiggwilson.mql.ast.AddExpression
 import com.craiggwilson.mql.ast.AndExpression
+import com.craiggwilson.mql.ast.ArrayAccessExpression
 import com.craiggwilson.mql.ast.DivideExpression
 import com.craiggwilson.mql.ast.EqualsExpression
 import com.craiggwilson.mql.ast.FieldReferenceExpression
@@ -14,6 +15,7 @@ import com.craiggwilson.mql.ast.MultiplyExpression
 import com.craiggwilson.mql.ast.NotEqualsExpression
 import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.OrExpression
+import com.craiggwilson.mql.ast.RangeExpression
 import com.craiggwilson.mql.ast.SubtractExpression
 
 class QueryLanguageExpressionTranslator(valueTranslator: ValueTranslator) : AbstractExpressionTranslator(valueTranslator) {
@@ -28,6 +30,10 @@ class QueryLanguageExpressionTranslator(valueTranslator: ValueTranslator) : Abst
     }
 
     override fun visit(n: AndExpression): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun visit(n: ArrayAccessExpression): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -63,15 +69,19 @@ class QueryLanguageExpressionTranslator(valueTranslator: ValueTranslator) : Abst
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(n: NotExpression): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun visit(n: NotEqualsExpression): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    override fun visit(n: NotExpression): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun visit(n: OrExpression): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun visit(n: RangeExpression): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

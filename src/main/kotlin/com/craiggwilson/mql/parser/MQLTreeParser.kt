@@ -2,6 +2,7 @@ package com.craiggwilson.mql.parser
 
 import com.craiggwilson.mql.ast.AddExpression
 import com.craiggwilson.mql.ast.AndExpression
+import com.craiggwilson.mql.ast.ArrayAccessExpression
 import com.craiggwilson.mql.ast.BooleanExpression
 import com.craiggwilson.mql.ast.CollectionName
 import com.craiggwilson.mql.ast.DatabaseName
@@ -29,6 +30,7 @@ import com.craiggwilson.mql.ast.NullExpression
 import com.craiggwilson.mql.ast.NumberExpression
 import com.craiggwilson.mql.ast.OrExpression
 import com.craiggwilson.mql.ast.ProjectStage
+import com.craiggwilson.mql.ast.RangeExpression
 import com.craiggwilson.mql.ast.SkipStage
 import com.craiggwilson.mql.ast.SortStage
 import com.craiggwilson.mql.ast.Stage
@@ -170,6 +172,17 @@ class MQLTreeParser {
 
                 AndExpression(left, right)
             }
+            is MQLParser.ArrayAccessExpressionContext -> {
+                val array = parseExpression(ctx.expression(0))
+                val start = ctx.start?.let { parseExpression(it) } ?: NullExpression
+                if (ctx.COLON() == null) {
+                    ArrayAccessExpression(array, start)
+                } else {
+                    val end = ctx.end?.let { parseExpression(it) } ?: NullExpression
+                    val range = RangeExpression(start, end)
+                    ArrayAccessExpression(array, range)
+                }
+            }
             is MQLParser.BooleanExpressionContext -> BooleanExpression(ctx.TRUE() != null)
             is MQLParser.ComparisonExpressionContext -> {
                 val left = parseExpression(ctx.expression(0))
@@ -218,6 +231,15 @@ class MQLTreeParser {
                 val right = parseExpression(ctx.expression(1))
 
                 OrExpression(left, right)
+            }
+            is MQLParser.RangeExpressionContext -> {
+                val start = parseExpression(ctx.expression(0))
+                val end = parseExpression(ctx.expression(1))
+                val step = if (ctx.expression().size == 3) {
+                    parseExpression(ctx.expression(2))
+                } else null
+
+                RangeExpression(start, end, step)
             }
             is MQLParser.StringExpressionContext -> StringExpression(unquote(ctx.text))
             is MQLParser.UnaryMinusExpressionContext -> {
