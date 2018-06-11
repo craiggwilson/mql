@@ -4,7 +4,9 @@ import java.math.BigDecimal
 
 sealed class Expression : Node()
 sealed class ConstantExpression : Expression()
-sealed class NumberExpression : ConstantExpression()
+sealed class NumberExpression : ConstantExpression() {
+    abstract fun negate(): NumberExpression
+}
 
 // Expressions
 data class BooleanExpression(val value: Boolean) : ConstantExpression() {
@@ -20,6 +22,10 @@ data class BooleanExpression(val value: Boolean) : ConstantExpression() {
 data class DecimalExpression(val value: BigDecimal) : NumberExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
+    override fun negate(): DecimalExpression {
+        return DecimalExpression(value.negate())
+    }
+
     fun update(value: BigDecimal): DecimalExpression {
         if (value != this.value) {
             return DecimalExpression(value)
@@ -29,6 +35,10 @@ data class DecimalExpression(val value: BigDecimal) : NumberExpression() {
 
 data class DoubleExpression(val value: Double) : NumberExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    override fun negate(): DoubleExpression {
+        return DoubleExpression(-value)
+    }
 
     fun update(value: Double): DoubleExpression {
         if (value != this.value) {
@@ -51,6 +61,10 @@ data class FieldReferenceExpression(val parent: Expression?, val name: FieldName
 data class Int32Expression(val value: Int) : NumberExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
+    override fun negate(): Int32Expression {
+        return Int32Expression(-value)
+    }
+
     fun update(value: Int): Int32Expression {
         if (value != this.value) {
             return Int32Expression(value)
@@ -60,6 +74,10 @@ data class Int32Expression(val value: Int) : NumberExpression() {
 
 data class Int64Expression(val value: Long) : NumberExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    override fun negate(): Int64Expression {
+        return Int64Expression(-value)
+    }
 
     fun update(value: Long): Int64Expression {
         if (value != this.value) {

@@ -140,7 +140,7 @@ class MQLTreeParser {
 
     private fun parseExpression(ctx: MQLParser.ExpressionContext): Expression {
         return when (ctx) {
-            is MQLParser.BoolExpressionContext -> BooleanExpression(ctx.TRUE() != null)
+            is MQLParser.BooleanExpressionContext -> BooleanExpression(ctx.TRUE() != null)
             is MQLParser.FieldExpressionContext -> FieldReferenceExpression(null, getFieldName(ctx.id()))
             is MQLParser.MemberExpressionContext -> {
                 val parent = parseExpression(ctx.expression())
@@ -152,37 +152,62 @@ class MQLTreeParser {
                     throw ParseException("function not yet supported")
                 }
             }
-            is MQLParser.NullExpressionContext -> NullExpression
-            is MQLParser.NumberExpressionContext -> {
-                when {
-                    ctx.BIN() != null -> {
-                        parseIntegralExpression(ctx.text.substring(2), 2)
-                    }
-                    ctx.HEX() != null -> {
-                        parseIntegralExpression(ctx.text.substring(2), 16)
-                    }
-                    ctx.INT() != null -> {
-                        parseIntegralExpression(ctx.text, 10)
-                    }
-                    ctx.LONG() != null -> {
-                        parseIntegralExpression(ctx.text, 10, true)
-                    }
-                    ctx.DECIMAL() != null -> {
-                        val forceDecimal = ctx.text.endsWith("M", true) || ctx.text.contains("E", true)
-                        val text = ctx.text.let { if (it.endsWith("M", true)) it.substring(0, it.length - 1) else it }
-                        if (forceDecimal) {
-                            val value = text.toBigDecimal()
-                            DecimalExpression(value)
-                        } else {
-                            val value = text.toDouble()
-                            DoubleExpression(value)
-                        }
-                    }
-                    else -> throw ParseException("aha")
+            is MQLParser.UnaryMinusExpressionContext -> {
+                val expression = parseExpression(ctx.expression())
+                if (expression is NumberExpression) {
+                    expression.negate()
+                } else {
+                    throw ParseException("minus operator not supported: ${ctx.text}")
                 }
             }
+            is MQLParser.NullExpressionContext -> NullExpression
+            is MQLParser.NumberExpressionContext -> parseNumber(ctx.number())
             is MQLParser.StringExpressionContext -> StringExpression(unquote(ctx.text))
             else -> throw ParseException("expression not supported: $ctx")
+        }
+    }
+
+    private fun parseNumber(ctx: MQLParser.NumberContext): NumberExpression {
+        fun parseIntegralExpression(text: String, radix: Int, forceLong: Boolean = false): NumberExpression {
+            var parseText = text
+            var parseForceLong = forceLong
+            if (text.endsWith("L", true)) {
+                parseForceLong = true
+                parseText = text.substring(0, text.length-1)
+            }
+            val num = parseText.toLong(radix)
+            if (parseForceLong || num > Int.MAX_VALUE) {
+                return Int64Expression(num)
+            } else {
+                return Int32Expression(num.toInt())
+            }
+        }
+
+        return when {
+            ctx.BIN() != null -> {
+                parseIntegralExpression(ctx.text.substring(2), 2)
+            }
+            ctx.HEX() != null -> {
+                parseIntegralExpression(ctx.text.substring(2), 16)
+            }
+            ctx.INT() != null -> {
+                parseIntegralExpression(ctx.text, 10)
+            }
+            ctx.LONG() != null -> {
+                parseIntegralExpression(ctx.text, 10, true)
+            }
+            ctx.DECIMAL() != null -> {
+                val forceDecimal = ctx.text.endsWith("M", true) || ctx.text.contains("E", true)
+                val text = ctx.text.let { if (it.endsWith("M", true)) it.substring(0, it.length - 1) else it }
+                if (forceDecimal) {
+                    val value = text.toBigDecimal()
+                    DecimalExpression(value)
+                } else {
+                    val value = text.toDouble()
+                    DoubleExpression(value)
+                }
+            }
+            else -> throw ParseException("unsupported number: ${ctx.text}")
         }
     }
 
@@ -245,21 +270,6 @@ class MQLTreeParser {
             .fold(null as FieldReferenceExpression?) { acc, item -> FieldReferenceExpression(acc, item) }
 
         return fre as FieldReferenceExpression
-    }
-
-    private fun parseIntegralExpression(text: String, radix: Int, forceLong: Boolean = false): NumberExpression {
-        var parseText = text
-        var parseForceLong = forceLong
-        if (text.endsWith("L", true)) {
-            parseForceLong = true
-            parseText = text.substring(0, text.length-1)
-        }
-        val num = parseText.toLong(radix)
-        if (parseForceLong || num > Int.MAX_VALUE) {
-            return Int64Expression(num)
-        } else {
-            return Int32Expression(num.toInt())
-        }
     }
 
     private fun unquote(text: String): String {

@@ -90,9 +90,9 @@ expression:
 | function                                                              #functionCallExpression
 | variable_name                                                         #variableReferenceExpression
 | id                                                                    #fieldExpression
-| (INT | LONG | DECIMAL | BIN | HEX)                                    #numberExpression
+| number                                                                #numberExpression
 | STRING                                                                #stringExpression
-| (TRUE | FALSE)                                                        #boolExpression
+| (TRUE | FALSE)                                                        #booleanExpression
 | NULL                                                                  #nullExpression
 ;
 
@@ -116,6 +116,10 @@ lambda_argument:
 
 lambda_expression:
   lambda_argument (COMMA lambda_argument)* ARROW expression
+;
+
+number:
+  (INT | LONG | DECIMAL | BIN | HEX)
 ;
 
 variable_assignment:
