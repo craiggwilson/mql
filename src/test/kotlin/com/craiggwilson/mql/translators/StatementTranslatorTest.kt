@@ -63,6 +63,7 @@ class StatementTranslatorTest() {
 
                 // field references
                 test("a", "\"\$a\""),
+                test("a[0].b", "{ \"\$let\": { \"vars\": { \"parent\": { \"\$arrayElemAt\": [ \"\$a\", NumberInt(\"0\") ] } }, \"in\": \"\$\$parent.b\" } }"),
 
                 // binary expression
                 test("1.0 + 2.0", "{ \"\$add\": [ 1.0, 2.0 ] }"),

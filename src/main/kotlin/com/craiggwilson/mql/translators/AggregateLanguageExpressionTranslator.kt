@@ -71,6 +71,12 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
 
     override fun visit(n: FieldReferenceExpression): String {
         val flattened = flatten(n)
+        if (flattened.parent != null) {
+            val parent = visit(flattened.parent)
+
+            return "{ \"\$let\": { \"vars\": { \"parent\": $parent }, \"in\": \"\$\$parent.${flattened.name.name}\" } }"
+        }
+
         return quote("\$${flattened.name.name}")
     }
 
