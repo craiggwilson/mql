@@ -7,6 +7,7 @@ import com.craiggwilson.mql.ast.ConditionalExpression
 import com.craiggwilson.mql.ast.DivideExpression
 import com.craiggwilson.mql.ast.EqualsExpression
 import com.craiggwilson.mql.ast.FieldReferenceExpression
+import com.craiggwilson.mql.ast.FunctionCallExpression
 import com.craiggwilson.mql.ast.GreaterThanExpression
 import com.craiggwilson.mql.ast.GreaterThanOrEqualsExpression
 import com.craiggwilson.mql.ast.LessThanExpression
@@ -109,6 +110,37 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
         }
 
         return quote("\$${flattened.name.name}")
+    }
+
+    override fun visit(n: FunctionCallExpression): String {
+        // shift parent to first position
+        var arguments = n.arguments
+        if (n.parent != null) {
+            arguments = listOf(FunctionCallExpression.Argument.Positional(n.parent)) + arguments
+        }
+
+        if (arguments.all { it is FunctionCallExpression.Argument.Named }) {
+            val argExpressions = arguments
+                .filterIsInstance<FunctionCallExpression.Argument.Named>()
+                .map { argument ->
+                    val name = quote(argument.name.name)
+                    val expression = visit(argument.expression)
+
+                    "$name: $expression"
+                }.joinToString()
+
+            return "{ \"\$${n.name.name}\": { $argExpressions } }"
+        } else {
+            val argExpressions = arguments.map { argument ->
+                when (argument) {
+                    is FunctionCallExpression.Argument.Named -> visit(argument.expression)
+                    is FunctionCallExpression.Argument.Positional -> visit(argument.expression)
+                    else -> throw UnsupportedOperationException("lamda arguments are not supported")
+                }
+            }.joinToString()
+
+            return "{ \"\$${n.name.name}\": [ $argExpressions ] }"
+        }
     }
 
     override fun visit(n: GreaterThanExpression): String {

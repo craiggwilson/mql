@@ -110,7 +110,13 @@ class StatementTranslatorTest() {
                 test("switch case true then false case false then true else null", "{ \"\$switch\": { \"branches\": [ { \"case\": true, \"then\": false }, { \"case\": false, \"then\": true } ], \"default\": null } }"),
 
                 // let
-                test("let \$x := true, \$y := false in \$x and \$y", "{ \"\$let\": { \"vars\": { \"x\": true, \"y\": false }, \"in\": { \"\$and\": [ \"\$\$x\", \"\$\$y\" ] } } }")
+                test("let \$x := true, \$y := false in \$x and \$y", "{ \"\$let\": { \"vars\": { \"x\": true, \"y\": false }, \"in\": { \"\$and\": [ \"\$\$x\", \"\$\$y\" ] } } }"),
+
+                // functions
+                test("testFunc(a, 1.0)", "{ \"\$testFunc\": [ \"\$a\", 1.0 ] }"),
+                test("testFunc(arg1 := a, arg2 := 1.0)", "{ \"\$testFunc\": { \"arg1\": \"\$a\", \"arg2\": 1.0 } }"),
+                test("a.testFunc(1.0)", "{ \"\$testFunc\": [ \"\$a\", 1.0 ] }"),
+                test("a.testFunc(arg2 := 1.0)", "{ \"\$testFunc\": [ \"\$a\", 1.0 ] }")
             )
         }
 

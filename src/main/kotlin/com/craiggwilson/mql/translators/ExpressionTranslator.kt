@@ -10,6 +10,7 @@ import com.craiggwilson.mql.ast.DivideExpression
 import com.craiggwilson.mql.ast.DoubleExpression
 import com.craiggwilson.mql.ast.EqualsExpression
 import com.craiggwilson.mql.ast.FieldReferenceExpression
+import com.craiggwilson.mql.ast.FunctionCallExpression
 import com.craiggwilson.mql.ast.GreaterThanExpression
 import com.craiggwilson.mql.ast.GreaterThanOrEqualsExpression
 import com.craiggwilson.mql.ast.Int32Expression
@@ -40,6 +41,7 @@ interface ExpressionTranslator {
     fun visit(n: DivideExpression): String
     fun visit(n: EqualsExpression): String
     fun visit(n: FieldReferenceExpression): String
+    fun visit(n: FunctionCallExpression): String
     fun visit(n: GreaterThanExpression): String
     fun visit(n: GreaterThanOrEqualsExpression): String
     fun visit(n: LessThanExpression): String

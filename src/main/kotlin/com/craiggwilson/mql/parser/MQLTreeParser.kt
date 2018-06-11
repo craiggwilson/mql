@@ -16,6 +16,9 @@ import com.craiggwilson.mql.ast.Expression
 import com.craiggwilson.mql.ast.FieldDeclaration
 import com.craiggwilson.mql.ast.FieldName
 import com.craiggwilson.mql.ast.FieldReferenceExpression
+import com.craiggwilson.mql.ast.FunctionArgumentName
+import com.craiggwilson.mql.ast.FunctionCallExpression
+import com.craiggwilson.mql.ast.FunctionName
 import com.craiggwilson.mql.ast.GreaterThanExpression
 import com.craiggwilson.mql.ast.GreaterThanOrEqualsExpression
 import com.craiggwilson.mql.ast.Int32Expression
@@ -212,10 +215,13 @@ class MQLTreeParser {
 
                 ConditionalExpression(condition, then, fallback)
             }
-            is MQLParser.FieldExpressionContext -> FieldReferenceExpression(null, getFieldName(ctx.id()))
+            is MQLParser.FieldExpressionContext -> FieldReferenceExpression(null, getFieldName(ctx.field_name()))
+            is MQLParser.FunctionCallExpressionContext -> {
+                parseFunction(ctx.function())
+            }
             is MQLParser.LetExpressionContext -> {
                 val variables = ctx.variable_assignment().map { va ->
-                    val name = VariableName(va.variable_name().text.substring(1))
+                    val name = getVariableName(va.variable_name())
                     val expression = parseExpression(va.expression())
 
                     LetExpression.Variable(name, expression)
@@ -228,11 +234,17 @@ class MQLTreeParser {
             is MQLParser.MemberExpressionContext -> {
                 val parent = parseExpression(ctx.expression())
 
-                if (ctx.id() != null) {
-                    val fieldName = getFieldName(ctx.id())
+                if (ctx.field_name() != null) {
+                    val fieldName = getFieldName(ctx.field_name())
                     FieldReferenceExpression(parent, fieldName)
                 } else {
-                    throw ParseException("function not yet supported")
+                    val function = parseFunction(ctx.function())
+
+                    function.update(
+                        parent,
+                        function.name,
+                        function.arguments
+                    )
                 }
             }
             is MQLParser.MultiplicationExpressionContext -> {
@@ -313,10 +325,27 @@ class MQLTreeParser {
                 }
             }
             is MQLParser.VariableReferenceExpressionContext -> {
-                VariableReferenceExpression(VariableName(ctx.variable_name().text.substring(1)))
+                VariableReferenceExpression(getVariableName(ctx.variable_name()))
             }
             else -> throw ParseException("expression not supported: ${ctx.text}")
         }
+    }
+
+    private fun parseFunction(ctx: MQLParser.FunctionContext): FunctionCallExpression {
+        val name = getFunctionName(ctx.function_name())
+        val arguments = ctx.function_argument().map { fa ->
+            if (fa.function_argument_name() != null) {
+                val argName = getFunctionArgumentName(fa.function_argument_name())
+                val expression = parseExpression(fa.expression())
+
+                FunctionCallExpression.Argument.Named(argName, expression)
+            } else {
+                val expression = parseExpression(fa.expression())
+                FunctionCallExpression.Argument.Positional(expression)
+            }
+        }
+
+        return FunctionCallExpression(null, name, arguments)
     }
 
     private fun parseNumber(ctx: MQLParser.NumberContext): NumberExpression {
@@ -328,10 +357,10 @@ class MQLTreeParser {
                 parseText = text.substring(0, text.length-1)
             }
             val num = parseText.toLong(radix)
-            if (parseForceLong || num > Int.MAX_VALUE) {
-                return Int64Expression(num)
+            return if (parseForceLong || num > Int.MAX_VALUE) {
+                Int64Expression(num)
             } else {
-                return Int32Expression(num.toInt())
+                Int32Expression(num.toInt())
             }
         }
 
@@ -385,11 +414,11 @@ class MQLTreeParser {
             databaseName = getDatabaseName(ctx.database_name())
         }
 
-        if (ctx.QUOTED_ID() != null) {
-            return CollectionName(databaseName, unquote(ctx.QUOTED_ID().text))
+        if (ctx.id().QUOTED_ID() != null) {
+            return CollectionName(databaseName, unquote(ctx.id().text))
         }
 
-        return CollectionName(databaseName, ctx.UNQUOTED_ID().text)
+        return CollectionName(databaseName, ctx.id().text)
     }
 
     private fun getDatabaseName(ctx: MQLParser.Database_nameContext): DatabaseName {
@@ -401,15 +430,15 @@ class MQLTreeParser {
     }
 
     private fun getFieldDeclaration(ctx: MQLParser.Multipart_field_nameContext): FieldDeclaration {
-        val fre = ctx.id()
+        val fre = ctx.field_name()
             .map { getFieldName(it) }
             .fold(null as FieldDeclaration?) { acc, item -> FieldDeclaration(acc, item) }
 
         return fre as FieldDeclaration
     }
 
-    private fun getFieldName(ctx: MQLParser.IdContext): FieldName {
-        if (ctx.QUOTED_ID() != null) {
+    private fun getFieldName(ctx: MQLParser.Field_nameContext): FieldName {
+        if (ctx.id().QUOTED_ID() != null) {
             return FieldName(unquote(ctx.text))
         }
 
@@ -417,11 +446,23 @@ class MQLTreeParser {
     }
 
     private fun getFieldReferenceExpression(ctx: MQLParser.Multipart_field_nameContext): FieldReferenceExpression {
-        val fre = ctx.id()
+        val fre = ctx.field_name()
             .map { getFieldName(it) }
             .fold(null as FieldReferenceExpression?) { acc, item -> FieldReferenceExpression(acc, item) }
 
         return fre as FieldReferenceExpression
+    }
+
+    private fun getFunctionName(ctx: MQLParser.Function_nameContext): FunctionName {
+        return FunctionName(ctx.text)
+    }
+
+    private fun getFunctionArgumentName(ctx: MQLParser.Function_argument_nameContext): FunctionArgumentName {
+        return FunctionArgumentName(ctx.text)
+    }
+
+    private fun getVariableName(ctx: MQLParser.Variable_nameContext): VariableName {
+        return VariableName(ctx.text.substring(1))
     }
 
     private fun unquote(text: String): String {

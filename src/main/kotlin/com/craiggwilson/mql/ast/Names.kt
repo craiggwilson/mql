@@ -7,4 +7,6 @@ data class FieldName(val name: String) {
         return FieldName("${this.name}.${name.name}")
     }
 }
+data class FunctionName(val name: String)
+data class FunctionArgumentName(val name: String)
 data class VariableName(val name: String)

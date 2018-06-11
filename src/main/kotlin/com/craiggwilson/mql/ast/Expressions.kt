@@ -126,10 +126,43 @@ data class FieldReferenceExpression(val parent: Expression?, val name: FieldName
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
     fun update(parent: Expression?, name: FieldName): FieldReferenceExpression {
-        if (parent !== this.parent || name !== this.name) {
-            return FieldReferenceExpression(parent, name)
+        return if (parent !== this.parent || name !== this.name) {
+            FieldReferenceExpression(parent, name)
+        } else this
+    }
+}
+
+data class FunctionCallExpression(val parent: Expression?, val name: FunctionName, val arguments: List<Argument>) : Expression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(parent: Expression?, name: FunctionName, arguments: List<Argument>): FunctionCallExpression {
+        return if (parent !== this.parent || name !== this.name || arguments !== this.arguments) {
+            FunctionCallExpression(parent, name, arguments)
+        } else this
+    }
+
+    sealed class Argument {
+        data class Positional(val expression: Expression) : Argument() {
+            fun update(expression: Expression) : Positional {
+                return if (expression !== this.expression) {
+                    Positional(expression)
+                } else this
+            }
         }
-        return this
+        data class Named(val name: FunctionArgumentName, val expression: Expression) : Argument() {
+            fun update(name: FunctionArgumentName, expression: Expression) : Named {
+                return if (name !== this.name || expression !== this.expression) {
+                    Named(name, expression)
+                } else this
+            }
+        }
+        data class Lambda(val parameters: List<VariableName>, val expression: Expression): Argument() {
+            fun update(parameters: List<VariableName>, expression: Expression): Lambda {
+                return if (parameters !== this.parameters || expression !== this.expression) {
+                    Lambda(parameters, expression)
+                } else this
+            }
+        }
     }
 }
 

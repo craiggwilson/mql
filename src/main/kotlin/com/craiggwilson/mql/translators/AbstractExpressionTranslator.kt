@@ -10,6 +10,7 @@ import com.craiggwilson.mql.ast.DivideExpression
 import com.craiggwilson.mql.ast.DoubleExpression
 import com.craiggwilson.mql.ast.EqualsExpression
 import com.craiggwilson.mql.ast.FieldReferenceExpression
+import com.craiggwilson.mql.ast.FunctionCallExpression
 import com.craiggwilson.mql.ast.GreaterThanExpression
 import com.craiggwilson.mql.ast.GreaterThanOrEqualsExpression
 import com.craiggwilson.mql.ast.Int32Expression
@@ -41,6 +42,7 @@ abstract class AbstractExpressionTranslator(private val valueTranslator: ValueTr
     abstract override fun visit(n: DivideExpression): String
     abstract override fun visit(n: EqualsExpression): String
     abstract override fun visit(n: FieldReferenceExpression): String
+    abstract override fun visit(n: FunctionCallExpression): String
     abstract override fun visit(n: GreaterThanExpression): String
     abstract override fun visit(n: GreaterThanOrEqualsExpression): String
     abstract override fun visit(n: LessThanExpression): String

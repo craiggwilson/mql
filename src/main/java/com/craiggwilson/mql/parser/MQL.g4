@@ -80,7 +80,7 @@ expression:
       | start=expression? COLON end=expression
     ) RBRACK                                                            #arrayAccessExpression
 | expression RANGE expression (STEP expression)?                        #rangeExpression
-| expression DOT (id | function)                                        #memberExpression
+| expression DOT (field_name | function)                                #memberExpression
 | SWITCH switch_case+ (ELSE expression)?                                #switchExpression
 | IF expression THEN expression ELSE expression                         #conditionalExpression
 | LET variable_assignment (COMMA variable_assignment)* IN expression    #letExpression
@@ -89,7 +89,7 @@ expression:
 | LPAREN expression RPAREN                                              #parenthesisExpression
 | function                                                              #functionCallExpression
 | variable_name                                                         #variableReferenceExpression
-| id                                                                    #fieldExpression
+| field_name                                                            #fieldExpression
 | number                                                                #numberExpression
 | STRING                                                                #stringExpression
 | (TRUE | FALSE)                                                        #booleanExpression
@@ -107,7 +107,7 @@ function:
 function_argument:
   expression
 | lambda_expression
-| id ASSIGN function_argument;
+| function_argument_name ASSIGN expression;
 
 lambda_argument:
   variable_name
@@ -132,24 +132,23 @@ variable_assignment:
 
 // NAMING
 collection_name:
-  (QUOTED_ID | UNQUOTED_ID)
-| database_name DOT (QUOTED_ID | UNQUOTED_ID)
+  id
+| database_name DOT id
 ;
 
-database_name: (QUOTED_ID | UNQUOTED_ID);
+database_name: QUOTED_ID | UNQUOTED_ID;
 
-multipart_field_name: id (DOT id)*;
+field_name: id;
 
-id:
-  QUOTED_ID
-| UNQUOTED_ID
-;
+function_name: UNQUOTED_ID;
 
-function_name:
-  UNQUOTED_ID
-;
+function_argument_name: id;
 
-variable_name: DOLLAR (QUOTED_ID | UNQUOTED_ID);
+multipart_field_name: field_name (DOT field_name)*;
+
+id: QUOTED_ID | UNQUOTED_ID;
+
+variable_name: DOLLAR id;
 
 /////////////
 // LEXER
@@ -237,7 +236,7 @@ HEX: '0' X HEX_DIGIT HEX_DIGIT_OR_SEPARATOR* L?;
 
 STRING: '\'' ('\\'. | '\'\'' | ~('\'' | '\\'))* '\'';
 QUOTED_ID: '`' ('\\'. | '\'\'' | ~('`' | '\\'))* '`';
-UNQUOTED_ID: [_a-zA-Z]+;
+UNQUOTED_ID: [_a-zA-Z] [_a-zA-Z0-9]*;
 WS: ( ' ' | '\t' | '\r' | '\n' )+ -> skip;
 
 fragment BIN_DIGIT:             [01];

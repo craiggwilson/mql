@@ -21,6 +21,7 @@ abstract class Visitor<T> {
     open fun visit(n: DoubleExpression): T = throw NotImplementedError()
     open fun visit(n: EqualsExpression): T = throw NotImplementedError()
     open fun visit(n: FieldReferenceExpression): T = throw NotImplementedError()
+    open fun visit(n: FunctionCallExpression): T = throw NotImplementedError()
     open fun visit(n: GreaterThanExpression): T = throw NotImplementedError()
     open fun visit(n: GreaterThanOrEqualsExpression): T = throw NotImplementedError()
     open fun visit(n: Int32Expression): T = throw NotImplementedError()
@@ -84,51 +85,81 @@ abstract class NodeVisitor : Visitor<Node>() {
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
+
     override fun visit(n: AndExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
+
     override fun visit(n: ArrayAccessExpression): Node = n.update(
         visit(n.array) as Expression,
         visit(n.accessor) as Expression
     )
+
     override fun visit(n: BooleanExpression): Node = n
     override fun visit(n: ConditionalExpression): Node = n.update(
         visit(n.cases) { case ->
             case.update(
                 visit(case.condition) as Expression,
-                visit(case.then ) as Expression
+                visit(case.then) as Expression
             )
         },
         visit(n.fallback) as Expression?
     )
+
     override fun visit(n: DecimalExpression): Node = n
     override fun visit(n: DivideExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
+
     override fun visit(n: DoubleExpression): Node = n
     override fun visit(n: EqualsExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
+
     override fun visit(n: FieldReferenceExpression): Node = n.update(
         visit(n.parent) as Expression?,
         n.name)
+
+    override fun visit(n: FunctionCallExpression): Node = n.update(
+        visit(n.parent) as Expression?,
+        n.name,
+        visit(n.arguments) { argument ->
+            when (argument) {
+                is FunctionCallExpression.Argument.Named -> argument.update(
+                    argument.name,
+                    visit(argument.expression) as Expression
+                )
+                is FunctionCallExpression.Argument.Positional -> argument.update(
+                    visit(argument.expression) as Expression
+                )
+                is FunctionCallExpression.Argument.Lambda -> argument.update(
+                    argument.parameters,
+                    visit(argument.expression) as Expression
+                )
+            }
+        }
+    )
+
     override fun visit(n: GreaterThanExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
+
     override fun visit(n: GreaterThanOrEqualsExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
+
     override fun visit(n: Int32Expression): Node = n
     override fun visit(n: Int64Expression): Node = n
     override fun visit(n: LessThanExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
+
     override fun visit(n: LessThanOrEqualsExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
@@ -143,17 +174,21 @@ abstract class NodeVisitor : Visitor<Node>() {
         },
         visit(n.expression) as Expression
     )
+
     override fun visit(n: ModExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
+
     override fun visit(n: MultiplyExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
+
     override fun visit(n: NewArrayExpression): Node = n.update(
         visit(n.items)
     )
+
     override fun visit(n: NewDocumentExpression): Node = n.update(
         visit(n.elements) { element ->
             element.update(
@@ -162,31 +197,38 @@ abstract class NodeVisitor : Visitor<Node>() {
             )
         }
     )
+
     override fun visit(n: NotEqualsExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
+
     override fun visit(n: NotExpression): Node = n.update(
         visit(n.expression) as Expression
     )
+
     override fun visit(n: NullExpression): Node = n
     override fun visit(n: OrExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
+
     override fun visit(n: PowerExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
+
     override fun visit(n: RangeExpression): Node = n.update(
         visit(n.start) as Expression,
         visit(n.end) as Expression,
         visit(n.step) as Expression
     )
+
     override fun visit(n: SubtractExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
+
     override fun visit(n: StringExpression): Node = n
     override fun visit(n: VariableReferenceExpression): Node = n
 
