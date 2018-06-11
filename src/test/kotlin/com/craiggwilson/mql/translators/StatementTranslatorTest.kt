@@ -36,6 +36,11 @@ class StatementTranslatorTest() {
         @JvmStatic
         private fun expressions(): Collection<Array<String>> {
             return listOf(
+                // order of operations
+                test("true AND false", "{ \"\$and\": [ true, false ] }"),
+                test("true AND false OR true", "{ \"\$or\": [ { \"\$and\": [ true, false ] }, true ] }"),
+                test("true AND (false OR true)", "{ \"\$and\": [ true, { \"\$or\": [ false, true ] } ] }"),
+
                 // constants
                 test("false", "false"),
                 test("true", "true"),

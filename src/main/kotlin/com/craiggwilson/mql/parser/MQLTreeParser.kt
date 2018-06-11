@@ -233,6 +233,7 @@ class MQLTreeParser {
 
                 OrExpression(left, right)
             }
+            is MQLParser.ParenthesisExpressionContext -> parseExpression(ctx.expression())
             is MQLParser.PowerExpressionContext -> {
                 val left = parseExpression(ctx.expression(0))
                 val right = parseExpression(ctx.expression(1))
