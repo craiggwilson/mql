@@ -26,7 +26,7 @@ class ShellTranslator : Visitor<String>() {
     private var dollarReference = false
 
     override fun visit(n: BooleanExpression): String {
-        return n.toString()
+        return n.value.toString()
     }
 
     override fun visit(n: DecimalExpression): String {
