@@ -1,11 +1,11 @@
-package com.craiggwilson.mql
+package com.craiggwilson.mql.translators
 
 import com.craiggwilson.mql.parser.parseMQL
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 
-class ShellTranslatorTest() {
+class StatementTranslatorTest() {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("expressions")
