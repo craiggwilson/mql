@@ -17,6 +17,8 @@ import com.craiggwilson.mql.ast.LessThanExpression
 import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
 import com.craiggwilson.mql.ast.ModExpression
 import com.craiggwilson.mql.ast.MultiplyExpression
+import com.craiggwilson.mql.ast.NewArrayExpression
+import com.craiggwilson.mql.ast.NewDocumentExpression
 import com.craiggwilson.mql.ast.NotEqualsExpression
 import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.NullExpression
@@ -39,6 +41,8 @@ abstract class AbstractExpressionTranslator(private val valueTranslator: ValueTr
     abstract override fun visit(n: LessThanOrEqualsExpression): String
     abstract override fun visit(n: ModExpression): String
     abstract override fun visit(n: MultiplyExpression): String
+    abstract override fun visit(n: NewArrayExpression): String
+    abstract override fun visit(n: NewDocumentExpression): String
     abstract override fun visit(n: NotEqualsExpression): String
     abstract override fun visit(n: NotExpression): String
     abstract override fun visit(n: OrExpression): String

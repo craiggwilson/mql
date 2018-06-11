@@ -64,6 +64,13 @@ class StatementTranslatorTest() {
                 // field references
                 test("a", "\"\$a\""),
                 test("a[0].b", "{ \"\$let\": { \"vars\": { \"parent\": { \"\$arrayElemAt\": [ \"\$a\", NumberInt(\"0\") ] } }, \"in\": \"\$\$parent.b\" } }"),
+                test("{a:= false}.a", "{ \"\$let\": { \"vars\": { \"parent\": { \"a\": false } }, \"in\": \"\$\$parent.a\" } }"),
+
+                // arrays
+                test("[true, false, true]", "[ true, false, true ]"),
+
+                // documents
+                test("{ a:= 1.0, b:= 2.0 }", "{ \"a\": 1.0, \"b\": 2.0 }"),
 
                 // binary expression
                 test("1.0 + 2.0", "{ \"\$add\": [ 1.0, 2.0 ] }"),

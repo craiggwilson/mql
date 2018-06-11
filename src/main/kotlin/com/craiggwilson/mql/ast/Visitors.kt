@@ -28,6 +28,8 @@ abstract class Visitor<T> {
     open fun visit(n: LessThanOrEqualsExpression): T = throw NotImplementedError()
     open fun visit(n: MultiplyExpression): T = throw NotImplementedError()
     open fun visit(n: ModExpression): T = throw NotImplementedError()
+    open fun visit(n: NewArrayExpression): T = throw NotImplementedError()
+    open fun visit(n: NewDocumentExpression): T = throw NotImplementedError()
     open fun visit(n: NotEqualsExpression): T = throw NotImplementedError()
     open fun visit(n: NotExpression): T = throw NotImplementedError()
     open fun visit(n: NullExpression): T = throw NotImplementedError()
@@ -126,6 +128,17 @@ abstract class NodeVisitor : Visitor<Node>() {
     override fun visit(n: MultiplyExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
+    )
+    override fun visit(n: NewArrayExpression): Node = n.update(
+        visit(n.items)
+    )
+    override fun visit(n: NewDocumentExpression): Node = n.update(
+        visit(n.elements) { element ->
+            element.update(
+                visit(element.field) as FieldDeclaration,
+                visit(element.expression) as Expression
+            )
+        }
     )
     override fun visit(n: NotEqualsExpression): Node = n.update(
         visit(n.left) as Expression,

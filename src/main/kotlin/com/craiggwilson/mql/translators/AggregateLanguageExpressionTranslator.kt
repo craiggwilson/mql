@@ -12,6 +12,8 @@ import com.craiggwilson.mql.ast.LessThanExpression
 import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
 import com.craiggwilson.mql.ast.ModExpression
 import com.craiggwilson.mql.ast.MultiplyExpression
+import com.craiggwilson.mql.ast.NewArrayExpression
+import com.craiggwilson.mql.ast.NewDocumentExpression
 import com.craiggwilson.mql.ast.NotEqualsExpression
 import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.NullExpression
@@ -120,6 +122,23 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
         val right = visit(n.right)
 
         return "{ \"\$multiply\": [ $left, $right ] }"
+    }
+
+    override fun visit(n: NewArrayExpression): String {
+        val items = n.items.map { visit(it) }.joinToString()
+
+        return "[ $items ]"
+    }
+
+    override fun visit(n: NewDocumentExpression): String {
+        val fieldString = n.elements.joinToString { element ->
+            val fieldName = visit(element.field)
+            val expression = visit(element.expression)
+
+            "$fieldName: $expression"
+        }
+
+        return "{ $fieldString }"
     }
 
     override fun visit(n: NotEqualsExpression): String {

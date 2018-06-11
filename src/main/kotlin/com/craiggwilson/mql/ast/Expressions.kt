@@ -201,6 +201,34 @@ data class MultiplyExpression(override val left: Expression, override val right:
     }
 }
 
+data class NewArrayExpression(val items: List<Expression>) : Expression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(items: List<Expression>): NewArrayExpression {
+        return if (items !== this.items) {
+            NewArrayExpression(items)
+        } else this
+    }
+}
+
+data class NewDocumentExpression(val elements: List<Element>) : Expression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(elements: List<Element>): NewDocumentExpression {
+        return if (elements !== this.elements) {
+            NewDocumentExpression(elements)
+        } else this
+    }
+
+    data class Element(val field: FieldDeclaration, val expression: Expression) {
+        fun update(field: FieldDeclaration, expression: Expression): Element {
+            return if (field !== this.field || expression !== this.expression) {
+                Element(field, expression)
+            } else this
+        }
+    }
+}
+
 data class NotEqualsExpression(override val left: Expression, override val right: Expression) : BinaryExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 

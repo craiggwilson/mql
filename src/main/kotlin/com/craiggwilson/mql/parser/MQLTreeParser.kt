@@ -24,6 +24,8 @@ import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
 import com.craiggwilson.mql.ast.LimitStage
 import com.craiggwilson.mql.ast.ModExpression
 import com.craiggwilson.mql.ast.MultiplyExpression
+import com.craiggwilson.mql.ast.NewArrayExpression
+import com.craiggwilson.mql.ast.NewDocumentExpression
 import com.craiggwilson.mql.ast.NotEqualsExpression
 import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.NullExpression
@@ -220,6 +222,21 @@ class MQLTreeParser {
                     "%" -> ModExpression(left, right)
                     else -> throw ParseException("unknown multiplication operator: ${ctx.op.text}")
                 }
+            }
+            is MQLParser.NewArrayExpressionContext -> {
+                val items = ctx.expression().map { parseExpression(it) }
+
+                NewArrayExpression(items)
+            }
+            is MQLParser.NewDocumentExpressionContext -> {
+                val elements = ctx.field_assignment().map { fa ->
+                    val field = getFieldDeclaration(fa.multipart_field_name())
+                    val expression = parseExpression(fa.expression())
+
+                    NewDocumentExpression.Element(field, expression)
+                }
+
+                NewDocumentExpression(elements)
             }
             is MQLParser.NotExpressionContext -> {
                 val expression = parseExpression(ctx.expression())

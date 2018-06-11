@@ -17,6 +17,8 @@ import com.craiggwilson.mql.ast.LessThanExpression
 import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
 import com.craiggwilson.mql.ast.ModExpression
 import com.craiggwilson.mql.ast.MultiplyExpression
+import com.craiggwilson.mql.ast.NewArrayExpression
+import com.craiggwilson.mql.ast.NewDocumentExpression
 import com.craiggwilson.mql.ast.NotEqualsExpression
 import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.NullExpression
@@ -40,6 +42,8 @@ interface ExpressionTranslator {
     fun visit(n: LessThanOrEqualsExpression): String
     fun visit(n: ModExpression): String
     fun visit(n: MultiplyExpression): String
+    fun visit(n: NewArrayExpression): String
+    fun visit(n: NewDocumentExpression): String
     fun visit(n: NotEqualsExpression): String
     fun visit(n: NotExpression): String
     fun visit(n: OrExpression): String

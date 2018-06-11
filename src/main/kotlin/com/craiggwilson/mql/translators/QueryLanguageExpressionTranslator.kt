@@ -12,6 +12,8 @@ import com.craiggwilson.mql.ast.LessThanExpression
 import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
 import com.craiggwilson.mql.ast.ModExpression
 import com.craiggwilson.mql.ast.MultiplyExpression
+import com.craiggwilson.mql.ast.NewArrayExpression
+import com.craiggwilson.mql.ast.NewDocumentExpression
 import com.craiggwilson.mql.ast.NotEqualsExpression
 import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.OrExpression
@@ -67,6 +69,14 @@ class QueryLanguageExpressionTranslator(valueTranslator: ValueTranslator) : Abst
     }
 
     override fun visit(n: MultiplyExpression): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun visit(n: NewArrayExpression): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun visit(n: NewDocumentExpression): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
