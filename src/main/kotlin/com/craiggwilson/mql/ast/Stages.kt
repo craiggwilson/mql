@@ -14,6 +14,24 @@ data class LimitStage(val limit: Long) : Stage() {
     }
 }
 
+data class ProjectStage(val items: List<Item>) : Stage() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(items: List<Item>): ProjectStage {
+        return if (items !== this.items) {
+            ProjectStage(items)
+        } else this
+    }
+
+    data class Item(val field: FieldDeclaration, val expression: Expression) {
+        fun update(field: FieldDeclaration, expression: Expression): Item {
+            return if (field !== this.field || expression !== this.expression) {
+                return Item(field, expression)
+            } else this
+        }
+    }
+}
+
 data class SkipStage(val skip: Long) : Stage() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 

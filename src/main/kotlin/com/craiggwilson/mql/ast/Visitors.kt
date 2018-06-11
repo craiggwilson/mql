@@ -15,11 +15,13 @@ abstract class Visitor<T> {
 
     // Nodes
 
+    open fun visit(n: FieldDeclaration): T = throw NotImplementedError()
     open fun visit(n: Statement): T = throw NotImplementedError()
 
     // Stages
 
     open fun visit(n: LimitStage): T = throw NotImplementedError()
+    open fun visit(n: ProjectStage): T = throw NotImplementedError()
     open fun visit(n: SkipStage): T = throw NotImplementedError()
     open fun visit(n: SortStage): T = throw NotImplementedError()
     open fun visit(n: UnwindStage): T = throw NotImplementedError()
@@ -44,4 +46,48 @@ abstract class Visitor<T> {
 
     @Suppress("UNCHECKED_CAST")
     protected fun <T : Node> visit(items: List<T>): List<T> = visit(items) { visit(it) as T }
+}
+
+abstract class NodeVisitor : Visitor<Node>() {
+    // Expressions
+
+    override fun visit(n: FieldReferenceExpression): Node = n.update(
+        visit(n.parent) as Expression?,
+        n.name)
+
+    // Nodes
+
+    override fun visit(n: FieldDeclaration): Node = n.update(
+        visit(n.parent) as FieldDeclaration?,
+        n.name)
+
+    override fun visit(n: Statement): Node = n.update(
+        n.collectionName,
+        visit(n.pipeline))
+
+    // Stages
+
+    override fun visit(n: LimitStage): Node = n.update(n.limit)
+
+    override fun visit(n: ProjectStage): Node = n.update(
+        visit(n.items) { item ->
+            item.update(
+                visit(item.field) as FieldDeclaration,
+                visit(item.expression) as Expression
+            )
+        }
+    )
+
+    override fun visit(n: SkipStage): Node = n.update(n.skip)
+
+    override fun visit(n: SortStage): Node = n.update(
+        visit(n.fields) { field ->
+            field.update(
+                visit(field.field) as FieldReferenceExpression,
+                field.direction
+            )
+        }
+    )
+
+    override fun visit(n: UnwindStage): Node = n.update(n.field, n.indexField, n.preserveNullAndEmpty)
 }

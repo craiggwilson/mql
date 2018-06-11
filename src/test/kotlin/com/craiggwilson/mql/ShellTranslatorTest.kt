@@ -31,6 +31,17 @@ class ShellTranslatorTest() {
                     "db.bar.aggregate([{ \$limit: 10 }])"
                 ),
 
+                // PROJECT
+                test(
+                    "FROM bar PROJECT a, b.c, `c`",
+                    "db.bar.aggregate([{ \$project: { \"a\": \"\$a\", \"b.c\": \"\$b.c\", \"c\": \"\$c\" } }])"
+                ),
+
+                test(
+                    "FROM bar PROJECT a := a, b_c := b.c, C := `c`",
+                    "db.bar.aggregate([{ \$project: { \"a\": \"\$a\", \"b_c\": \"\$b.c\", \"C\": \"\$c\" } }])"
+                ),
+
                 // SKIP
                 test(
                     "FROM bar SKIP 10",

@@ -80,15 +80,14 @@ expression:
       | expression? COLON expression
     ) RBRACK                                                            #arrayExpression
 | expression RANGE expression                                           #rangeExpression
-| expression DOT expression                                             #memberExpression
+| expression DOT (id | function)                                        #memberExpression
 | SWITCH (CASE expression THEN expression)+ (ELSE expression)?          #switchExpression
 | IF expression THEN expression ELSE expression                         #conditionalExpression
 | LET variable_assignment (COMMA variable_assignment)* IN expression    #letExpression
 | LBRACE (field_assignment (COMMA field_assignment)*)? RBRACE           #documentExpression
 | LBRACK (expression (COMMA expression)*)? RBRACK                       #arrayExpression
 | LPAREN expression RPAREN                                              #parenthesisExpression
-| function_name
-    LPAREN (function_argument (COMMA function_argument)*)? RPAREN       #functionCallExpression
+| function                                                              #functionCallExpression
 | variable_name                                                         #variableReferenceExpression
 | id                                                                    #fieldExpression
 | INT                                                                   #numberExpression
@@ -98,9 +97,12 @@ expression:
 | NULL                                                                  #nullExpression
 ;
 
-
 field_assignment:
   (multipart_field_name ASSIGN)? expression
+;
+
+function:
+  function_name LPAREN (function_argument (COMMA function_argument)*)? RPAREN
 ;
 
 function_argument:

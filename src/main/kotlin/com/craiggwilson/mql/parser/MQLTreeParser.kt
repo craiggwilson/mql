@@ -3,10 +3,12 @@ package com.craiggwilson.mql.parser
 import com.craiggwilson.mql.ast.CollectionName
 import com.craiggwilson.mql.ast.DatabaseName
 import com.craiggwilson.mql.ast.Direction
+import com.craiggwilson.mql.ast.Expression
 import com.craiggwilson.mql.ast.FieldDeclaration
 import com.craiggwilson.mql.ast.FieldName
 import com.craiggwilson.mql.ast.FieldReferenceExpression
 import com.craiggwilson.mql.ast.LimitStage
+import com.craiggwilson.mql.ast.ProjectStage
 import com.craiggwilson.mql.ast.SkipStage
 import com.craiggwilson.mql.ast.SortStage
 import com.craiggwilson.mql.ast.Stage
@@ -21,6 +23,8 @@ fun parseMQL(mql: String): List<Statement> {
 }
 
 class MQLTreeParser {
+
+    private var generatedIdNum = 0
 
     fun parse(mql: String): List<Statement> {
         val input = CharStreams.fromString(mql)
@@ -62,6 +66,7 @@ class MQLTreeParser {
     private fun parseStage(ctx: MQLParser.StageContext): Stage {
         return when {
             ctx.limit_stage() != null -> parseLimitStage(ctx.limit_stage())
+            ctx.project_stage() != null -> parseProjectStage(ctx.project_stage())
             ctx.skip_stage() != null -> parseSkipStage(ctx.skip_stage())
             ctx.sort_stage() != null -> parseSortStage(ctx.sort_stage())
             ctx.unwind_stage() != null -> parseUnwindStage(ctx.unwind_stage())
@@ -71,6 +76,21 @@ class MQLTreeParser {
 
     private fun parseLimitStage(ctx: MQLParser.Limit_stageContext): LimitStage {
         return LimitStage(ctx.INT().text.toLong())
+    }
+
+    private fun parseProjectStage(ctx: MQLParser.Project_stageContext): ProjectStage {
+        val items = ctx.field_assignment().map { item ->
+            val expression = parseExpression(item.expression())
+            val fieldDeclaration = if(item.multipart_field_name() != null) {
+                getFieldDeclaration(item.multipart_field_name())
+            } else {
+                generateFieldDeclaration(expression)
+            }
+
+            ProjectStage.Item(fieldDeclaration, expression)
+        }
+
+        return ProjectStage(items)
     }
 
     private fun parseSkipStage(ctx: MQLParser.Skip_stageContext): SkipStage {
@@ -95,14 +115,14 @@ class MQLTreeParser {
     private fun parseUnwindStage(ctx: MQLParser.Unwind_stageContext): UnwindStage {
         val field = getFieldReferenceExpression(ctx.multipart_field_name())
 
-        var preserveNullAndEmpty: Boolean = false
+        var preserveNullAndEmpty = false
         var indexField: FieldDeclaration? = null
 
         if (ctx.unwind_option() != null) {
             ctx.unwind_option().forEach {
                 when {
-                    it.PRESERVE_NULL_AND_EMPTY() != null -> preserveNullAndEmpty = true;
-                    it.INDEX() != null -> indexField = getFieldDeclarationExpression(it.multipart_field_name())
+                    it.PRESERVE_NULL_AND_EMPTY() != null -> preserveNullAndEmpty = true
+                    it.INDEX() != null -> indexField = getFieldDeclaration(it.multipart_field_name())
                 }
             }
         }
@@ -110,20 +130,21 @@ class MQLTreeParser {
         return UnwindStage(field, indexField, preserveNullAndEmpty)
     }
 
-    private fun getFieldDeclarationExpression(ctx: MQLParser.Multipart_field_nameContext): FieldDeclaration {
-        val fre = ctx.id()
-            .map { getFieldName(it) }
-            .fold(null as FieldDeclaration?) { acc, item -> FieldDeclaration(acc, item) }
+    private fun parseExpression(ctx: MQLParser.ExpressionContext): Expression {
+        return when (ctx) {
+            is MQLParser.FieldExpressionContext -> FieldReferenceExpression(null, getFieldName(ctx.id()))
+            is MQLParser.MemberExpressionContext -> {
+                val parent = parseExpression(ctx.expression())
 
-        return fre as FieldDeclaration
-    }
-
-    private fun getFieldReferenceExpression(ctx: MQLParser.Multipart_field_nameContext): FieldReferenceExpression {
-        val fre = ctx.id()
-            .map { getFieldName(it) }
-            .fold(null as FieldReferenceExpression?) { acc, item -> FieldReferenceExpression(acc, item) }
-
-        return fre as FieldReferenceExpression
+                if (ctx.id() != null) {
+                    val fieldName = getFieldName(ctx.id())
+                    FieldReferenceExpression(parent, fieldName)
+                } else {
+                    throw ParseException("function not yet supported")
+                }
+            }
+            else -> throw ParseException("expression not supported: $ctx")
+        }
     }
 
     private fun getCollectionName(ctx: MQLParser.Collection_nameContext): CollectionName {
@@ -147,12 +168,44 @@ class MQLTreeParser {
         return DatabaseName(ctx.text)
     }
 
+    private fun getFieldDeclaration(ctx: MQLParser.Multipart_field_nameContext): FieldDeclaration {
+        val fre = ctx.id()
+            .map { getFieldName(it) }
+            .fold(null as FieldDeclaration?) { acc, item -> FieldDeclaration(acc, item) }
+
+        return fre as FieldDeclaration
+    }
+
     private fun getFieldName(ctx: MQLParser.IdContext): FieldName {
         if (ctx.QUOTED_ID() != null) {
             return FieldName(unquote(ctx.text))
         }
 
         return FieldName(ctx.text)
+    }
+
+    private fun getFieldReferenceExpression(ctx: MQLParser.Multipart_field_nameContext): FieldReferenceExpression {
+        val fre = ctx.id()
+            .map { getFieldName(it) }
+            .fold(null as FieldReferenceExpression?) { acc, item -> FieldReferenceExpression(acc, item) }
+
+        return fre as FieldReferenceExpression
+    }
+
+    private fun generateFieldDeclaration(expression: Expression): FieldDeclaration {
+        return when (expression) {
+            is FieldReferenceExpression -> {
+                val parent = if (expression.parent != null) {
+                    generateFieldDeclaration(expression.parent)
+                } else null
+
+                FieldDeclaration(parent, expression.name)
+            }
+            else -> {
+                generatedIdNum++
+                FieldDeclaration(FieldName("__fld$generatedIdNum"))
+            }
+        }
     }
 
     private fun unquote(text: String): String {
