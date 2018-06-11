@@ -1,27 +1,40 @@
 package com.craiggwilson.mql.parser
 
+import com.craiggwilson.mql.ast.AddExpression
+import com.craiggwilson.mql.ast.AndExpression
 import com.craiggwilson.mql.ast.BooleanExpression
 import com.craiggwilson.mql.ast.CollectionName
 import com.craiggwilson.mql.ast.DatabaseName
 import com.craiggwilson.mql.ast.DecimalExpression
 import com.craiggwilson.mql.ast.Direction
+import com.craiggwilson.mql.ast.DivideExpression
 import com.craiggwilson.mql.ast.DoubleExpression
+import com.craiggwilson.mql.ast.EqualsExpression
 import com.craiggwilson.mql.ast.Expression
 import com.craiggwilson.mql.ast.FieldDeclaration
 import com.craiggwilson.mql.ast.FieldName
 import com.craiggwilson.mql.ast.FieldReferenceExpression
+import com.craiggwilson.mql.ast.GreaterThanExpression
+import com.craiggwilson.mql.ast.GreaterThanOrEqualsExpression
 import com.craiggwilson.mql.ast.Int32Expression
 import com.craiggwilson.mql.ast.Int64Expression
+import com.craiggwilson.mql.ast.LessThanExpression
+import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
 import com.craiggwilson.mql.ast.LimitStage
+import com.craiggwilson.mql.ast.ModExpression
+import com.craiggwilson.mql.ast.MultiplyExpression
+import com.craiggwilson.mql.ast.NotEqualsExpression
 import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.NullExpression
 import com.craiggwilson.mql.ast.NumberExpression
+import com.craiggwilson.mql.ast.OrExpression
 import com.craiggwilson.mql.ast.ProjectStage
 import com.craiggwilson.mql.ast.SkipStage
 import com.craiggwilson.mql.ast.SortStage
 import com.craiggwilson.mql.ast.Stage
 import com.craiggwilson.mql.ast.Statement
 import com.craiggwilson.mql.ast.StringExpression
+import com.craiggwilson.mql.ast.SubtractExpression
 import com.craiggwilson.mql.ast.UnwindStage
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -141,7 +154,37 @@ class MQLTreeParser {
 
     private fun parseExpression(ctx: MQLParser.ExpressionContext): Expression {
         return when (ctx) {
+            is MQLParser.AdditionExpressionContext -> {
+                val left = parseExpression(ctx.expression(0))
+                val right = parseExpression(ctx.expression(1))
+
+                when (ctx.op.text) {
+                    "+" -> AddExpression(left, right)
+                    "-" -> SubtractExpression(left, right)
+                    else -> throw ParseException("unknown multiplication operator: ${ctx.op.text}")
+                }
+            }
+            is MQLParser.AndExpressionContext -> {
+                val left = parseExpression(ctx.expression(0))
+                val right = parseExpression(ctx.expression(1))
+
+                AndExpression(left, right)
+            }
             is MQLParser.BooleanExpressionContext -> BooleanExpression(ctx.TRUE() != null)
+            is MQLParser.ComparisonExpressionContext -> {
+                val left = parseExpression(ctx.expression(0))
+                val right = parseExpression(ctx.expression(1))
+
+                when (ctx.op.text) {
+                    "=" -> EqualsExpression(left, right)
+                    "!=" -> NotEqualsExpression(left, right)
+                    "<" -> LessThanExpression(left, right)
+                    "<=" -> LessThanOrEqualsExpression(left, right)
+                    ">" -> GreaterThanExpression(left, right)
+                    ">=" -> GreaterThanOrEqualsExpression(left, right)
+                    else -> throw ParseException("unknown multiplication operator: ${ctx.op.text}")
+                }
+            }
             is MQLParser.FieldExpressionContext -> FieldReferenceExpression(null, getFieldName(ctx.id()))
             is MQLParser.MemberExpressionContext -> {
                 val parent = parseExpression(ctx.expression())
@@ -153,12 +196,29 @@ class MQLTreeParser {
                     throw ParseException("function not yet supported")
                 }
             }
+            is MQLParser.MultiplicationExpressionContext -> {
+                val left = parseExpression(ctx.expression(0))
+                val right = parseExpression(ctx.expression(1))
+
+                when (ctx.op.text) {
+                    "*" -> MultiplyExpression(left, right)
+                    "/" -> DivideExpression(left, right)
+                    "%" -> ModExpression(left, right)
+                    else -> throw ParseException("unknown multiplication operator: ${ctx.op.text}")
+                }
+            }
             is MQLParser.NotExpressionContext -> {
                 val expression = parseExpression(ctx.expression())
                 return NotExpression(expression)
             }
             is MQLParser.NullExpressionContext -> NullExpression
             is MQLParser.NumberExpressionContext -> parseNumber(ctx.number())
+            is MQLParser.OrExpressionContext -> {
+                val left = parseExpression(ctx.expression(0))
+                val right = parseExpression(ctx.expression(1))
+
+                OrExpression(left, right)
+            }
             is MQLParser.StringExpressionContext -> StringExpression(unquote(ctx.text))
             is MQLParser.UnaryMinusExpressionContext -> {
                 val expression = parseExpression(ctx.expression())
