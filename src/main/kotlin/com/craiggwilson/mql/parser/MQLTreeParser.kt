@@ -113,14 +113,13 @@ class MQLTreeParser {
     }
 
     private fun parseProjectStage(ctx: MQLParser.Project_stageContext): ProjectStage {
-        val items = ctx.field_assignment().map { item ->
-            val expression = parseExpression(item.expression())
-            val fieldDeclaration = if(item.multipart_field_name() != null) {
-                getFieldDeclaration(item.multipart_field_name())
-            } else {
-                generateFieldDeclaration(expression)
+        val items = ctx.project_item().map { item ->
+            val expression = when {
+                item.expression() != null -> parseExpression(item.expression())
+                else -> getFieldReferenceExpression(item.multipart_field_name())
             }
 
+            val fieldDeclaration = getFieldDeclaration(item.multipart_field_name())
             ProjectStage.Item(fieldDeclaration, expression)
         }
 
@@ -265,7 +264,7 @@ class MQLTreeParser {
             }
             is MQLParser.NewDocumentExpressionContext -> {
                 val elements = ctx.field_assignment().map { fa ->
-                    val field = getFieldDeclaration(fa.multipart_field_name())
+                    val field = getFieldDeclaration(fa.field_name())
                     val expression = parseExpression(fa.expression())
 
                     NewDocumentExpression.Element(field, expression)
@@ -435,6 +434,10 @@ class MQLTreeParser {
             .fold(null as FieldDeclaration?) { acc, item -> FieldDeclaration(acc, item) }
 
         return fre as FieldDeclaration
+    }
+
+    private fun getFieldDeclaration(ctx: MQLParser.Field_nameContext): FieldDeclaration {
+        return FieldDeclaration(null, getFieldName(ctx))
     }
 
     private fun getFieldName(ctx: MQLParser.Field_nameContext): FieldName {

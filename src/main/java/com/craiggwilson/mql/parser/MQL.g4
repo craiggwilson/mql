@@ -39,7 +39,11 @@ match_stage:
 ;
 
 project_stage:
-  PROJECT field_assignment (COMMA field_assignment)*
+  PROJECT project_item (COMMA project_item)*
+;
+
+project_item:
+  multipart_field_name (ASSIGN expression)?
 ;
 
 skip_stage:
@@ -97,7 +101,7 @@ expression:
 ;
 
 field_assignment:
-  (multipart_field_name ASSIGN)? expression
+  field_name ASSIGN expression
 ;
 
 function:
