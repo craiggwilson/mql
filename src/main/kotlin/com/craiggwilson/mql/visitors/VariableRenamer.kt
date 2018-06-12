@@ -5,15 +5,14 @@ import com.craiggwilson.mql.ast.NodeVisitor
 import com.craiggwilson.mql.ast.VariableName
 import com.craiggwilson.mql.ast.VariableReferenceExpression
 
-fun renameVariables(n: Node, vararg renames: Pair<VariableName, VariableName>): Node {
-    return VariableRenamingVisitor(renames.toMap()).visit(n) as Node
+fun renameVariables(n: Node, renames: Map<VariableName, VariableName>): Node {
+    return VariableRenamer(renames).visit(n) as Node
 }
 
-private class VariableRenamingVisitor(private val replacements: Map<VariableName, VariableName>) : NodeVisitor() {
-    constructor(oldName: VariableName, newName: VariableName): this(mapOf(oldName to newName))
+private class VariableRenamer(renames: Map<VariableName, VariableName>) : NodeVisitor() {
+    private val renames = renames.toMutableMap()
 
-    override fun visit(n: VariableReferenceExpression): Node {
-        val newName = replacements[n.name] ?: n.name
-        return n.update(newName)
-    }
+    override fun visit(n: VariableReferenceExpression): Node = n.update(
+        renames[n.name] ?: n.name
+    )
 }

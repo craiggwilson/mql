@@ -26,6 +26,7 @@ abstract class Visitor<T> {
     open fun visit(n: GreaterThanOrEqualsExpression): T = throw NotImplementedError()
     open fun visit(n: Int32Expression): T = throw NotImplementedError()
     open fun visit(n: Int64Expression): T = throw NotImplementedError()
+    open fun visit(n: LambdaExpression): T = throw NotImplementedError()
     open fun visit(n: LessThanExpression): T = throw NotImplementedError()
     open fun visit(n: LessThanOrEqualsExpression): T = throw NotImplementedError()
     open fun visit(n: LetExpression): T = throw NotImplementedError()
@@ -135,10 +136,6 @@ abstract class NodeVisitor : Visitor<Node>() {
                 is FunctionCallExpression.Argument.Positional -> argument.update(
                     visit(argument.expression) as Expression
                 )
-                is FunctionCallExpression.Argument.Lambda -> argument.update(
-                    argument.parameters,
-                    visit(argument.expression) as Expression
-                )
             }
         }
     )
@@ -155,6 +152,10 @@ abstract class NodeVisitor : Visitor<Node>() {
 
     override fun visit(n: Int32Expression): Node = n
     override fun visit(n: Int64Expression): Node = n
+    override fun visit(n: LambdaExpression): Node  = n.update(
+        n.parameters,
+        visit(n.expression) as Expression
+    )
     override fun visit(n: LessThanExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression

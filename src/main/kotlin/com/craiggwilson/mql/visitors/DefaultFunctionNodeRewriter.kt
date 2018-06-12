@@ -4,9 +4,13 @@ import com.craiggwilson.mql.ast.Expression
 import com.craiggwilson.mql.ast.FunctionArgumentName
 import com.craiggwilson.mql.ast.FunctionCallExpression
 import com.craiggwilson.mql.ast.FunctionName
+import com.craiggwilson.mql.ast.LambdaExpression
+import com.craiggwilson.mql.ast.LetExpression
 import com.craiggwilson.mql.ast.Node
+import com.craiggwilson.mql.ast.NodeVisitor
 import com.craiggwilson.mql.ast.StringExpression
 import com.craiggwilson.mql.ast.VariableName
+import com.craiggwilson.mql.ast.VariableReferenceExpression
 
 object DefaultFunctionNodeRewriter : NodeRewriter {
     private val map = mapOf(
@@ -26,11 +30,11 @@ private class MapFunctionHandler : NodeHandler<FunctionCallExpression> {
     override fun visit(n: FunctionCallExpression): Node {
         val args = shiftArgs(n)
 
-        if (args.size != 2 || args[1] !is FunctionCallExpression.Argument.Lambda) {
+        if (args.size != 2 || args[1].expression !is LambdaExpression) {
             return n
         }
 
-        val lambda = args[1] as FunctionCallExpression.Argument.Lambda
+        val lambda = args[1].expression as LambdaExpression
         if (lambda.parameters.size != 1) {
             return n
         }
@@ -51,29 +55,62 @@ private class ReduceFunctionHandler : NodeHandler<FunctionCallExpression> {
     override fun visit(n: FunctionCallExpression): Node {
         val args = shiftArgs(n)
 
-        if (args.size != 3 || args[2] !is FunctionCallExpression.Argument.Lambda) {
+        if (args.size != 3 || args[2].expression !is LambdaExpression) {
             return n
         }
 
-        val lambda = args[2] as FunctionCallExpression.Argument.Lambda
+        val lambda = args[2].expression as LambdaExpression
         if (lambda.parameters.size != 2) {
             return n
         }
 
         val input = args[0].expression
         val initialValue = args[1].expression
-        val inn = renameVariables(
-            lambda.expression,
-            lambda.parameters[0] to VariableName("value"),
-            lambda.parameters[1] to VariableName("this")
-        ) as Expression
 
-        return FunctionCallExpression(null, n.name, listOf(
+        val newVariableNames = listOf(VariableName("value"), VariableName("this"))
+        val renames = lambda.parameters
+            .mapIndexed { index, variableName -> variableName to newVariableNames[index] }
+            .toMap()
+            .toMutableMap()
+
+        val usedVariables = findUsedVariables(lambda.expression)
+        val conflictingVariables = newVariableNames.intersect(usedVariables)
+        val letVariables = conflictingVariables.map { c ->
+            var i = 0
+            var next = VariableName("closed_${c.name}$i")
+            while(usedVariables.contains(next)) {
+                i++
+                next = VariableName("closed_${c.name}$i")
+            }
+
+            renames[c] = next
+            LetExpression.Variable(next, VariableReferenceExpression(c))
+        }
+
+        val inn = renameVariables(lambda.expression, renames) as Expression
+
+        val function = FunctionCallExpression(null, n.name, listOf(
             FunctionCallExpression.Argument.Named(FunctionArgumentName("input"), input),
             FunctionCallExpression.Argument.Named(FunctionArgumentName("initialValue"), initialValue),
             FunctionCallExpression.Argument.Named(FunctionArgumentName("in"), inn)
         ))
+
+        return if (letVariables.isNotEmpty()) {
+            LetExpression(letVariables, function)
+        } else function
     }
+}
+
+private fun findUsedVariables(n: Node): Set<VariableName> {
+    val usedVariables = mutableSetOf<VariableName>()
+    object: NodeVisitor() {
+        override fun visit(n: VariableReferenceExpression): Node {
+            usedVariables += n.name
+            return n
+        }
+    }.visit(n)
+
+    return usedVariables
 }
 
 private fun shiftArgs(n: FunctionCallExpression): List<FunctionCallExpression.Argument> {
@@ -81,10 +118,3 @@ private fun shiftArgs(n: FunctionCallExpression): List<FunctionCallExpression.Ar
         listOf(FunctionCallExpression.Argument.Positional(n.parent)) + n.arguments
     } else n.arguments
 }
-
-private val FunctionCallExpression.Argument.expression
-    get() = when(this) {
-        is FunctionCallExpression.Argument.Positional -> this.expression
-        is FunctionCallExpression.Argument.Named -> this.expression
-        is FunctionCallExpression.Argument.Lambda -> this.expression
-    }

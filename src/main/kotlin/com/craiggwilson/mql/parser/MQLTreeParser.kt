@@ -23,6 +23,7 @@ import com.craiggwilson.mql.ast.GreaterThanExpression
 import com.craiggwilson.mql.ast.GreaterThanOrEqualsExpression
 import com.craiggwilson.mql.ast.Int32Expression
 import com.craiggwilson.mql.ast.Int64Expression
+import com.craiggwilson.mql.ast.LambdaExpression
 import com.craiggwilson.mql.ast.LessThanExpression
 import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
 import com.craiggwilson.mql.ast.LetExpression
@@ -344,7 +345,7 @@ class MQLTreeParser() {
             } else {
                 val parameters = fa.lambda_expression().lambda_argument().map { getVariableName(it.variable_name()) }
                 val expression = parseExpression(fa.lambda_expression().expression())
-                FunctionCallExpression.Argument.Lambda(parameters, expression)
+                FunctionCallExpression.Argument.Positional(LambdaExpression(parameters, expression))
             }
         }
 

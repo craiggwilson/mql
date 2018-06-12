@@ -142,24 +142,19 @@ data class FunctionCallExpression(val parent: Expression?, val name: FunctionNam
     }
 
     sealed class Argument {
-        data class Positional(val expression: Expression) : Argument() {
+        abstract val expression: Expression
+
+        data class Positional(override val expression: Expression) : Argument() {
             fun update(expression: Expression) : Positional {
                 return if (expression !== this.expression) {
                     Positional(expression)
                 } else this
             }
         }
-        data class Named(val name: FunctionArgumentName, val expression: Expression) : Argument() {
+        data class Named(val name: FunctionArgumentName, override val expression: Expression) : Argument() {
             fun update(name: FunctionArgumentName, expression: Expression) : Named {
                 return if (name !== this.name || expression !== this.expression) {
                     Named(name, expression)
-                } else this
-            }
-        }
-        data class Lambda(val parameters: List<VariableName>, val expression: Expression): Argument() {
-            fun update(parameters: List<VariableName>, expression: Expression): Lambda {
-                return if (parameters !== this.parameters || expression !== this.expression) {
-                    Lambda(parameters, expression)
                 } else this
             }
         }
@@ -210,6 +205,16 @@ data class Int64Expression(val value: Long) : NumberExpression() {
     fun update(value: Long): Int64Expression {
         return if (value != this.value) {
             Int64Expression(value)
+        } else this
+    }
+}
+
+data class LambdaExpression(val parameters: List<VariableName>, val expression: Expression): Expression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(parameters: List<VariableName>, expression: Expression): LambdaExpression {
+        return if (parameters !== this.parameters || expression !== this.expression) {
+            LambdaExpression(parameters, expression)
         } else this
     }
 }

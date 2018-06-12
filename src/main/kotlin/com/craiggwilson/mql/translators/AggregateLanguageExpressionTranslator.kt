@@ -10,6 +10,7 @@ import com.craiggwilson.mql.ast.FieldReferenceExpression
 import com.craiggwilson.mql.ast.FunctionCallExpression
 import com.craiggwilson.mql.ast.GreaterThanExpression
 import com.craiggwilson.mql.ast.GreaterThanOrEqualsExpression
+import com.craiggwilson.mql.ast.LambdaExpression
 import com.craiggwilson.mql.ast.LessThanExpression
 import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
 import com.craiggwilson.mql.ast.LetExpression
@@ -133,13 +134,7 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
 
             return "{ \"\$${n.name.name}\": { $argExpressions } }"
         } else {
-            val argExpressions = arguments.map { argument ->
-                when (argument) {
-                    is FunctionCallExpression.Argument.Named -> visit(argument.expression)
-                    is FunctionCallExpression.Argument.Positional -> visit(argument.expression)
-                    else -> throw UnsupportedOperationException("lamda arguments are not supported")
-                }
-            }.joinToString()
+            val argExpressions = arguments.map { visit(it.expression) }.joinToString()
 
             return "{ \"\$${n.name.name}\": [ $argExpressions ] }"
         }
@@ -157,6 +152,10 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
         val right = visit(n.right)
 
         return "{ \"\$gte\": [ $left, $right ] }"
+    }
+
+    override fun visit(n: LambdaExpression): String {
+        throw UnsupportedOperationException("lambda expressions are not supported")
     }
 
     override fun visit(n: LessThanExpression): String {
