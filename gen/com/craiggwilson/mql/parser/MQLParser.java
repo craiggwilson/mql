@@ -1912,13 +1912,13 @@ public class MQLParser extends Parser {
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
-		public Lambda_expressionContext lambda_expression() {
-			return getRuleContext(Lambda_expressionContext.class,0);
-		}
 		public Function_argument_nameContext function_argument_name() {
 			return getRuleContext(Function_argument_nameContext.class,0);
 		}
 		public TerminalNode ASSIGN() { return getToken(MQLParser.ASSIGN, 0); }
+		public Lambda_expressionContext lambda_expression() {
+			return getRuleContext(Lambda_expressionContext.class,0);
+		}
 		public Function_argumentContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -1943,18 +1943,18 @@ public class MQLParser extends Parser {
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(326);
-				lambda_expression();
+				function_argument_name();
+				setState(327);
+				match(ASSIGN);
+				setState(328);
+				expression(0);
 				}
 				break;
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(327);
-				function_argument_name();
-				setState(328);
-				match(ASSIGN);
-				setState(329);
-				expression(0);
+				setState(330);
+				lambda_expression();
 				}
 				break;
 			}
@@ -2666,9 +2666,9 @@ public class MQLParser extends Parser {
 		"\u013d\u013f\5&\24\2\u013e\u013c\3\2\2\2\u013f\u0142\3\2\2\2\u0140\u013e"+
 		"\3\2\2\2\u0140\u0141\3\2\2\2\u0141\u0144\3\2\2\2\u0142\u0140\3\2\2\2\u0143"+
 		"\u013b\3\2\2\2\u0143\u0144\3\2\2\2\u0144\u0145\3\2\2\2\u0145\u0146\7\37"+
-		"\2\2\u0146%\3\2\2\2\u0147\u014e\5 \21\2\u0148\u014e\5*\26\2\u0149\u014a"+
-		"\5:\36\2\u014a\u014b\7\5\2\2\u014b\u014c\5 \21\2\u014c\u014e\3\2\2\2\u014d"+
-		"\u0147\3\2\2\2\u014d\u0148\3\2\2\2\u014d\u0149\3\2\2\2\u014e\'\3\2\2\2"+
+		"\2\2\u0146%\3\2\2\2\u0147\u014e\5 \21\2\u0148\u0149\5:\36\2\u0149\u014a"+
+		"\7\5\2\2\u014a\u014b\5 \21\2\u014b\u014e\3\2\2\2\u014c\u014e\5*\26\2\u014d"+
+		"\u0147\3\2\2\2\u014d\u0148\3\2\2\2\u014d\u014c\3\2\2\2\u014e\'\3\2\2\2"+
 		"\u014f\u0152\5@!\2\u0150\u0152\7!\2\2\u0151\u014f\3\2\2\2\u0151\u0150"+
 		"\3\2\2\2\u0152)\3\2\2\2\u0153\u0158\5(\25\2\u0154\u0155\7\b\2\2\u0155"+
 		"\u0157\5(\25\2\u0156\u0154\3\2\2\2\u0157\u015a\3\2\2\2\u0158\u0156\3\2"+

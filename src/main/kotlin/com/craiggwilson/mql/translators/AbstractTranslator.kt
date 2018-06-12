@@ -11,11 +11,11 @@ abstract class AbstractTranslator : Visitor<String>() {
     }
 
     protected fun flatten(field: FieldReferenceExpression): FieldReferenceExpression {
-        if (field.parent != null && field.parent is FieldReferenceExpression) {
+        return if (field.parent != null && field.parent is FieldReferenceExpression) {
             val combined = FieldReferenceExpression(field.parent.parent, field.parent.name.append(field.name))
-            return flatten(combined)
+            flatten(combined)
         } else {
-            return field
+            field
         }
     }
 

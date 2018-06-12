@@ -19,6 +19,17 @@ class StatementTranslatorTest() {
     }
 
     @ParameterizedTest(name = "{0}")
+    @MethodSource("functions")
+    fun testFunctions(mql: String, expected: String) {
+        val actualExpected = "db.bar.aggregate([{ \$project: { \"test\": $expected } }])"
+
+        val parsed = parseMQL("FROM bar PROJECT test := $mql")[0]
+        val actual = parsed.toShell()
+
+        assertEquals(actualExpected, actual)
+    }
+
+    @ParameterizedTest(name = "{0}")
     @MethodSource("stages")
     fun testStages(mql: String, expected: String) {
         val parsed = parseMQL(mql)[0]
@@ -117,6 +128,13 @@ class StatementTranslatorTest() {
                 test("testFunc(arg1 := a, arg2 := 1.0)", "{ \"\$testFunc\": { \"arg1\": \"\$a\", \"arg2\": 1.0 } }"),
                 test("a.testFunc(1.0)", "{ \"\$testFunc\": [ \"\$a\", 1.0 ] }"),
                 test("a.testFunc(arg2 := 1.0)", "{ \"\$testFunc\": [ \"\$a\", 1.0 ] }")
+            )
+        }
+
+        @JvmStatic
+        private fun functions(): Collection<Array<String>> {
+            return listOf(
+                test("map(a,\$x => \$x.b + 1)", "{ \"\$map\": { \"input\": \"\$a\", \"as\": \"x\", \"in\": { \"\$add\": [ \"\$\$x.b\", NumberInt(\"1\") ] } } }")
             )
         }
 

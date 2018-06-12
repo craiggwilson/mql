@@ -103,13 +103,15 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
 
     override fun visit(n: FieldReferenceExpression): String {
         val flattened = flatten(n)
-        if (flattened.parent != null) {
+        return if (flattened.parent != null && flattened.parent is VariableReferenceExpression) {
+            quote("\$\$${flattened.parent.name.name}.${flattened.name.name}")
+        } else if (flattened.parent != null) {
             val parent = visit(flattened.parent)
 
-            return "{ \"\$let\": { \"vars\": { \"parent\": $parent }, \"in\": \"\$\$parent.${flattened.name.name}\" } }"
+            "{ \"\$let\": { \"vars\": { \"parent\": $parent }, \"in\": \"\$\$parent.${flattened.name.name}\" } }"
+        } else {
+            quote("\$${flattened.name.name}")
         }
-
-        return quote("\$${flattened.name.name}")
     }
 
     override fun visit(n: FunctionCallExpression): String {

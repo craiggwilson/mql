@@ -110,8 +110,8 @@ function:
 
 function_argument:
   expression
-| lambda_expression
-| function_argument_name ASSIGN expression;
+| function_argument_name ASSIGN expression
+| lambda_expression;
 
 lambda_argument:
   variable_name
@@ -239,14 +239,14 @@ BIN: '0' B BIN_DIGIT BIN_DIGIT_OR_SEPARATOR* L?;
 HEX: '0' X HEX_DIGIT HEX_DIGIT_OR_SEPARATOR* L?;
 
 STRING: '\'' ('\\'. | '\'\'' | ~('\'' | '\\'))* '\'';
-QUOTED_ID: '`' ('\\'. | '\'\'' | ~('`' | '\\'))* '`';
+QUOTED_ID: '`' ('\\'. | '``' | ~('`' | '\\'))* '`';
 UNQUOTED_ID: [_a-zA-Z] [_a-zA-Z0-9]*;
 WS: ( ' ' | '\t' | '\r' | '\n' )+ -> skip;
 
 fragment BIN_DIGIT:             [01];
 fragment BIN_DIGIT_OR_SEPARATOR: BIN_DIGIT | UNDERSCORE;
 fragment DEC_DIGIT:             [0-9];
-fragment EXPONENT_NUM_PART:     E '-'? DEC_DIGIT DEC_DIGIT_OR_SEPARATOR*;
+fragment EXPONENT_NUM_PART:     E ('+'|'-')? DEC_DIGIT DEC_DIGIT_OR_SEPARATOR*;
 fragment HEX_DIGIT:             [0-9a-fA-F];
 fragment HEX_DIGIT_OR_SEPARATOR: HEX_DIGIT | UNDERSCORE;
 fragment DEC_DIGIT_OR_SEPARATOR: DEC_DIGIT | UNDERSCORE;

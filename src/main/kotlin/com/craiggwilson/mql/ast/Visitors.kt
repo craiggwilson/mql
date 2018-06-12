@@ -221,7 +221,7 @@ abstract class NodeVisitor : Visitor<Node>() {
     override fun visit(n: RangeExpression): Node = n.update(
         visit(n.start) as Expression,
         visit(n.end) as Expression,
-        visit(n.step) as Expression
+        visit(n.step) as Expression?
     )
 
     override fun visit(n: SubtractExpression): Node = n.update(

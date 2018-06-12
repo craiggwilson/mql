@@ -31,6 +31,7 @@ import com.craiggwilson.mql.ast.ModExpression
 import com.craiggwilson.mql.ast.MultiplyExpression
 import com.craiggwilson.mql.ast.NewArrayExpression
 import com.craiggwilson.mql.ast.NewDocumentExpression
+import com.craiggwilson.mql.ast.Node
 import com.craiggwilson.mql.ast.NotEqualsExpression
 import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.NullExpression
@@ -48,15 +49,19 @@ import com.craiggwilson.mql.ast.SubtractExpression
 import com.craiggwilson.mql.ast.UnwindStage
 import com.craiggwilson.mql.ast.VariableName
 import com.craiggwilson.mql.ast.VariableReferenceExpression
+import com.craiggwilson.mql.ast.Visitor
+import com.craiggwilson.mql.visitors.DefaultNodeTransformer
+import com.craiggwilson.mql.visitors.NodeTransformer
+import com.craiggwilson.mql.visitors.TransformerVisitor
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.atn.PredictionMode
 
-fun parseMQL(mql: String): List<Statement> {
-    return MQLTreeParser().parse(mql)
+fun parseMQL(mql: String, nodeTransformer: NodeTransformer = DefaultNodeTransformer): List<Statement> {
+    return MQLTreeParser(TransformerVisitor(nodeTransformer)).parse(mql)
 }
 
-class MQLTreeParser {
+class MQLTreeParser(private val postProcessor: Visitor<Node>) {
 
     private var generatedIdNum = 0
 
@@ -84,7 +89,8 @@ class MQLTreeParser {
 
         val statements = mutableListOf<Statement>()
         for (stmt in parseCtx.statement()) {
-            statements += parseStatement(stmt)
+            val parsed = parseStatement(stmt)
+            statements += postProcessor.visit(parsed) as Statement
         }
 
         return statements
@@ -338,9 +344,13 @@ class MQLTreeParser {
                 val expression = parseExpression(fa.expression())
 
                 FunctionCallExpression.Argument.Named(argName, expression)
-            } else {
+            } else if (fa.expression() != null) {
                 val expression = parseExpression(fa.expression())
                 FunctionCallExpression.Argument.Positional(expression)
+            } else {
+                val parameters = fa.lambda_expression().lambda_argument().map { getVariableName(it.variable_name()) }
+                val expression = parseExpression(fa.lambda_expression().expression())
+                FunctionCallExpression.Argument.Lambda(parameters, expression)
             }
         }
 

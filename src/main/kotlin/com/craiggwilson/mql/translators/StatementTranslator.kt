@@ -12,7 +12,7 @@ fun Statement.toShell(): String {
     return StatementTranslator(ShellValueTranslator()).visit(this)
 }
 
-class StatementTranslator(val valueTranslator: ValueTranslator) : AbstractTranslator() {
+class StatementTranslator(valueTranslator: ValueTranslator) : AbstractTranslator() {
     private val aggLanguageTranslator = AggregateLanguageExpressionTranslator(valueTranslator)
     private val queryLanguageTranslator = QueryLanguageExpressionTranslator(valueTranslator)
 
