@@ -2,9 +2,9 @@ package com.craiggwilson.mql.visitors
 
 import com.craiggwilson.mql.ast.Node
 
-object DefaultNodeTransformer : NodeTransformer {
-    private val transformer = CompositeNodeTransformer(listOf(
-        DefaultFunctionNodeTransformer
+object DefaultNodeRewriter : NodeRewriter {
+    private val transformer = CompositeNodeRewriter(listOf(
+        DefaultFunctionNodeRewriter
     ))
 
     override val appliesTo = transformer.appliesTo

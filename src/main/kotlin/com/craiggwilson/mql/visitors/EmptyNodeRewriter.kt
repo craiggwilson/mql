@@ -2,8 +2,8 @@ package com.craiggwilson.mql.visitors
 
 import com.craiggwilson.mql.ast.Node
 
-object EmptyNodeTransformer : NodeTransformer {
-    override val appliesTo = emptyList<Class<*>>()
+object EmptyNodeRewriter : NodeRewriter {
+    override val appliesTo = emptySet<Class<*>>()
 
     override fun visit(n: Node): Node = n
 }

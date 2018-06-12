@@ -31,7 +31,6 @@ import com.craiggwilson.mql.ast.ModExpression
 import com.craiggwilson.mql.ast.MultiplyExpression
 import com.craiggwilson.mql.ast.NewArrayExpression
 import com.craiggwilson.mql.ast.NewDocumentExpression
-import com.craiggwilson.mql.ast.Node
 import com.craiggwilson.mql.ast.NotEqualsExpression
 import com.craiggwilson.mql.ast.NotExpression
 import com.craiggwilson.mql.ast.NullExpression
@@ -49,19 +48,15 @@ import com.craiggwilson.mql.ast.SubtractExpression
 import com.craiggwilson.mql.ast.UnwindStage
 import com.craiggwilson.mql.ast.VariableName
 import com.craiggwilson.mql.ast.VariableReferenceExpression
-import com.craiggwilson.mql.ast.Visitor
-import com.craiggwilson.mql.visitors.DefaultNodeTransformer
-import com.craiggwilson.mql.visitors.NodeTransformer
-import com.craiggwilson.mql.visitors.TransformerVisitor
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.atn.PredictionMode
 
-fun parseMQL(mql: String, nodeTransformer: NodeTransformer = DefaultNodeTransformer): List<Statement> {
-    return MQLTreeParser(TransformerVisitor(nodeTransformer)).parse(mql)
+fun parseMQL(mql: String): List<Statement> {
+    return MQLTreeParser().parse(mql)
 }
 
-class MQLTreeParser(private val postProcessor: Visitor<Node>) {
+class MQLTreeParser() {
 
     private var generatedIdNum = 0
 
@@ -89,8 +84,7 @@ class MQLTreeParser(private val postProcessor: Visitor<Node>) {
 
         val statements = mutableListOf<Statement>()
         for (stmt in parseCtx.statement()) {
-            val parsed = parseStatement(stmt)
-            statements += postProcessor.visit(parsed) as Statement
+            statements += parseStatement(stmt)
         }
 
         return statements

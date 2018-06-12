@@ -73,18 +73,18 @@ expression:
   <assoc=right>expression CARET expression                              #powerExpression
 | MINUS expression                                                      #unaryMinusExpression
 | (NOT | NOT_SYMBOL) expression                                         #notExpression
-| expression op=(MULT | DIV | MOD) expression                           #multiplicationExpression
-| expression op=(PLUS | MINUS) expression                               #additionExpression
-| expression op=(EQ | GT | GTE | LT | LTE | NEQ) expression             #comparisonExpression
-| expression (AND | AND_SYMBOL) expression                              #andExpression
-| expression (OR | OR_SYMBOL) expression                                #orExpression
+| expression DOT (field_name | function)                                #memberExpression
 | expression LBRACK (
         start=expression
       | start=expression COLON end=expression?
       | start=expression? COLON end=expression
     ) RBRACK                                                            #arrayAccessExpression
+| expression op=(MULT | DIV | MOD) expression                           #multiplicationExpression
+| expression op=(PLUS | MINUS) expression                               #additionExpression
+| expression op=(EQ | GT | GTE | LT | LTE | NEQ) expression             #comparisonExpression
+| expression (AND | AND_SYMBOL) expression                              #andExpression
+| expression (OR | OR_SYMBOL) expression                                #orExpression
 | expression RANGE expression (STEP expression)?                        #rangeExpression
-| expression DOT (field_name | function)                                #memberExpression
 | SWITCH switch_case+ (ELSE expression)?                                #switchExpression
 | IF expression THEN expression ELSE expression                         #conditionalExpression
 | LET variable_assignment (COMMA variable_assignment)* IN expression    #letExpression
@@ -119,7 +119,8 @@ lambda_argument:
 ;
 
 lambda_expression:
-  lambda_argument (COMMA lambda_argument)* ARROW expression
+  lambda_argument ARROW expression
+| LPAREN lambda_argument (COMMA lambda_argument)* RPAREN ARROW expression
 ;
 
 number:

@@ -7,20 +7,25 @@ import com.craiggwilson.mql.ast.SkipStage
 import com.craiggwilson.mql.ast.SortStage
 import com.craiggwilson.mql.ast.Statement
 import com.craiggwilson.mql.ast.UnwindStage
+import com.craiggwilson.mql.visitors.DefaultNodeRewriter
+import com.craiggwilson.mql.visitors.NodeRewriter
+import com.craiggwilson.mql.visitors.Rewriter
 
 fun Statement.toShell(): String {
     return StatementTranslator(ShellValueTranslator()).visit(this)
 }
 
-class StatementTranslator(valueTranslator: ValueTranslator) : AbstractTranslator() {
+class StatementTranslator(valueTranslator: ValueTranslator, rewriter: NodeRewriter = DefaultNodeRewriter) : AbstractTranslator() {
+    private val preProcessor = Rewriter(rewriter)
     private val aggLanguageTranslator = AggregateLanguageExpressionTranslator(valueTranslator)
     private val queryLanguageTranslator = QueryLanguageExpressionTranslator(valueTranslator)
 
     // Nodes
     override fun visit(n: Statement): String {
-        val pipelineString = n.pipeline.joinToString(prefix = "[", postfix = "]") { visit(it) as String }
+        val stmt = preProcessor.visit(n) as Statement
+        val pipelineString = stmt.pipeline.joinToString(prefix = "[", postfix = "]") { visit(it) as String }
 
-        return "db.${n.collectionName.name}.aggregate($pipelineString)"
+        return "db.${stmt.collectionName.name}.aggregate($pipelineString)"
     }
 
     // Stages

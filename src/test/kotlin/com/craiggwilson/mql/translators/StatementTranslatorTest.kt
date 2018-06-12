@@ -134,7 +134,9 @@ class StatementTranslatorTest() {
         @JvmStatic
         private fun functions(): Collection<Array<String>> {
             return listOf(
-                test("map(a,\$x => \$x.b + 1)", "{ \"\$map\": { \"input\": \"\$a\", \"as\": \"x\", \"in\": { \"\$add\": [ \"\$\$x.b\", NumberInt(\"1\") ] } } }")
+                test("map(a,\$x => \$x.b + 1)", "{ \"\$map\": { \"input\": \"\$a\", \"as\": \"x\", \"in\": { \"\$add\": [ \"\$\$x.b\", NumberInt(\"1\") ] } } }"),
+                test("reduce(a, 10, (\$acc, \$current) => \$acc + \$current.b)", "{ \"\$reduce\": { \"input\": \"\$a\", \"initialValue\": NumberInt(\"10\"), \"in\": { \"\$add\": [ \"\$\$value\", \"\$\$this.b\" ] } } }"),
+                test("a.map(\$x => \$x.b).reduce(10, (\$acc, \$current) => \$acc + \$current)", "{ \"\$reduce\": { \"input\": { \"\$map\": { \"input\": \"\$a\", \"as\": \"x\", \"in\": \"\$\$x.b\" } }, \"initialValue\": NumberInt(\"10\"), \"in\": { \"\$add\": [ \"\$\$value\", \"\$\$this\" ] } } }")
             )
         }
 
