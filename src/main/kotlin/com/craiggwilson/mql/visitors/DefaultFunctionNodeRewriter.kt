@@ -14,8 +14,9 @@ import com.craiggwilson.mql.ast.VariableReferenceExpression
 
 object DefaultFunctionNodeRewriter : NodeRewriter {
     private val map = mapOf(
-        FunctionName("map") to MapFunctionHandler(),
-        FunctionName("reduce") to ReduceFunctionHandler()
+        FunctionName("filter") to FilterFunctionHandler,
+        FunctionName("map") to MapFunctionHandler,
+        FunctionName("reduce") to ReduceFunctionHandler
     )
 
     override val appliesTo = setOf(FunctionCallExpression::class.java)
@@ -26,7 +27,32 @@ object DefaultFunctionNodeRewriter : NodeRewriter {
     }
 }
 
-private class MapFunctionHandler : NodeHandler<FunctionCallExpression> {
+private object FilterFunctionHandler: NodeHandler<FunctionCallExpression> {
+    override fun visit(n: FunctionCallExpression): Node {
+        val args = shiftArgs(n)
+
+        if (args.size != 2 || args[1].expression !is LambdaExpression) {
+            return n
+        }
+
+        val lambda = args[1].expression as LambdaExpression
+        if (lambda.parameters.size != 1) {
+            return n
+        }
+
+        val input = args[0].expression
+        val az = StringExpression(lambda.parameters[0].name)
+        val cond = lambda.expression
+
+        return FunctionCallExpression(null, n.name, listOf(
+            FunctionCallExpression.Argument.Named(FunctionArgumentName("input"), input),
+            FunctionCallExpression.Argument.Named(FunctionArgumentName("as"), az),
+            FunctionCallExpression.Argument.Named(FunctionArgumentName("cond"), cond)
+        ))
+    }
+}
+
+private object MapFunctionHandler : NodeHandler<FunctionCallExpression> {
     override fun visit(n: FunctionCallExpression): Node {
         val args = shiftArgs(n)
 
@@ -51,7 +77,7 @@ private class MapFunctionHandler : NodeHandler<FunctionCallExpression> {
     }
 }
 
-private class ReduceFunctionHandler : NodeHandler<FunctionCallExpression> {
+private object ReduceFunctionHandler : NodeHandler<FunctionCallExpression> {
     override fun visit(n: FunctionCallExpression): Node {
         val args = shiftArgs(n)
 
