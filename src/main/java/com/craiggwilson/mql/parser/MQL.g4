@@ -153,7 +153,7 @@ multipart_field_name: field_name (DOT field_name)*;
 
 id: QUOTED_ID | UNQUOTED_ID;
 
-variable_name: DOLLAR id;
+variable_name: VARIABLE_ID;
 
 /////////////
 // LEXER
@@ -166,7 +166,6 @@ CARET:      '^';
 COLON:      ':';
 COMMA:      ',';
 DIV:        '/';
-DOLLAR:     '$';
 DOT:        '.';
 EQ:         '=';
 GT:         '>';
@@ -242,6 +241,7 @@ HEX: '0' X HEX_DIGIT HEX_DIGIT_OR_SEPARATOR* L?;
 STRING: '\'' ('\\'. | '\'\'' | ~('\'' | '\\'))* '\'';
 QUOTED_ID: '`' ('\\'. | '``' | ~('`' | '\\'))* '`';
 UNQUOTED_ID: [_a-zA-Z] [_a-zA-Z0-9]*;
+VARIABLE_ID: '$' [a-z][_a-zA-Z0-9]*;
 WS: ( ' ' | '\t' | '\r' | '\n' )+ -> skip;
 
 fragment BIN_DIGIT:             [01];
