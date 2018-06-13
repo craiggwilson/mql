@@ -1,9 +1,11 @@
 package com.craiggwilson.mql.visitors
 
+import com.craiggwilson.mql.ast.ArrayAccessExpression
 import com.craiggwilson.mql.ast.Expression
 import com.craiggwilson.mql.ast.FunctionArgumentName
 import com.craiggwilson.mql.ast.FunctionCallExpression
 import com.craiggwilson.mql.ast.FunctionName
+import com.craiggwilson.mql.ast.Int32Expression
 import com.craiggwilson.mql.ast.LambdaExpression
 import com.craiggwilson.mql.ast.LetExpression
 import com.craiggwilson.mql.ast.Node
@@ -11,12 +13,16 @@ import com.craiggwilson.mql.ast.NodeVisitor
 import com.craiggwilson.mql.ast.StringExpression
 import com.craiggwilson.mql.ast.VariableName
 import com.craiggwilson.mql.ast.VariableReferenceExpression
+import com.craiggwilson.mql.ast.builders.function
+import com.craiggwilson.mql.ast.builders.newArray
+import com.craiggwilson.mql.ast.builders.variableReference
 
 object DefaultFunctionNodeRewriter : NodeRewriter {
     private val map = mapOf(
         FunctionName("filter") to FilterFunctionHandler,
         FunctionName("map") to MapFunctionHandler,
-        FunctionName("reduce") to ReduceFunctionHandler
+        FunctionName("reduce") to ReduceFunctionHandler,
+        FunctionName("zip") to ZipFunctionHandler
     )
 
     override val appliesTo = setOf(FunctionCallExpression::class.java)
@@ -65,15 +71,12 @@ private object MapFunctionHandler : NodeHandler<FunctionCallExpression> {
             return n
         }
 
-        val input = args[0].expression
-        val az = StringExpression(lambda.parameters[0].name)
-        val inn = lambda.expression
-
-        return FunctionCallExpression(null, n.name, listOf(
-            FunctionCallExpression.Argument.Named(FunctionArgumentName("input"), input),
-            FunctionCallExpression.Argument.Named(FunctionArgumentName("as"), az),
-            FunctionCallExpression.Argument.Named(FunctionArgumentName("in"), inn)
-        ))
+        return function(
+            "map",
+            "input" to args[0].expression,
+            "as" to StringExpression(lambda.parameters[0].name),
+            "in" to lambda.expression
+        )
     }
 }
 
@@ -113,17 +116,52 @@ private object ReduceFunctionHandler : NodeHandler<FunctionCallExpression> {
             LetExpression.Variable(next, VariableReferenceExpression(c))
         }
 
-        val inn = renameVariables(lambda.expression, renames) as Expression
+        val inn = replaceExpressions(
+            lambda.expression,
+            renames.map { VariableReferenceExpression(it.key) to VariableReferenceExpression(it.value) }
+                .toMap()) as Expression
 
-        val function = FunctionCallExpression(null, n.name, listOf(
-            FunctionCallExpression.Argument.Named(FunctionArgumentName("input"), input),
-            FunctionCallExpression.Argument.Named(FunctionArgumentName("initialValue"), initialValue),
-            FunctionCallExpression.Argument.Named(FunctionArgumentName("in"), inn)
-        ))
+        val f = function(
+            "reduce",
+            "input" to input,
+            "initialValue" to initialValue,
+            "in" to inn
+        )
 
         return if (letVariables.isNotEmpty()) {
-            LetExpression(letVariables, function)
-        } else function
+            LetExpression(letVariables, f)
+        } else f
+    }
+}
+
+private object ZipFunctionHandler : NodeHandler<FunctionCallExpression> {
+    override fun visit(n: FunctionCallExpression): Node {
+        val args = shiftArgs(n)
+
+        if (args.size != 3 || args[2].expression !is LambdaExpression) {
+            return n
+        }
+
+        val lambda = args[2].expression as LambdaExpression
+        if (lambda.parameters.size != 2) {
+            return n
+        }
+
+        return function(
+            "map",
+            "input" to function(
+                "zip",
+                "inputs" to newArray(args[0].expression, args[1].expression)
+            ),
+            "as" to StringExpression("x"),
+            "in" to replaceExpressions(
+                lambda.expression,
+                mapOf(
+                    VariableReferenceExpression(lambda.parameters[0]) to ArrayAccessExpression(variableReference("x"), Int32Expression(0)),
+                    VariableReferenceExpression(lambda.parameters[1]) to ArrayAccessExpression(variableReference("x"), Int32Expression(1))
+                )
+            ) as Expression
+        )
     }
 }
 

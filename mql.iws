@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8a06b168-40ec-462c-af76-4cde3d8c447f" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/mql.iws" beforeDir="false" afterPath="$PROJECT_DIR$/mql.iws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/classes/META-INF/mql.kotlin_module" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/classes/META-INF/mql.kotlin_module" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/visitors/DefaultFunctionNodeRewriter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/visitors/DefaultFunctionNodeRewriter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/visitors/VariableRenamer.kt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/kotlin/com/craiggwilson/mql/translators/StatementTranslatorTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/com/craiggwilson/mql/translators/StatementTranslatorTest.kt" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -56,8 +59,8 @@
       <file leaf-file-name="StatementTranslatorTest.kt" pinned="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test/kotlin/com/craiggwilson/mql/translators/StatementTranslatorTest.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="420">
-              <caret line="148" column="9" lean-forward="true" selection-start-line="148" selection-start-column="9" selection-end-line="148" selection-end-column="9" />
+            <state relative-caret-position="354">
+              <caret line="146" column="16" selection-start-line="146" selection-start-column="16" selection-end-line="146" selection-end-column="16" />
             </state>
           </provider>
         </entry>
@@ -86,10 +89,22 @@
       <file leaf-file-name="DefaultFunctionNodeRewriter.kt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/visitors/DefaultFunctionNodeRewriter.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="19" column="5" lean-forward="true" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
+            <state relative-caret-position="288">
+              <caret line="24" column="49" selection-start-line="24" selection-start-column="49" selection-end-line="24" selection-end-column="49" />
               <folding>
-                <element signature="e#39#564#0" expanded="true" />
+                <element signature="e#39#777#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ExpressionReplacer.kt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/visitors/ExpressionReplacer.kt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="270">
+              <caret line="18" column="1" lean-forward="true" selection-start-line="18" selection-start-column="1" selection-end-line="18" selection-end-column="1" />
+              <folding>
+                <element signature="e#39#162#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -670,7 +685,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/FieldAssignment.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/Stages.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ShellTranslator.kt" />
         <option value="$PROJECT_DIR$/src/test/kotlin/com/craiggwilson/mql/ShellTranslatorTest.kt" />
@@ -719,6 +733,7 @@
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/translators/QueryLanguageExpressionTranslator.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/translators/StatementTranslator.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/translators/AggregateLanguageExpressionTranslator.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/visitors/ExpressionReplacer.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/visitors/DefaultFunctionNodeRewriter.kt" />
         <option value="$PROJECT_DIR$/src/test/kotlin/com/craiggwilson/mql/translators/StatementTranslatorTest.kt" />
       </list>
@@ -1127,24 +1142,6 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="StatementTranslatorTest - 2018.06.13 at 15h 20m 11s.xml">
-      <configuration name="StatementTranslatorTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="StatementTranslatorTest - 2018.06.13 at 15h 21m 19s.xml">
-      <configuration name="StatementTranslatorTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="StatementTranslatorTest - 2018.06.13 at 15h 22m 00s.xml">
-      <configuration name="StatementTranslatorTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="StatementTranslatorTest - 2018.06.13 at 15h 54m 40s.xml">
-      <configuration name="StatementTranslatorTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="StatementTranslatorTest - 2018.06.13 at 15h 58m 37s.xml">
-      <configuration name="StatementTranslatorTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="StatementTranslatorTest - 2018.06.13 at 15h 59m 59s.xml">
-      <configuration name="StatementTranslatorTest" configurationId="JUnit" />
-    </history-entry>
     <history-entry file="StatementTranslatorTest - 2018.06.13 at 16h 01m 37s.xml">
       <configuration name="StatementTranslatorTest" configurationId="JUnit" />
     </history-entry>
@@ -1155,6 +1152,24 @@
       <configuration name="StatementTranslatorTest" configurationId="JUnit" />
     </history-entry>
     <history-entry file="StatementTranslatorTest - 2018.06.13 at 16h 15m 21s.xml">
+      <configuration name="StatementTranslatorTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="StatementTranslatorTest - 2018.06.13 at 16h 16m 07s.xml">
+      <configuration name="StatementTranslatorTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="StatementTranslatorTest - 2018.06.13 at 17h 04m 33s.xml">
+      <configuration name="StatementTranslatorTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="StatementTranslatorTest - 2018.06.13 at 17h 16m 44s.xml">
+      <configuration name="StatementTranslatorTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="StatementTranslatorTest - 2018.06.13 at 17h 18m 57s.xml">
+      <configuration name="StatementTranslatorTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="StatementTranslatorTest - 2018.06.13 at 17h 20m 09s.xml">
+      <configuration name="StatementTranslatorTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="StatementTranslatorTest - 2018.06.13 at 17h 22m 01s.xml">
       <configuration name="StatementTranslatorTest" configurationId="JUnit" />
     </history-entry>
   </component>
@@ -1257,13 +1272,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.1.51/b44aed5fe16fe27bb75488a2274d435e875fdb44/kotlin-stdlib-1.1.51-sources.jar!/generated/_Collections.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="1693" column="40" selection-start-line="1693" selection-start-column="40" selection-end-line="1693" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-test/1.2.0/56c34b939088063adb4d9c2e5b79af36d4827bd9/kotlin-test-1.2.0.jar!/kotlin/test/AssertionsKt.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
@@ -1441,16 +1449,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/visitors/VariableRenamer.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="17" column="1" selection-start-line="17" selection-start-column="1" selection-end-line="17" selection-end-column="1" />
-          <folding>
-            <element signature="e#39#224#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/craiggwilson/mql/parser/MQL.g4">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="458">
@@ -1555,16 +1553,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/translators/StatementTranslator.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="735">
-          <caret line="49" column="80" selection-start-line="49" selection-start-column="79" selection-end-line="49" selection-end-column="80" />
-          <folding>
-            <element signature="e#42#684#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/ast/builders/Builders.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
@@ -1582,20 +1570,50 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/translators/StatementTranslator.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="735">
+          <caret line="49" column="80" selection-start-line="49" selection-start-column="79" selection-end-line="49" selection-end-column="80" />
+          <folding>
+            <element signature="e#42#684#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/visitors/VariableRenamer.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" selection-start-line="7" selection-end-line="17" selection-end-column="1" />
+          <folding>
+            <element signature="e#39#224#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/visitors/ExpressionReplacer.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="18" column="1" lean-forward="true" selection-start-line="18" selection-start-column="1" selection-end-line="18" selection-end-column="1" />
+          <folding>
+            <element signature="e#39#162#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/kotlin/com/craiggwilson/mql/visitors/DefaultFunctionNodeRewriter.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="19" column="5" lean-forward="true" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
+        <state relative-caret-position="288">
+          <caret line="24" column="49" selection-start-line="24" selection-start-column="49" selection-end-line="24" selection-end-column="49" />
           <folding>
-            <element signature="e#39#564#0" expanded="true" />
+            <element signature="e#39#777#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/kotlin/com/craiggwilson/mql/translators/StatementTranslatorTest.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="148" column="9" lean-forward="true" selection-start-line="148" selection-start-column="9" selection-end-line="148" selection-end-column="9" />
+        <state relative-caret-position="354">
+          <caret line="146" column="16" selection-start-line="146" selection-start-column="16" selection-end-line="146" selection-end-column="16" />
         </state>
       </provider>
     </entry>
