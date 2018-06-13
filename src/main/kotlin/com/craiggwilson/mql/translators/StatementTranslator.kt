@@ -10,65 +10,81 @@ import com.craiggwilson.mql.ast.UnwindStage
 import com.craiggwilson.mql.visitors.DefaultNodeRewriter
 import com.craiggwilson.mql.visitors.NodeRewriter
 import com.craiggwilson.mql.visitors.Rewriter
+import org.bson.BsonArray
+import org.bson.BsonBoolean
+import org.bson.BsonDocument
+import org.bson.BsonElement
+import org.bson.BsonInt32
+import org.bson.BsonInt64
+import org.bson.BsonString
 
-fun Statement.toShell(): String {
-    return StatementTranslator(ShellValueTranslator()).visit(this)
+fun Statement.translate(): BsonArray {
+    return StatementTranslator().visit(this)
 }
 
-class StatementTranslator(valueTranslator: ValueTranslator, rewriter: NodeRewriter = DefaultNodeRewriter) : AbstractTranslator() {
+class StatementTranslator(rewriter: NodeRewriter = DefaultNodeRewriter) : AbstractTranslator() {
     private val preProcessor = Rewriter(rewriter)
-    private val aggLanguageTranslator = AggregateLanguageExpressionTranslator(valueTranslator)
-    private val queryLanguageTranslator = QueryLanguageExpressionTranslator(valueTranslator)
+    private val aggLanguageTranslator = AggregateLanguageExpressionTranslator
 
     // Nodes
-    override fun visit(n: Statement): String {
+    override fun visit(n: Statement): BsonArray {
         val stmt = preProcessor.visit(n) as Statement
-        val pipelineString = stmt.pipeline.joinToString(prefix = "[", postfix = "]") { visit(it) as String }
-
-        return "db.${stmt.collectionName.name}.aggregate($pipelineString)"
+        return BsonArray(stmt.pipeline.map { visit(it) })
     }
 
     // Stages
-    override fun visit(n: LimitStage): String {
-        return "{ \$limit: ${n.limit} }"
-    }
+    override fun visit(n: LimitStage) = BsonDocument("\$limit", BsonInt64(n.limit))
 
-    override fun visit(n: ProjectStage): String {
-        val fieldString = n.items.joinToString { item ->
-            val fieldName = visit(item.field)
-            val expression = aggLanguageTranslator.visit(item.expression)
-
-            "$fieldName: $expression"
-        }
-
-        return "{ \$project: { $fieldString } }"
-    }
-
-    override fun visit(n: SkipStage): String {
-        return "{ \$skip: ${n.skip} }"
-    }
-
-    override fun visit(n: SortStage): String {
-        val fieldString = n.fields.joinToString { field ->
-            val fieldName = queryLanguageTranslator.visit(field.field)
-            val direction = if (field.direction == Direction.ASCENDING) {
-                "1"
-            } else {
-                "-1"
+    override fun visit(n: ProjectStage) = BsonDocument(
+        "\$project",
+        BsonDocument(
+            n.items.map { item ->
+                BsonElement(
+                    item.field.flatten().name.name,
+                    aggLanguageTranslator.visit(item.expression)
+                )
             }
+        )
+    )
 
-            "$fieldName: $direction"
+    override fun visit(n: SkipStage) = BsonDocument("\$skip", BsonInt64(n.skip))
+
+    override fun visit(n: SortStage) = BsonDocument(
+        "\$sort",
+        BsonDocument(
+            n.fields.map { field ->
+                val ref = field.field.flatten()
+                if (ref.parent != null) {
+                    throw UnsupportedOperationException("can only specify a field for sorting")
+                }
+
+                BsonElement(
+                    ref.name.name,
+                    if (field.direction == Direction.ASCENDING) {
+                        BsonInt32(1)
+                    } else {
+                        BsonInt32(-1)
+                    }
+                )
+            }
+        )
+    )
+
+    override fun visit(n: UnwindStage): BsonDocument {
+        val ref = n.field.flatten()
+        if (ref.parent != null) {
+            throw UnsupportedOperationException("can only specify a field for sorting")
         }
 
-        return "{ \$sort: { $fieldString } }"
-    }
+        val elements = mutableListOf(
+            BsonElement("path", BsonString("\$${ref.name.name}")),
+            BsonElement("preserveNullAndEmptyArrays", BsonBoolean(n.preserveNullAndEmpty))
+        )
 
-    override fun visit(n: UnwindStage): String {
-        var options = "path: ${aggLanguageTranslator.visit(n.field)}, preserveNullAndEmptyArrays: ${n.preserveNullAndEmpty}"
         if (n.indexField != null) {
-            options += ", includeArrayIndex: ${visit(n.indexField)}"
+            elements += BsonElement("includeArrayIndex", BsonString(n.indexField.flatten().name.name))
         }
 
-        return "{ \$unwind: { $options } }"
+        return BsonDocument("\$unwind", BsonDocument(elements))
     }
 }

@@ -125,6 +125,21 @@ data class EqualsExpression(override val left: Expression, override val right: E
 data class FieldReferenceExpression(val parent: Expression?, val name: FieldName) : Expression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
+    fun flatten(): FieldReferenceExpression {
+        var name = this.name
+        var parent = this.parent
+        while (parent != null) {
+            if (parent !is FieldReferenceExpression) {
+                break
+            }
+
+            name = parent.name.append(name)
+            parent = parent.parent
+        }
+
+        return update(parent, name)
+    }
+
     fun update(parent: Expression?, name: FieldName): FieldReferenceExpression {
         return if (parent !== this.parent || name !== this.name) {
             FieldReferenceExpression(parent, name)

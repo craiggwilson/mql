@@ -1,6 +1,7 @@
 package com.craiggwilson.mql.translators
 
 import com.craiggwilson.mql.parser.parseMQL
+import org.bson.BsonArray
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
@@ -10,10 +11,10 @@ class StatementTranslatorTest() {
     @ParameterizedTest(name = "{0}")
     @MethodSource("aggExpressions")
     fun testAggExpressions(mql: String, expected: String) {
-        val actualExpected = "db.bar.aggregate([{ \$project: { \"test\": $expected } }])"
+        val actualExpected = BsonArray.parse("[{ \"\$project\": { \"test\": $expected } }]")
 
         val parsed = parseMQL("FROM bar PROJECT test := $mql")[0]
-        val actual = parsed.toShell()
+        val actual = parsed.translate()
 
         assertEquals(actualExpected, actual)
     }
@@ -21,10 +22,10 @@ class StatementTranslatorTest() {
     @ParameterizedTest(name = "{0}")
     @MethodSource("functions")
     fun testFunctions(mql: String, expected: String) {
-        val actualExpected = "db.bar.aggregate([{ \$project: { \"test\": $expected } }])"
+        val actualExpected = BsonArray.parse("[{ \"\$project\": { \"test\": $expected } }]")
 
         val parsed = parseMQL("FROM bar PROJECT test := $mql")[0]
-        val actual = parsed.toShell()
+        val actual = parsed.translate()
 
         assertEquals(actualExpected, actual)
     }
@@ -32,10 +33,12 @@ class StatementTranslatorTest() {
     @ParameterizedTest(name = "{0}")
     @MethodSource("stages")
     fun testStages(mql: String, expected: String) {
-        val parsed = parseMQL(mql)[0]
-        val actual = parsed.toShell()
+        val actualExpected = BsonArray.parse(expected)
 
-        assertEquals(expected, actual)
+        val parsed = parseMQL(mql)[0]
+        val actual = parsed.translate()
+
+        assertEquals(actualExpected, actual)
     }
 
     companion object {
@@ -149,48 +152,48 @@ class StatementTranslatorTest() {
                 // LIMIT
                 test(
                     "FROM bar LIMIT 10",
-                    "db.bar.aggregate([{ \$limit: 10 }])"
+                    "[{ \$limit: NumberLong(\"10\") }]"
                 ),
 
                 // PROJECT
                 test(
                     "FROM bar PROJECT a, b.c, `c`",
-                    "db.bar.aggregate([{ \$project: { \"a\": \"\$a\", \"b.c\": \"\$b.c\", \"c\": \"\$c\" } }])"
+                    "[{ \$project: { \"a\": \"\$a\", \"b.c\": \"\$b.c\", \"c\": \"\$c\" } }]"
                 ),
 
                 test(
                     "FROM bar PROJECT a := a, b_c := b.c, C := `c`",
-                    "db.bar.aggregate([{ \$project: { \"a\": \"\$a\", \"b_c\": \"\$b.c\", \"C\": \"\$c\" } }])"
+                    "[{ \$project: { \"a\": \"\$a\", \"b_c\": \"\$b.c\", \"C\": \"\$c\" } }]"
                 ),
 
                 // SKIP
                 test(
                     "FROM bar SKIP 10",
-                    "db.bar.aggregate([{ \$skip: 10 }])"
+                    "[{ \$skip: NumberLong(\"10\") }]"
                 ),
 
                 // SORT
                 test(
                     "FROM bar SORT a, b.a DESC, c.a ASC",
-                    "db.bar.aggregate([{ \$sort: { \"a\": 1, \"b.a\": -1, \"c.a\": 1 } }])"
+                    "[{ \$sort: { \"a\": 1, \"b.a\": -1, \"c.a\": 1 } }]"
                 ),
 
                 // UNWIND
                 test(
                     "FROM bar UNWIND a.b",
-                    "db.bar.aggregate([{ \$unwind: { path: \"\$a.b\", preserveNullAndEmptyArrays: false } }])"
+                    "[{ \$unwind: { path: \"\$a.b\", preserveNullAndEmptyArrays: false } }]"
                 ),
                 test(
                     "FROM bar UNWIND a.b WITH PRESERVE_NULL_AND_EMPTY",
-                    "db.bar.aggregate([{ \$unwind: { path: \"\$a.b\", preserveNullAndEmptyArrays: true } }])"
+                    "[{ \$unwind: { path: \"\$a.b\", preserveNullAndEmptyArrays: true } }]"
                 ),
                 test(
                     "FROM bar UNWIND a.b WITH INDEX b.a",
-                    "db.bar.aggregate([{ \$unwind: { path: \"\$a.b\", preserveNullAndEmptyArrays: false, includeArrayIndex: \"b.a\" } }])"
+                    "[{ \$unwind: { path: \"\$a.b\", preserveNullAndEmptyArrays: false, includeArrayIndex: \"b.a\" } }]"
                 ),
                 test(
                     "FROM bar UNWIND a.b WITH INDEX b.a PRESERVE_NULL_AND_EMPTY",
-                    "db.bar.aggregate([{ \$unwind: { path: \"\$a.b\", preserveNullAndEmptyArrays: true, includeArrayIndex: \"b.a\" } }])"
+                    "[{ \$unwind: { path: \"\$a.b\", preserveNullAndEmptyArrays: true, includeArrayIndex: \"b.a\" } }]"
                 )
             )
         }

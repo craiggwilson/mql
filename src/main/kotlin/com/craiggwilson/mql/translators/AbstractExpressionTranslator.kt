@@ -31,62 +31,83 @@ import com.craiggwilson.mql.ast.RangeExpression
 import com.craiggwilson.mql.ast.StringExpression
 import com.craiggwilson.mql.ast.SubtractExpression
 import com.craiggwilson.mql.ast.VariableReferenceExpression
+import org.bson.BsonArray
+import org.bson.BsonBoolean
+import org.bson.BsonDecimal128
+import org.bson.BsonDocument
+import org.bson.BsonDouble
+import org.bson.BsonElement
+import org.bson.BsonInt32
+import org.bson.BsonInt64
+import org.bson.BsonNull
+import org.bson.BsonString
+import org.bson.BsonValue
+import org.bson.types.Decimal128
 
-abstract class AbstractExpressionTranslator(private val valueTranslator: ValueTranslator): AbstractTranslator(), ExpressionTranslator {
+internal abstract class AbstractExpressionTranslator: AbstractTranslator(), ExpressionTranslator {
     // Expressions
 
-    abstract override fun visit(n: AddExpression): String
-    abstract override fun visit(n: AndExpression): String
-    abstract override fun visit(n: ArrayAccessExpression): String
-    abstract override fun visit(n: ConditionalExpression): String
-    abstract override fun visit(n: DivideExpression): String
-    abstract override fun visit(n: EqualsExpression): String
-    abstract override fun visit(n: FieldReferenceExpression): String
-    abstract override fun visit(n: FunctionCallExpression): String
-    abstract override fun visit(n: GreaterThanExpression): String
-    abstract override fun visit(n: GreaterThanOrEqualsExpression): String
-    abstract override fun visit(n: LessThanExpression): String
-    abstract override fun visit(n: LessThanOrEqualsExpression): String
-    abstract override fun visit(n: LetExpression): String
-    abstract override fun visit(n: ModExpression): String
-    abstract override fun visit(n: MultiplyExpression): String
-    abstract override fun visit(n: NewArrayExpression): String
-    abstract override fun visit(n: NewDocumentExpression): String
-    abstract override fun visit(n: NotEqualsExpression): String
-    abstract override fun visit(n: NotExpression): String
-    abstract override fun visit(n: OrExpression): String
-    abstract override fun visit(n: PowerExpression): String
-    abstract override fun visit(n: RangeExpression): String
-    abstract override fun visit(n: SubtractExpression): String
-    abstract override fun visit(n: VariableReferenceExpression): String
+    abstract override fun visit(n: AddExpression): BsonValue
+    abstract override fun visit(n: AndExpression): BsonValue
+    abstract override fun visit(n: ArrayAccessExpression): BsonValue
+    abstract override fun visit(n: ConditionalExpression): BsonValue
+    abstract override fun visit(n: DivideExpression): BsonValue
+    abstract override fun visit(n: EqualsExpression): BsonValue
+    abstract override fun visit(n: FieldReferenceExpression): BsonValue
+    abstract override fun visit(n: FunctionCallExpression): BsonValue
+    abstract override fun visit(n: GreaterThanExpression): BsonValue
+    abstract override fun visit(n: GreaterThanOrEqualsExpression): BsonValue
+    abstract override fun visit(n: LessThanExpression): BsonValue
+    abstract override fun visit(n: LessThanOrEqualsExpression): BsonValue
+    abstract override fun visit(n: LetExpression): BsonValue
+    abstract override fun visit(n: ModExpression): BsonValue
+    abstract override fun visit(n: MultiplyExpression): BsonValue
+    override fun visit(n: NewArrayExpression): BsonValue {
+        val items = n.items.map { visit(it) }
+
+        return BsonArray(items)
+    }
+
+    override fun visit(n: NewDocumentExpression): BsonValue {
+        val elements = n.elements.map { BsonElement(it.field.flatten().name.name, visit(it.expression)) }
+
+        return BsonDocument(elements)
+    }
+    abstract override fun visit(n: NotEqualsExpression): BsonValue
+    abstract override fun visit(n: NotExpression): BsonValue
+    abstract override fun visit(n: OrExpression): BsonValue
+    abstract override fun visit(n: PowerExpression): BsonValue
+    abstract override fun visit(n: RangeExpression): BsonValue
+    abstract override fun visit(n: SubtractExpression): BsonValue
+    abstract override fun visit(n: VariableReferenceExpression): BsonValue
 
     // Values
 
-    override fun visit(n: BooleanExpression): String {
-        return valueTranslator.visit(n)
+    override fun visit(n: BooleanExpression): BsonValue {
+        return BsonBoolean(n.value)
     }
 
-    override fun visit(n: DecimalExpression): String {
-        return valueTranslator.visit(n)
+    override fun visit(n: DecimalExpression): BsonValue {
+        return BsonDecimal128(Decimal128(n.value))
     }
 
-    override fun visit(n: DoubleExpression): String {
-        return valueTranslator.visit(n)
+    override fun visit(n: DoubleExpression): BsonValue {
+        return BsonDouble(n.value)
     }
 
-    override fun visit(n: Int32Expression): String {
-        return valueTranslator.visit(n)
+    override fun visit(n: Int32Expression): BsonValue {
+        return BsonInt32(n.value)
     }
 
-    override fun visit(n: Int64Expression): String {
-        return valueTranslator.visit(n)
+    override fun visit(n: Int64Expression): BsonValue {
+        return BsonInt64(n.value)
     }
 
-    override fun visit(n: NullExpression): String {
-        return valueTranslator.visit(n)
+    override fun visit(n: NullExpression): BsonValue {
+        return BsonNull.VALUE
     }
 
-    override fun visit(n: StringExpression): String {
-        return valueTranslator.visit(n)
+    override fun visit(n: StringExpression): BsonValue {
+        return BsonString(n.value)
     }
 }

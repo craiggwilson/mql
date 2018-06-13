@@ -31,40 +31,41 @@ import com.craiggwilson.mql.ast.RangeExpression
 import com.craiggwilson.mql.ast.StringExpression
 import com.craiggwilson.mql.ast.SubtractExpression
 import com.craiggwilson.mql.ast.VariableReferenceExpression
+import org.bson.BsonValue
 
 interface ExpressionTranslator {
 
-    fun visit(n: AddExpression): String
-    fun visit(n: AndExpression): String
-    fun visit(n: ArrayAccessExpression): String
-    fun visit(n: ConditionalExpression): String
-    fun visit(n: DivideExpression): String
-    fun visit(n: EqualsExpression): String
-    fun visit(n: FieldReferenceExpression): String
-    fun visit(n: FunctionCallExpression): String
-    fun visit(n: GreaterThanExpression): String
-    fun visit(n: GreaterThanOrEqualsExpression): String
-    fun visit(n: LessThanExpression): String
-    fun visit(n: LessThanOrEqualsExpression): String
-    fun visit(n: LetExpression): String
-    fun visit(n: ModExpression): String
-    fun visit(n: MultiplyExpression): String
-    fun visit(n: NewArrayExpression): String
-    fun visit(n: NewDocumentExpression): String
-    fun visit(n: NotEqualsExpression): String
-    fun visit(n: NotExpression): String
-    fun visit(n: OrExpression): String
-    fun visit(n: PowerExpression): String
-    fun visit(n: RangeExpression): String
-    fun visit(n: SubtractExpression): String
-    fun visit(n: VariableReferenceExpression): String
+    fun visit(n: AddExpression): BsonValue
+    fun visit(n: AndExpression): BsonValue
+    fun visit(n: ArrayAccessExpression): BsonValue
+    fun visit(n: ConditionalExpression): BsonValue
+    fun visit(n: DivideExpression): BsonValue
+    fun visit(n: EqualsExpression): BsonValue
+    fun visit(n: FieldReferenceExpression): BsonValue
+    fun visit(n: FunctionCallExpression): BsonValue
+    fun visit(n: GreaterThanExpression): BsonValue
+    fun visit(n: GreaterThanOrEqualsExpression): BsonValue
+    fun visit(n: LessThanExpression): BsonValue
+    fun visit(n: LessThanOrEqualsExpression): BsonValue
+    fun visit(n: LetExpression): BsonValue
+    fun visit(n: ModExpression): BsonValue
+    fun visit(n: MultiplyExpression): BsonValue
+    fun visit(n: NewArrayExpression): BsonValue
+    fun visit(n: NewDocumentExpression): BsonValue
+    fun visit(n: NotEqualsExpression): BsonValue
+    fun visit(n: NotExpression): BsonValue
+    fun visit(n: OrExpression): BsonValue
+    fun visit(n: PowerExpression): BsonValue
+    fun visit(n: RangeExpression): BsonValue
+    fun visit(n: SubtractExpression): BsonValue
+    fun visit(n: VariableReferenceExpression): BsonValue
 
     // Values
-    fun visit(n: BooleanExpression): String
-    fun visit(n: DecimalExpression): String
-    fun visit(n: DoubleExpression): String
-    fun visit(n: Int32Expression): String
-    fun visit(n: Int64Expression): String
-    fun visit(n: NullExpression): String
-    fun visit(n: StringExpression): String
+    fun visit(n: BooleanExpression): BsonValue
+    fun visit(n: DecimalExpression): BsonValue
+    fun visit(n: DoubleExpression): BsonValue
+    fun visit(n: Int32Expression): BsonValue
+    fun visit(n: Int64Expression): BsonValue
+    fun visit(n: NullExpression): BsonValue
+    fun visit(n: StringExpression): BsonValue
 }
