@@ -79,12 +79,12 @@ expression:
       | start=expression COLON end=expression?
       | start=expression? COLON end=expression
     ) RBRACK                                                            #arrayAccessExpression
+| expression RANGE expression (STEP expression)?                        #rangeExpression
 | expression op=(MULT | DIV | MOD) expression                           #multiplicationExpression
 | expression op=(PLUS | MINUS) expression                               #additionExpression
 | expression op=(EQ | GT | GTE | LT | LTE | NEQ) expression             #comparisonExpression
 | expression (AND | AND_SYMBOL) expression                              #andExpression
 | expression (OR | OR_SYMBOL) expression                                #orExpression
-| expression RANGE expression (STEP expression)?                        #rangeExpression
 | SWITCH switch_case+ (ELSE expression)?                                #switchExpression
 | IF expression THEN expression ELSE expression                         #conditionalExpression
 | LET variable_assignment (COMMA variable_assignment)* IN expression    #letExpression

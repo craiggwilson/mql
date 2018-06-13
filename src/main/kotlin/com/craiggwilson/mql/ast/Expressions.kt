@@ -133,6 +133,8 @@ data class FieldReferenceExpression(val parent: Expression?, val name: FieldName
 }
 
 data class FunctionCallExpression(val parent: Expression?, val name: FunctionName, val arguments: List<Argument>) : Expression() {
+    constructor(name: FunctionName, arguments: List<Argument>): this(null, name, arguments)
+
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
     fun update(parent: Expression?, name: FunctionName, arguments: List<Argument>): FunctionCallExpression {

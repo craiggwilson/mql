@@ -6,6 +6,8 @@ import com.craiggwilson.mql.ast.ArrayAccessExpression
 import com.craiggwilson.mql.ast.ConditionalExpression
 import com.craiggwilson.mql.ast.DivideExpression
 import com.craiggwilson.mql.ast.EqualsExpression
+import com.craiggwilson.mql.ast.FieldDeclaration
+import com.craiggwilson.mql.ast.FieldName
 import com.craiggwilson.mql.ast.FieldReferenceExpression
 import com.craiggwilson.mql.ast.FunctionCallExpression
 import com.craiggwilson.mql.ast.GreaterThanExpression
@@ -25,81 +27,78 @@ import com.craiggwilson.mql.ast.OrExpression
 import com.craiggwilson.mql.ast.PowerExpression
 import com.craiggwilson.mql.ast.RangeExpression
 import com.craiggwilson.mql.ast.SubtractExpression
+import com.craiggwilson.mql.ast.VariableName
 import com.craiggwilson.mql.ast.VariableReferenceExpression
+import com.craiggwilson.mql.ast.builders.fieldReference
+import com.craiggwilson.mql.ast.builders.function
+import com.craiggwilson.mql.ast.builders.let
+import com.craiggwilson.mql.ast.builders.newArray
+import com.craiggwilson.mql.ast.builders.newDocument
+import com.craiggwilson.mql.ast.builders.subtract
+import com.craiggwilson.mql.ast.builders.variableReference
 
 class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : AbstractExpressionTranslator(valueTranslator) {
     override fun visit(n: AddExpression): String {
-        val left = visit(n.left)
-        val right = visit(n.right)
-
-        return "{ \"\$add\": [ $left, $right ] }"
+        return visit(function("add", n.left, n.right))
     }
 
     override fun visit(n: AndExpression): String {
-        val left = visit(n.left)
-        val right = visit(n.right)
-
-        return "{ \"\$and\": [ $left, $right ] }"
+        return visit(function("and", n.left, n.right))
     }
 
     override fun visit(n: ArrayAccessExpression): String {
-        val array = visit(n.array)
-        if (n.accessor is RangeExpression) {
-            return if (n.accessor.end === NullExpression) {
-                val start = visit(n.accessor.start)
-                "{ \"\$let\": { \"vars\": { \"array\": $array }, \"in\": { \"\$slice\": [ \"\$\$array\", { \"\$subtract\": [ $start, { \"\$size\": \"\$\$array\" } ] } ] } } }"
-            } else if (n.accessor.start === NullExpression) {
-                val end = visit(n.accessor.end)
-                "{ \"\$slice\": [ $array, $end ] }"
-            } else {
-                val start = visit(n.accessor.start)
-                val end = visit(SubtractExpression(n.accessor.end, n.accessor.start))
-                "{ \"\$slice\": [ $array, $start, $end ] }"
+        return if (n.accessor is RangeExpression) {
+            when {
+                n.accessor.end === NullExpression -> visit(LetExpression(
+                    listOf(LetExpression.Variable(VariableName("array"), n.array)),
+                    function(
+                        "slice",
+                        variableReference("array"),
+                        subtract(
+                            n.accessor.start,
+                            function("size", variableReference("array"))))
+                ))
+                n.accessor.start === NullExpression -> visit(function("slice", n.array, n.accessor.end))
+                else -> visit(function("slice", n.array, n.accessor.start, subtract(n.accessor.end, n.accessor.start)))
             }
         } else {
-            val index = visit(n.accessor)
-            return "{ \"\$arrayElemAt\": [ $array, $index ] }"
+            visit(function("arrayElemAt", n.array, n.accessor))
         }
     }
 
     override fun visit(n: ConditionalExpression): String {
         if (n.cases.size == 1 && n.fallback != null) {
-            val condition = visit(n.cases[0].condition)
-            val then = visit(n.cases[0].then)
-            val fallback = visit(n.fallback)
-
-            return "{ \"\$cond\": [ $condition, $then, $fallback ] }"
+            return visit(function("cond", n.cases[0].condition, n.cases[0].then, n.fallback))
         } else {
-            val branches = n.cases.joinToString { case ->
-                val condition = visit(case.condition)
-                val then = visit(case.then)
-
-                "{ \"case\": $condition, \"then\": $then }"
+            val branches = n.cases.map { case ->
+                newDocument(
+                    "case" to case.condition,
+                    "then" to case.then
+                )
             }
 
-            var body = "\"branches\": [ $branches ]"
-
-            if (n.fallback != null) {
-                val fallback = visit(n.fallback)
-                body += ", \"default\": $fallback"
+            val f = if (n.fallback != null) {
+                function(
+                    "switch",
+                    "branches" to newArray(branches),
+                    "default" to n.fallback)
+            } else {
+                function(
+                    "switch",
+                    "branches" to newArray(branches)
+                )
             }
 
-            return "{ \"\$switch\": { $body } }"
+            return visit(f)
         }
     }
 
     override fun visit(n: DivideExpression): String {
-        val left = visit(n.left)
-        val right = visit(n.right)
-
-        return "{ \"\$divide\": [ $left, $right ] }"
+        return visit(function("divide", n.left, n.right))
     }
 
     override fun visit(n: EqualsExpression): String {
-        val left = visit(n.left)
-        val right = visit(n.right)
-
-        return "{ \"\$eq\": [ $left, $right ] }"
+        return visit(function("eq", n.left, n.right))
     }
 
     override fun visit(n: FieldReferenceExpression): String {
@@ -107,9 +106,10 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
         return if (flattened.parent != null && flattened.parent is VariableReferenceExpression) {
             quote("\$\$${flattened.parent.name.name}.${flattened.name.name}")
         } else if (flattened.parent != null) {
-            val parent = visit(flattened.parent)
-
-            "{ \"\$let\": { \"vars\": { \"parent\": $parent }, \"in\": \"\$\$parent.${flattened.name.name}\" } }"
+            return visit(let(
+                listOf("parent" to flattened.parent),
+                fieldReference(variableReference("parent"), flattened.name.name)
+            ))
         } else {
             quote("\$${flattened.name.name}")
         }
@@ -122,36 +122,23 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
             arguments = listOf(FunctionCallExpression.Argument.Positional(n.parent)) + arguments
         }
 
-        if (arguments.all { it is FunctionCallExpression.Argument.Named }) {
-            val argExpressions = arguments
+        return if (arguments.all { it is FunctionCallExpression.Argument.Named }) {
+            val elements = arguments
                 .filterIsInstance<FunctionCallExpression.Argument.Named>()
-                .map { argument ->
-                    val name = quote(argument.name.name)
-                    val expression = visit(argument.expression)
+                .map { NewDocumentExpression.Element(FieldDeclaration(FieldName(it.name.name)), it.expression) }
 
-                    "$name: $expression"
-                }.joinToString()
-
-            return "{ \"\$${n.name.name}\": { $argExpressions } }"
+            visit(newDocument("$" + n.name.name to NewDocumentExpression(elements)))
         } else {
-            val argExpressions = arguments.map { visit(it.expression) }.joinToString()
-
-            return "{ \"\$${n.name.name}\": [ $argExpressions ] }"
+            visit(newDocument("$" + n.name.name to newArray(arguments.map { it.expression })))
         }
     }
 
     override fun visit(n: GreaterThanExpression): String {
-        val left = visit(n.left)
-        val right = visit(n.right)
-
-        return "{ \"\$gt\": [ $left, $right ] }"
+        return visit(function("gt", n.left, n.right))
     }
 
     override fun visit(n: GreaterThanOrEqualsExpression): String {
-        val left = visit(n.left)
-        val right = visit(n.right)
-
-        return "{ \"\$gte\": [ $left, $right ] }"
+        return visit(function("gte", n.left, n.right))
     }
 
     override fun visit(n: LambdaExpression): String {
@@ -159,43 +146,30 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
     }
 
     override fun visit(n: LessThanExpression): String {
-        val left = visit(n.left)
-        val right = visit(n.right)
-
-        return "{ \"\$lt\": [ $left, $right ] }"
+        return visit(function("lt", n.left, n.right))
     }
 
     override fun visit(n: LessThanOrEqualsExpression): String {
-        val left = visit(n.left)
-        val right = visit(n.right)
-
-        return "{ \"\$lte\": [ $left, $right ] }"
+        return visit(function("lte", n.left, n.right))
     }
 
     override fun visit(n: LetExpression): String {
-        val variables = n.variables.joinToString { variable ->
-            var name = quote(variable.name.name)
-            var expression = visit(variable.expression)
+        val variables = NewDocumentExpression(
+            n.variables.map { NewDocumentExpression.Element(FieldDeclaration(FieldName(it.name.name)), it.expression) }
+        )
 
-            "$name: $expression"
-        }
-
-        val expression = visit(n.expression)
-        return "{ \"\$let\": { \"vars\": { $variables }, \"in\": $expression } }"
+        return visit(function(
+            "let",
+            "vars" to variables,
+            "in" to n.expression))
     }
 
     override fun visit(n: ModExpression): String {
-        val left = visit(n.left)
-        val right = visit(n.right)
-
-        return "{ \"\$mod\": [ $left, $right ] }"
+        return visit(function("mod", n.left, n.right))
     }
 
     override fun visit(n: MultiplyExpression): String {
-        val left = visit(n.left)
-        val right = visit(n.right)
-
-        return "{ \"\$multiply\": [ $left, $right ] }"
+        return visit(function("multiply", n.left, n.right))
     }
 
     override fun visit(n: NewArrayExpression): String {
@@ -216,51 +190,31 @@ class AggregateLanguageExpressionTranslator(valueTranslator: ValueTranslator) : 
     }
 
     override fun visit(n: NotEqualsExpression): String {
-        val left = visit(n.left)
-        val right = visit(n.right)
-
-        return "{ \"\$ne\": [ $left, $right ] }"
+        return visit(function("ne", n.left, n.right))
     }
 
     override fun visit(n: NotExpression): String {
-        val expression = visit(n.expression)
-        return "{ \"\$not\": [ $expression ] }"
+        return visit(function("not", n.expression))
     }
 
     override fun visit(n: OrExpression): String {
-        val left = visit(n.left)
-        val right = visit(n.right)
-
-        return "{ \"\$or\": [ $left, $right ] }"
+        return visit(function("or", n.left, n.right))
     }
 
     override fun visit(n: PowerExpression): String {
-        val left = visit(n.left)
-        val right = visit(n.right)
-
-        return "{ \"\$pow\": [ $left, $right ] }"
+        return visit(function("pow", n.left, n.right))
     }
 
     override fun visit(n: RangeExpression): String {
-        val start = visit(n.start)
-        val end = visit(n.end)
-
-        var body = "[ $start, $end"
-        if (n.step != null) {
-            val step = visit(n.step)
-            body += ", $step"
+        return if (n.step != null) {
+            visit(function("range", n.start, n.end, n.step))
+        } else {
+            visit(function("range", n.start, n.end))
         }
-
-        body += " ]"
-
-        return "{ \"\$range\": $body }"
     }
 
     override fun visit(n: SubtractExpression): String {
-        val left = visit(n.left)
-        val right = visit(n.right)
-
-        return "{ \"\$subtract\": [ $left, $right ] }"
+        return visit(function("subtract", n.left, n.right))
     }
 
     override fun visit(n: VariableReferenceExpression): String {
