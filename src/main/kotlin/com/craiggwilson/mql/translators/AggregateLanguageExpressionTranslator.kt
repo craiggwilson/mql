@@ -12,6 +12,7 @@ import com.craiggwilson.mql.ast.FieldReferenceExpression
 import com.craiggwilson.mql.ast.FunctionCallExpression
 import com.craiggwilson.mql.ast.GreaterThanExpression
 import com.craiggwilson.mql.ast.GreaterThanOrEqualsExpression
+import com.craiggwilson.mql.ast.Int32Expression
 import com.craiggwilson.mql.ast.LambdaExpression
 import com.craiggwilson.mql.ast.LessThanExpression
 import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
@@ -25,6 +26,7 @@ import com.craiggwilson.mql.ast.NullExpression
 import com.craiggwilson.mql.ast.OrExpression
 import com.craiggwilson.mql.ast.PowerExpression
 import com.craiggwilson.mql.ast.RangeExpression
+import com.craiggwilson.mql.ast.StringExpression
 import com.craiggwilson.mql.ast.SubtractExpression
 import com.craiggwilson.mql.ast.VariableReferenceExpression
 import com.craiggwilson.mql.ast.builders.fieldReference
@@ -48,7 +50,7 @@ internal object AggregateLanguageExpressionTranslator : AbstractExpressionTransl
 
     override fun visit(n: ArrayAccessExpression): BsonValue {
         return visit(if (n.accessor is RangeExpression) {
-            when {
+            val access = when {
                 n.accessor.end === NullExpression -> let(
                     listOf("array" to n.array),
                     function(
@@ -61,6 +63,32 @@ internal object AggregateLanguageExpressionTranslator : AbstractExpressionTransl
                 n.accessor.start === NullExpression -> function("slice", n.array, n.accessor.end)
                 else -> function("slice", n.array, n.accessor.start, subtract(n.accessor.end, n.accessor.start))
             }
+
+            if (n.accessor.step != null) {
+                let(
+                    listOf("array" to access),
+                    function("map",
+                        "input" to function("filter",
+                            "input" to function("zip",
+                                "inputs" to newArray(
+                                    RangeExpression(Int32Expression(0), function("size", variableReference("array"))),
+                                    variableReference("array")
+                                )
+                            ),
+                            "as" to StringExpression("x"),
+                            "cond" to EqualsExpression(
+                                Int32Expression(0),
+                                ModExpression(
+                                    ArrayAccessExpression(variableReference("x"), Int32Expression(0)),
+                                    n.accessor.step
+                                )
+                            )
+                        ),
+                        "as" to StringExpression("x"),
+                        "in" to ArrayAccessExpression(variableReference("x"), Int32Expression(1))
+                    )
+                )
+            } else access
         } else {
             function("arrayElemAt", n.array, n.accessor)
         }) as BsonValue

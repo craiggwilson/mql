@@ -114,6 +114,7 @@ class StatementTranslatorTest() {
                 test("a[2:4]", "{ \"\$slice\": [ \"\$a\", NumberInt(\"2\"), { \"\$subtract\": [ NumberInt(\"4\"), NumberInt(\"2\") ] } ] }"),
                 test("a[2:]", "{ \"\$let\": { \"vars\": { \"array\": \"\$a\" }, \"in\": { \"\$slice\": [ \"\$\$array\", { \"\$subtract\": [ NumberInt(\"2\"), { \"\$size\": [ \"\$\$array\" ] } ] } ] } } }"),
                 test("a[:8]", "{ \"\$slice\": [ \"\$a\", NumberInt(\"8\") ] }"),
+                test("a[1..10 step 3]", "{ \"\$let\" : { \"vars\" : { \"array\" : { \"\$slice\" : [\"\$a\", 1, { \"\$subtract\" : [10, 1] }] } }, \"in\" : { \"\$map\" : { \"input\" : { \"\$filter\" : { \"input\" : { \"\$zip\" : { \"inputs\" : [{ \"\$range\" : [0, { \"\$size\" : [\"\$\$array\"] }] }, \"\$\$array\"] } }, \"as\" : \"x\", \"cond\" : { \"\$eq\" : [0, { \"\$mod\" : [{ \"\$arrayElemAt\" : [\"\$\$x\", 0] }, 3] }] } } }, \"as\" : \"x\", \"in\" : { \"\$arrayElemAt\" : [\"\$\$x\", 1] } } } } }"),
 
                 // range expression
                 test("1..4", "{ \"\$range\": [ NumberInt(\"1\"), NumberInt(\"4\") ] }"),
