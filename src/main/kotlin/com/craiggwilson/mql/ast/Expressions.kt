@@ -27,6 +27,23 @@ data class AddExpression(override val left: Expression, override val right: Expr
 data class AndExpression(override val left: Expression, override val right: Expression) : BinaryExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
+    fun flatten(): List<Expression> {
+        val parts = mutableListOf<Expression>()
+        if (left is AndExpression) {
+            parts += left.flatten()
+        } else {
+            parts += left
+        }
+
+        if (right is AndExpression) {
+            parts += right.flatten()
+        } else {
+            parts += right
+        }
+
+        return parts
+    }
+
     fun update(left: Expression, right: Expression): AndExpression {
         return if (left !== this.left || right !== this.right) {
             AndExpression(left, right)

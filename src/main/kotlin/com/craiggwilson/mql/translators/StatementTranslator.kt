@@ -2,6 +2,7 @@ package com.craiggwilson.mql.translators
 
 import com.craiggwilson.mql.ast.Direction
 import com.craiggwilson.mql.ast.LimitStage
+import com.craiggwilson.mql.ast.MatchStage
 import com.craiggwilson.mql.ast.ProjectStage
 import com.craiggwilson.mql.ast.SkipStage
 import com.craiggwilson.mql.ast.SortStage
@@ -25,6 +26,7 @@ fun Statement.translate(): BsonArray {
 class StatementTranslator(rewriter: NodeRewriter = DefaultNodeRewriter) : AbstractTranslator() {
     private val preProcessor = Rewriter(rewriter)
     private val aggLanguageTranslator = AggregateLanguageExpressionTranslator
+    private val queryLanguageTranslator = QueryLanguageExpressionTranslator
 
     // Nodes
     override fun visit(n: Statement): BsonArray {
@@ -34,6 +36,11 @@ class StatementTranslator(rewriter: NodeRewriter = DefaultNodeRewriter) : Abstra
 
     // Stages
     override fun visit(n: LimitStage) = BsonDocument("\$limit", BsonInt64(n.limit))
+
+    override fun visit(n: MatchStage) = BsonDocument(
+        "\$match",
+        queryLanguageTranslator.visit(n.expression) as BsonDocument
+    )
 
     override fun visit(n: ProjectStage) = BsonDocument(
         "\$project",

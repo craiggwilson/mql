@@ -31,6 +31,17 @@ class StatementTranslatorTest() {
     }
 
     @ParameterizedTest(name = "{0}")
+    @MethodSource("matchExpressions")
+    fun testMatchExpressions(mql: String, expected: String) {
+        val actualExpected = BsonArray.parse("[{ \"\$match\": $expected }]")
+
+        val parsed = parseMQL("FROM bar MATCH $mql")[0]
+        val actual = parsed.translate()
+
+        assertEquals(actualExpected, actual)
+    }
+
+    @ParameterizedTest(name = "{0}")
     @MethodSource("stages")
     fun testStages(mql: String, expected: String) {
         val actualExpected = BsonArray.parse(expected)
@@ -146,6 +157,17 @@ class StatementTranslatorTest() {
 
                 // renaming closed variable
                 test("let \$this := 1 in a.reduce(2, (\$acc, \$x) => \$acc + \$x + \$this)", "{ \"\$let\": { \"vars\": { \"this\": NumberInt(\"1\") }, \"in\": { \"\$let\": { \"vars\": { \"closed_this0\": \"\$\$this\" }, \"in\": { \"\$reduce\": { \"input\": \"\$a\", \"initialValue\": NumberInt(\"2\"), \"in\": { \"\$add\": [ { \"\$add\": [ \"\$\$value\", \"\$\$this\" ] }, \"\$\$closed_this0\" ] } } } } } } }")
+            )
+        }
+
+        @JvmStatic
+        private fun matchExpressions(): Collection<Array<String>> {
+            return listOf(
+                // order of operations
+                test("a = 10", "{ a: 10 }"),
+                test("a = 10 AND b = 11", "{ a: 10, b: 11 }"),
+                test("a = 10 AND a = 11", "{ \$and: [{ a: 10 }, { a: 11 }] }"),
+                test("a = 10 AND x / 11 = 12", "{ \"a\" : 10, \"\$expr\" : { \"\$eq\" : [{ \"\$divide\" : [\"\$x\", 11] }, 12] } }")
             )
         }
 

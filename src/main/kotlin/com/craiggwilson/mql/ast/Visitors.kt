@@ -52,6 +52,7 @@ abstract class Visitor<T> {
     // Stages
 
     open fun visit(n: LimitStage): T = throw NotImplementedError()
+    open fun visit(n: MatchStage): T = throw NotImplementedError()
     open fun visit(n: ProjectStage): T = throw NotImplementedError()
     open fun visit(n: SkipStage): T = throw NotImplementedError()
     open fun visit(n: SortStage): T = throw NotImplementedError()
@@ -246,6 +247,8 @@ abstract class NodeVisitor : Visitor<Node>() {
     // Stages
 
     override fun visit(n: LimitStage): Node = n.update(n.limit)
+
+    override fun visit(n: MatchStage): Node = n.update(visit(n.expression) as Expression)
 
     override fun visit(n: ProjectStage): Node = n.update(
         visit(n.items) { item ->

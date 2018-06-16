@@ -28,6 +28,7 @@ import com.craiggwilson.mql.ast.LessThanExpression
 import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
 import com.craiggwilson.mql.ast.LetExpression
 import com.craiggwilson.mql.ast.LimitStage
+import com.craiggwilson.mql.ast.MatchStage
 import com.craiggwilson.mql.ast.ModExpression
 import com.craiggwilson.mql.ast.MultiplyExpression
 import com.craiggwilson.mql.ast.NewArrayExpression
@@ -101,6 +102,7 @@ class MQLTreeParser() {
     private fun parseStage(ctx: MQLParser.StageContext): Stage {
         return when {
             ctx.limit_stage() != null -> parseLimitStage(ctx.limit_stage())
+            ctx.match_stage() != null -> parseMatchStage(ctx.match_stage())
             ctx.project_stage() != null -> parseProjectStage(ctx.project_stage())
             ctx.skip_stage() != null -> parseSkipStage(ctx.skip_stage())
             ctx.sort_stage() != null -> parseSortStage(ctx.sort_stage())
@@ -111,6 +113,10 @@ class MQLTreeParser() {
 
     private fun parseLimitStage(ctx: MQLParser.Limit_stageContext): LimitStage {
         return LimitStage(ctx.INT().text.toLong())
+    }
+
+    private fun parseMatchStage(ctx: MQLParser.Match_stageContext): MatchStage {
+        return MatchStage(parseExpression(ctx.expression()))
     }
 
     private fun parseProjectStage(ctx: MQLParser.Project_stageContext): ProjectStage {

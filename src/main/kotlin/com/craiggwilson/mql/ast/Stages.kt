@@ -14,6 +14,16 @@ data class LimitStage(val limit: Long) : Stage() {
     }
 }
 
+data class MatchStage(val expression: Expression) : Stage() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(expression: Expression): MatchStage {
+        return if (expression !== this.expression) {
+            MatchStage(expression)
+        } else this
+    }
+}
+
 data class ProjectStage(val items: List<Item>) : Stage() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
