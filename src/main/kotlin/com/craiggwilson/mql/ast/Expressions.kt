@@ -169,6 +169,12 @@ data class FunctionCallExpression(val parent: Expression?, val name: FunctionNam
 
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
+    fun shift(): FunctionCallExpression {
+        return if (parent != null) {
+            update(null, name, listOf(Argument.Positional(parent)) + arguments)
+        } else this
+    }
+
     fun update(parent: Expression?, name: FunctionName, arguments: List<Argument>): FunctionCallExpression {
         return if (parent !== this.parent || name !== this.name || arguments !== this.arguments) {
             FunctionCallExpression(parent, name, arguments)
@@ -211,6 +217,16 @@ data class GreaterThanOrEqualsExpression(override val left: Expression, override
     fun update(left: Expression, right: Expression): GreaterThanOrEqualsExpression {
         return if (left !== this.left || right !== this.right) {
             GreaterThanOrEqualsExpression(left, right)
+        } else this
+    }
+}
+
+data class InExpression(override val left: Expression, override val right: Expression) : BinaryExpression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(left: Expression, right: Expression): InExpression {
+        return if (left !== this.left || right !== this.right) {
+            InExpression(left, right)
         } else this
     }
 }
@@ -365,6 +381,23 @@ object NullExpression : ConstantExpression() {
 
 data class OrExpression(override val left: Expression, override val right: Expression) : BinaryExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun flatten(): List<Expression> {
+        val parts = mutableListOf<Expression>()
+        if (left is OrExpression) {
+            parts += left.flatten()
+        } else {
+            parts += left
+        }
+
+        if (right is OrExpression) {
+            parts += right.flatten()
+        } else {
+            parts += right
+        }
+
+        return parts
+    }
 
     fun update(left: Expression, right: Expression): OrExpression {
         return if (left !== this.left || right !== this.right) {

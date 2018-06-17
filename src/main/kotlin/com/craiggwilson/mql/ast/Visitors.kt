@@ -24,6 +24,7 @@ abstract class Visitor<T> {
     open fun visit(n: FunctionCallExpression): T = throw NotImplementedError()
     open fun visit(n: GreaterThanExpression): T = throw NotImplementedError()
     open fun visit(n: GreaterThanOrEqualsExpression): T = throw NotImplementedError()
+    open fun visit(n: InExpression): T = throw NotImplementedError()
     open fun visit(n: Int32Expression): T = throw NotImplementedError()
     open fun visit(n: Int64Expression): T = throw NotImplementedError()
     open fun visit(n: LambdaExpression): T = throw NotImplementedError()
@@ -147,6 +148,11 @@ abstract class NodeVisitor : Visitor<Node>() {
     )
 
     override fun visit(n: GreaterThanOrEqualsExpression): Node = n.update(
+        visit(n.left) as Expression,
+        visit(n.right) as Expression
+    )
+
+    override fun visit(n: InExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )

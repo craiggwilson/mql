@@ -12,6 +12,7 @@ import com.craiggwilson.mql.ast.FieldReferenceExpression
 import com.craiggwilson.mql.ast.FunctionCallExpression
 import com.craiggwilson.mql.ast.GreaterThanExpression
 import com.craiggwilson.mql.ast.GreaterThanOrEqualsExpression
+import com.craiggwilson.mql.ast.InExpression
 import com.craiggwilson.mql.ast.Int32Expression
 import com.craiggwilson.mql.ast.LambdaExpression
 import com.craiggwilson.mql.ast.LessThanExpression
@@ -165,6 +166,10 @@ internal object AggregateLanguageExpressionTranslator : AbstractExpressionTransl
 
     override fun visit(n: GreaterThanOrEqualsExpression): BsonValue {
         return visit(function("gte", n.left, n.right))
+    }
+
+    override fun visit(n: InExpression): BsonValue {
+        return visit(function("in", n.left, n.right))
     }
 
     override fun visit(n: LambdaExpression): BsonValue {

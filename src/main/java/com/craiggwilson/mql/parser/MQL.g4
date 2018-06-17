@@ -85,9 +85,10 @@ expression:
 | expression op=(EQ | GT | GTE | LT | LTE | NEQ) expression             #comparisonExpression
 | expression (AND | AND_SYMBOL) expression                              #andExpression
 | expression (OR | OR_SYMBOL) expression                                #orExpression
+| expression NOT? IN expression                                         #inExpression
 | SWITCH switch_case+ (ELSE expression)?                                #switchExpression
 | IF expression THEN expression ELSE expression                         #conditionalExpression
-| LET variable_assignment (COMMA variable_assignment)* IN expression    #letExpression
+| LET variable_assignment (COMMA variable_assignment)* ARROW expression #letExpression
 | LBRACE (field_assignment (COMMA field_assignment)*)? RBRACE           #newDocumentExpression
 | LBRACK (expression (COMMA expression)*)? RBRACK                       #newArrayExpression
 | LPAREN expression RPAREN                                              #parenthesisExpression

@@ -21,6 +21,7 @@ import com.craiggwilson.mql.ast.FunctionCallExpression
 import com.craiggwilson.mql.ast.FunctionName
 import com.craiggwilson.mql.ast.GreaterThanExpression
 import com.craiggwilson.mql.ast.GreaterThanOrEqualsExpression
+import com.craiggwilson.mql.ast.InExpression
 import com.craiggwilson.mql.ast.Int32Expression
 import com.craiggwilson.mql.ast.Int64Expression
 import com.craiggwilson.mql.ast.LambdaExpression
@@ -224,6 +225,15 @@ class MQLTreeParser() {
             is MQLParser.FieldExpressionContext -> FieldReferenceExpression(null, getFieldName(ctx.field_name()))
             is MQLParser.FunctionCallExpressionContext -> {
                 parseFunction(ctx.function())
+            }
+            is MQLParser.InExpressionContext -> {
+                val left = parseExpression(ctx.expression(0))
+                val right = parseExpression(ctx.expression(1))
+
+                val expression = InExpression(left, right)
+                if (ctx.NOT() != null) {
+                    NotExpression(expression)
+                } else expression
             }
             is MQLParser.LetExpressionContext -> {
                 val variables = ctx.variable_assignment().map { va ->

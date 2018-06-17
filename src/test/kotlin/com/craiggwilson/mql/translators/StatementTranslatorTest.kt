@@ -115,6 +115,10 @@ class StatementTranslatorTest() {
                 test("1.0^2.0", "{ \"\$pow\": [ 1.0, 2.0 ] }"),
                 test("1.0 - 2.0", "{ \"\$subtract\": [ 1.0, 2.0 ] }"),
 
+                // in expression
+                test("a in [10,11]", "{ \"\$in\": [\"\$a\", [ 10, 11 ] ] }"),
+                test("a not in [10,11]", "{ \"\$not\": [{ \"\$in\": [\"\$a\", [ 10, 11 ] ] }] }"),
+
                 // unary expression
                 test("NOT true", "{ \"\$not\": [ true ] }"),
 
@@ -136,7 +140,7 @@ class StatementTranslatorTest() {
                 test("switch case true then false case false then true else null", "{ \"\$switch\": { \"branches\": [ { \"case\": true, \"then\": false }, { \"case\": false, \"then\": true } ], \"default\": null } }"),
 
                 // let
-                test("let \$x := true, \$y := false in \$x and \$y", "{ \"\$let\": { \"vars\": { \"x\": true, \"y\": false }, \"in\": { \"\$and\": [ \"\$\$x\", \"\$\$y\" ] } } }"),
+                test("let \$x := true, \$y := false => \$x and \$y", "{ \"\$let\": { \"vars\": { \"x\": true, \"y\": false }, \"in\": { \"\$and\": [ \"\$\$x\", \"\$\$y\" ] } } }"),
 
                 // functions
                 test("testFunc(a, 1.0)", "{ \"\$testFunc\": [ \"\$a\", 1.0 ] }"),
@@ -156,18 +160,41 @@ class StatementTranslatorTest() {
                 test("a.zip([1,2,3], (\$x, \$y) => \$x + \$y)", "{ \"\$map\" : { \"input\" : { \"\$zip\" : { \"inputs\" : [\"\$a\", [1, 2, 3]] } }, \"as\" : \"x\", \"in\" : { \"\$add\" : [{ \"\$arrayElemAt\" : [\"\$\$x\", 0] }, { \"\$arrayElemAt\" : [\"\$\$x\", 1] }] } } }"),
 
                 // renaming closed variable
-                test("let \$this := 1 in a.reduce(2, (\$acc, \$x) => \$acc + \$x + \$this)", "{ \"\$let\": { \"vars\": { \"this\": NumberInt(\"1\") }, \"in\": { \"\$let\": { \"vars\": { \"closed_this0\": \"\$\$this\" }, \"in\": { \"\$reduce\": { \"input\": \"\$a\", \"initialValue\": NumberInt(\"2\"), \"in\": { \"\$add\": [ { \"\$add\": [ \"\$\$value\", \"\$\$this\" ] }, \"\$\$closed_this0\" ] } } } } } } }")
+                test("let \$this := 1 => a.reduce(2, (\$acc, \$x) => \$acc + \$x + \$this)", "{ \"\$let\": { \"vars\": { \"this\": NumberInt(\"1\") }, \"in\": { \"\$let\": { \"vars\": { \"closed_this0\": \"\$\$this\" }, \"in\": { \"\$reduce\": { \"input\": \"\$a\", \"initialValue\": NumberInt(\"2\"), \"in\": { \"\$add\": [ { \"\$add\": [ \"\$\$value\", \"\$\$this\" ] }, \"\$\$closed_this0\" ] } } } } } } }")
             )
         }
 
         @JvmStatic
         private fun matchExpressions(): Collection<Array<String>> {
             return listOf(
-                // order of operations
-                test("a = 10", "{ a: 10 }"),
-                test("a = 10 AND b = 11", "{ a: 10, b: 11 }"),
-                test("a = 10 AND a = 11", "{ \$and: [{ a: 10 }, { a: 11 }] }"),
-                test("a = 10 AND x / 11 = 12", "{ \"a\" : 10, \"\$expr\" : { \"\$eq\" : [{ \"\$divide\" : [\"\$x\", 11] }, 12] } }")
+                // comparison query operators
+                test("a = 10", "{ \"a\": { \"\$eq\": 10 } }"),
+                test("a > 10", "{ \"a\": { \"\$gt\": 10 } }"),
+                test("a >= 10", "{ \"a\": { \"\$gte\": 10 } }"),
+                test("a < 10", "{ \"a\": { \"\$lt\": 10 } }"),
+                test("a <= 10", "{ \"a\": { \"\$lte\": 10 } }"),
+                test("a != 10", "{ \"a\": { \"\$ne\": 10 } }"),
+                test("a in [10,11]", "{ \"a\": { \"\$in\": [ 10, 11 ] } }"),
+                test("a not in [10,11]", "{ \"a\": { \"\$nin\": [ 10, 11 ] } }"),
+
+                // logical query operators
+                test("a = 10 AND b = 11", "{ \"a\": { \"\$eq\": 10 }, \"b\": { \"\$eq\": 11 } }"),
+                test("a = 10 AND a = 11", "{ \"\$and\": [{ \"a\": { \"\$eq\": 10 } }, { \"a\": { \"\$eq\": 11 } }] }"),
+                test("a = 10 OR a = 11", "{ \"\$or\": [{ \"a\": { \"\$eq\": 10 } }, { \"a\": { \"\$eq\": 11 } }] }"),
+                test("NOT (a != 10)", "{ \"a\": { \"\$eq\": 10 } }"),
+                test("NOT (a = 10)", "{ \"a\": { \"\$ne\": 10 } }"),
+                test("NOT NOT (a = 10)", "{ \"a\": { \"\$eq\": 10 } }"),
+
+                // element query operators
+                test("{ a := { `\$exists` := true } }", "{ \"a\": { \"\$exists\": true } }"),
+                test("a.exists(true)", "{ \"a\": { \"\$exists\": true } }"),
+                test("exists(a, true)", "{ \"a\": { \"\$exists\": true } }"),
+                test("{ a := { `\$type` := 1 } }", "{ \"a\": { \"\$type\": 1 } }"),
+                test("a.type(1)", "{ \"a\": { \"\$type\": 1 } }"),
+                test("type(a, 1)", "{ \"a\": { \"\$type\": 1 } }"),
+
+                // evaluation query operators
+                test("a % 10 = 4", "{ \"a\" : { \"\$mod\" : [10, 4] } }")
             )
         }
 
