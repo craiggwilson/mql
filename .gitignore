@@ -23,3 +23,8 @@ gradle-app.setting
 *.zip
 *.tar.gz
 *.rar
+
+# intellij files
+.idea
+*.iml
+.DS_Store
