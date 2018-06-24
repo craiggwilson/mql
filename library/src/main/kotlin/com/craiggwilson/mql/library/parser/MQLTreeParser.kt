@@ -58,12 +58,10 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.atn.PredictionMode
 
 fun parseMQL(mql: String): List<Statement> {
-    return MQLTreeParser().parse(mql)
+    return MQLTreeParser.parse(mql)
 }
 
-class MQLTreeParser() {
-
-    private var generatedIdNum = 0
+object MQLTreeParser {
 
     fun parse(mql: String): List<Statement> {
         val input = CharStreams.fromString(mql)
@@ -103,79 +101,61 @@ class MQLTreeParser() {
     }
 
     private fun parseStage(ctx: MQLParser.StageContext): Stage {
-        return when {
-            ctx.limit_stage() != null -> parseLimitStage(ctx.limit_stage())
-            ctx.match_stage() != null -> parseMatchStage(ctx.match_stage())
-            ctx.project_stage() != null -> parseProjectStage(ctx.project_stage())
-            ctx.skip_stage() != null -> parseSkipStage(ctx.skip_stage())
-            ctx.sort_stage() != null -> parseSortStage(ctx.sort_stage())
-            ctx.unwind_stage() != null -> parseUnwindStage(ctx.unwind_stage())
-            else -> throw ParseException("stage is not supported: ${ctx.text}")
-        }
-    }
+        return when (ctx) {
+            is MQLParser.LimitStageContext -> LimitStage(ctx.INT().text.toLong())
+            is MQLParser.MatchStageContext -> MatchStage(parseExpression(ctx.expression()))
+            is MQLParser.ProjectStageContext -> {
+                val items = ctx.project_item().map { item ->
+                    val fieldDeclaration = getFieldDeclaration(item.multipart_field_declaration())
 
-    private fun parseLimitStage(ctx: MQLParser.Limit_stageContext): LimitStage {
-        return LimitStage(ctx.INT().text.toLong())
-    }
+                    if (item.NOT_SYMBOL() != null) {
+                        ProjectStage.Item.Exclude(fieldDeclaration)
+                    } else {
+                        val expression = when {
+                            item.expression() != null -> parseExpression(item.expression())
+                            else -> fieldDeclaration.toFieldReferenceExpression()
+                        }
 
-    private fun parseMatchStage(ctx: MQLParser.Match_stageContext): MatchStage {
-        return MatchStage(parseExpression(ctx.expression()))
-    }
-
-    private fun parseProjectStage(ctx: MQLParser.Project_stageContext): ProjectStage {
-        val items = ctx.project_item().map { item ->
-            val fieldDeclaration = getFieldDeclaration(item.multipart_field_declaration())
-
-            if (item.NOT_SYMBOL() != null) {
-                ProjectStage.Item.Exclude(fieldDeclaration)
-            } else {
-                val expression = when {
-                    item.expression() != null -> parseExpression(item.expression())
-                    else -> fieldDeclaration.toFieldReferenceExpression()
+                        ProjectStage.Item.Include(fieldDeclaration, expression)
+                    }
                 }
 
-                ProjectStage.Item.Include(fieldDeclaration, expression)
+                ProjectStage(items)
             }
-        }
+            is MQLParser.SkipStageContext -> SkipStage(ctx.INT().text.toLong())
+            is MQLParser.SortStageContext -> {
+                val fields = ctx.sort_field().map { fieldCtx ->
+                    val field = getFieldReferenceExpression(fieldCtx.multipart_field_name())
+                    val direction = if (fieldCtx.DESC() != null) {
+                        Direction.DESCENDING
+                    } else {
+                        Direction.ASCENDING
+                    }
 
-        return ProjectStage(items)
-    }
-
-    private fun parseSkipStage(ctx: MQLParser.Skip_stageContext): SkipStage {
-        return SkipStage(ctx.INT().text.toLong())
-    }
-
-    private fun parseSortStage(ctx: MQLParser.Sort_stageContext): SortStage {
-        val fields = ctx.sort_field().map { fieldCtx ->
-            val field = getFieldReferenceExpression(fieldCtx.multipart_field_name())
-            val direction = if (fieldCtx.DESC() != null) {
-                Direction.DESCENDING
-            } else {
-                Direction.ASCENDING
-            }
-
-            SortStage.Field(field, direction)
-        }
-
-        return SortStage(fields)
-    }
-
-    private fun parseUnwindStage(ctx: MQLParser.Unwind_stageContext): UnwindStage {
-        val field = getFieldReferenceExpression(ctx.multipart_field_name())
-
-        var preserveNullAndEmpty = false
-        var indexField: FieldDeclaration? = null
-
-        if (ctx.unwind_option() != null) {
-            ctx.unwind_option().forEach {
-                when {
-                    it.PRESERVE_NULL_AND_EMPTY() != null -> preserveNullAndEmpty = true
-                    it.INDEX() != null -> indexField = getFieldDeclaration(it.multipart_field_declaration())
+                    SortStage.Field(field, direction)
                 }
-            }
-        }
 
-        return UnwindStage(field, indexField, preserveNullAndEmpty)
+                SortStage(fields)
+            }
+            is MQLParser.UnwindStageContext -> {
+                val field = getFieldReferenceExpression(ctx.multipart_field_name())
+
+                var preserveNullAndEmpty = false
+                var indexField: FieldDeclaration? = null
+
+                if (ctx.unwind_option() != null) {
+                    ctx.unwind_option().forEach {
+                        when {
+                            it.PRESERVE_NULL_AND_EMPTY() != null -> preserveNullAndEmpty = true
+                            it.INDEX() != null -> indexField = getFieldDeclaration(it.multipart_field_declaration())
+                        }
+                    }
+                }
+
+                UnwindStage(field, indexField, preserveNullAndEmpty)
+            }
+            else -> throw ParseException("unsupported stage $ctx")
+        }
     }
 
     private fun parseExpression(ctx: MQLParser.ExpressionContext): Expression {

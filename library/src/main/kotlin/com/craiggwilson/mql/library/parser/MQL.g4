@@ -10,36 +10,16 @@ pipeline: FROM collection_name stage+;
 
 // STAGES
 stage:
-  group_stage
-| limit_stage
-| lookup_stage
-| match_stage
-| project_stage
-| skip_stage
-| sort_stage
-| unwind_stage
-;
-
-group_stage:
-  GROUP field_assignment (COMMA field_assignment)* BY expression (COMMA expression)*
-;
-
-limit_stage:
-  LIMIT INT
-;
-
-lookup_stage:
-  LOOKUP
-  (LET variable_assignment (COMMA variable_assignment)* )?
-  multipart_field_declaration COLON LPAREN pipeline RPAREN
-;
-
-match_stage:
-  MATCH expression
-;
-
-project_stage:
-  PROJECT project_item (COMMA project_item)*
+  GROUP field_assignment (COMMA field_assignment)* BY expression (COMMA expression)*   #groupStage
+| LIMIT INT                                                                            #limitStage
+| LOOKUP
+    (LET variable_assignment (COMMA variable_assignment)* )?
+    multipart_field_declaration COLON LPAREN pipeline RPAREN                           #lookupStage
+| MATCH expression                                                                     #matchStage
+| PROJECT project_item (COMMA project_item)*                                           #projectStage
+| SKIP_ INT                                                                            #skipStage
+| SORT sort_field (COMMA sort_field)*                                                  #sortStage
+| UNWIND multipart_field_name (WITH unwind_option+)?                                   #unwindStage
 ;
 
 project_item:
@@ -47,20 +27,8 @@ project_item:
 | multipart_field_declaration COLON expression
 ;
 
-skip_stage:
-  SKIP_ INT
-;
-
-sort_stage:
-  SORT sort_field (COMMA sort_field)*
-;
-
 sort_field:
   multipart_field_name (ASC | DESC)?
-;
-
-unwind_stage:
-  UNWIND multipart_field_name (WITH unwind_option+)?
 ;
 
 unwind_option:
