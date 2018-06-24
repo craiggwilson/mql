@@ -1,4 +1,4 @@
-package com.craiggwilson.mql.parser
+package com.craiggwilson.mql.library.parser
 
 class ParseException : RuntimeException {
     constructor(message: String) : super(message)

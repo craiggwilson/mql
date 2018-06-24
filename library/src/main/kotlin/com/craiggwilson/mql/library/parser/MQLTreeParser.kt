@@ -1,61 +1,65 @@
-package com.craiggwilson.mql.parser
+package com.craiggwilson.mql.library.parser
 
-import com.craiggwilson.mql.ast.AddExpression
-import com.craiggwilson.mql.ast.AndExpression
-import com.craiggwilson.mql.ast.ArrayAccessExpression
-import com.craiggwilson.mql.ast.BooleanExpression
-import com.craiggwilson.mql.ast.CollectionName
-import com.craiggwilson.mql.ast.ConditionalExpression
-import com.craiggwilson.mql.ast.DatabaseName
-import com.craiggwilson.mql.ast.DecimalExpression
-import com.craiggwilson.mql.ast.Direction
-import com.craiggwilson.mql.ast.DivideExpression
-import com.craiggwilson.mql.ast.DoubleExpression
-import com.craiggwilson.mql.ast.EqualsExpression
-import com.craiggwilson.mql.ast.Expression
-import com.craiggwilson.mql.ast.FieldDeclaration
-import com.craiggwilson.mql.ast.FieldName
-import com.craiggwilson.mql.ast.FieldReferenceExpression
-import com.craiggwilson.mql.ast.FunctionArgumentName
-import com.craiggwilson.mql.ast.FunctionCallExpression
-import com.craiggwilson.mql.ast.FunctionName
-import com.craiggwilson.mql.ast.GreaterThanExpression
-import com.craiggwilson.mql.ast.GreaterThanOrEqualsExpression
-import com.craiggwilson.mql.ast.InExpression
-import com.craiggwilson.mql.ast.Int32Expression
-import com.craiggwilson.mql.ast.Int64Expression
-import com.craiggwilson.mql.ast.LambdaExpression
-import com.craiggwilson.mql.ast.LessThanExpression
-import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
-import com.craiggwilson.mql.ast.LetExpression
-import com.craiggwilson.mql.ast.LimitStage
-import com.craiggwilson.mql.ast.MatchStage
-import com.craiggwilson.mql.ast.ModExpression
-import com.craiggwilson.mql.ast.MultiplyExpression
-import com.craiggwilson.mql.ast.NewArrayExpression
-import com.craiggwilson.mql.ast.NewDocumentExpression
-import com.craiggwilson.mql.ast.NotEqualsExpression
-import com.craiggwilson.mql.ast.NotExpression
-import com.craiggwilson.mql.ast.NullExpression
-import com.craiggwilson.mql.ast.NumberExpression
-import com.craiggwilson.mql.ast.OrExpression
-import com.craiggwilson.mql.ast.PowerExpression
-import com.craiggwilson.mql.ast.ProjectStage
-import com.craiggwilson.mql.ast.RangeExpression
-import com.craiggwilson.mql.ast.SkipStage
-import com.craiggwilson.mql.ast.SortStage
-import com.craiggwilson.mql.ast.Stage
-import com.craiggwilson.mql.ast.Statement
-import com.craiggwilson.mql.ast.StringExpression
-import com.craiggwilson.mql.ast.SubtractExpression
-import com.craiggwilson.mql.ast.UnwindStage
-import com.craiggwilson.mql.ast.VariableName
-import com.craiggwilson.mql.ast.VariableReferenceExpression
-import com.craiggwilson.mql.library.parser.MQLLexer
-import com.craiggwilson.mql.library.parser.MQLParser
+import com.craiggwilson.mql.library.ast.AddExpression
+import com.craiggwilson.mql.library.ast.AndExpression
+import com.craiggwilson.mql.library.ast.ArrayAccessExpression
+import com.craiggwilson.mql.library.ast.BooleanExpression
+import com.craiggwilson.mql.library.ast.CollectionName
+import com.craiggwilson.mql.library.ast.ConditionalExpression
+import com.craiggwilson.mql.library.ast.DatabaseName
+import com.craiggwilson.mql.library.ast.DecimalExpression
+import com.craiggwilson.mql.library.ast.Direction
+import com.craiggwilson.mql.library.ast.DivideExpression
+import com.craiggwilson.mql.library.ast.DoubleExpression
+import com.craiggwilson.mql.library.ast.EqualsExpression
+import com.craiggwilson.mql.library.ast.Expression
+import com.craiggwilson.mql.library.ast.FieldDeclaration
+import com.craiggwilson.mql.library.ast.FieldName
+import com.craiggwilson.mql.library.ast.FieldReferenceExpression
+import com.craiggwilson.mql.library.ast.FunctionArgumentName
+import com.craiggwilson.mql.library.ast.FunctionCallExpression
+import com.craiggwilson.mql.library.ast.FunctionName
+import com.craiggwilson.mql.library.ast.GreaterThanExpression
+import com.craiggwilson.mql.library.ast.GreaterThanOrEqualsExpression
+import com.craiggwilson.mql.library.ast.GroupStage
+import com.craiggwilson.mql.library.ast.InExpression
+import com.craiggwilson.mql.library.ast.Int32Expression
+import com.craiggwilson.mql.library.ast.Int64Expression
+import com.craiggwilson.mql.library.ast.LambdaExpression
+import com.craiggwilson.mql.library.ast.LessThanExpression
+import com.craiggwilson.mql.library.ast.LessThanOrEqualsExpression
+import com.craiggwilson.mql.library.ast.LetExpression
+import com.craiggwilson.mql.library.ast.LimitStage
+import com.craiggwilson.mql.library.ast.MatchStage
+import com.craiggwilson.mql.library.ast.ModExpression
+import com.craiggwilson.mql.library.ast.MultiplyExpression
+import com.craiggwilson.mql.library.ast.NewArrayExpression
+import com.craiggwilson.mql.library.ast.NewDocumentExpression
+import com.craiggwilson.mql.library.ast.NotEqualsExpression
+import com.craiggwilson.mql.library.ast.NotExpression
+import com.craiggwilson.mql.library.ast.NullExpression
+import com.craiggwilson.mql.library.ast.NumberExpression
+import com.craiggwilson.mql.library.ast.OrExpression
+import com.craiggwilson.mql.library.ast.PowerExpression
+import com.craiggwilson.mql.library.ast.ProjectStage
+import com.craiggwilson.mql.library.ast.RangeExpression
+import com.craiggwilson.mql.library.ast.SkipStage
+import com.craiggwilson.mql.library.ast.SortStage
+import com.craiggwilson.mql.library.ast.Stage
+import com.craiggwilson.mql.library.ast.Statement
+import com.craiggwilson.mql.library.ast.StringExpression
+import com.craiggwilson.mql.library.ast.SubtractExpression
+import com.craiggwilson.mql.library.ast.UnwindStage
+import com.craiggwilson.mql.library.ast.VariableName
+import com.craiggwilson.mql.library.ast.VariableReferenceExpression
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.atn.PredictionMode
+
+fun lexMQL(mql: String): MQLLexer {
+    val input = CharStreams.fromString(mql)
+    return MQLLexer(input)
+}
 
 fun parseMQL(mql: String): List<Statement> {
     return MQLTreeParser.parse(mql)
@@ -64,8 +68,7 @@ fun parseMQL(mql: String): List<Statement> {
 object MQLTreeParser {
 
     fun parse(mql: String): List<Statement> {
-        val input = CharStreams.fromString(mql)
-        val lexer = MQLLexer(input)
+        val lexer = lexMQL(mql)
         val tokens = CommonTokenStream(lexer)
         val p = MQLParser(tokens)
         p.interpreter.predictionMode = PredictionMode.SLL
@@ -102,6 +105,16 @@ object MQLTreeParser {
 
     private fun parseStage(ctx: MQLParser.StageContext): Stage {
         return when (ctx) {
+            is MQLParser.GroupStageContext -> {
+                val by = parseExpression(ctx.expression())
+                val elements = ctx.field_assignment().map { fa ->
+                    val fieldDeclaration = getFieldDeclaration(fa.field_declaration())
+                    val expression = parseExpression(fa.expression())
+                    NewDocumentExpression.Element(fieldDeclaration, expression)
+                }
+
+                GroupStage(by, NewDocumentExpression(elements))
+            }
             is MQLParser.LimitStageContext -> LimitStage(ctx.INT().text.toLong())
             is MQLParser.MatchStageContext -> MatchStage(parseExpression(ctx.expression()))
             is MQLParser.ProjectStageContext -> {

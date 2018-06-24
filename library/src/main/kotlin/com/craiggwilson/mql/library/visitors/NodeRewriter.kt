@@ -1,6 +1,6 @@
-package com.craiggwilson.mql.visitors
+package com.craiggwilson.mql.library.visitors
 
-import com.craiggwilson.mql.ast.Node
+import com.craiggwilson.mql.library.ast.Node
 
 interface NodeRewriter {
     val appliesTo: Set<Class<*>>

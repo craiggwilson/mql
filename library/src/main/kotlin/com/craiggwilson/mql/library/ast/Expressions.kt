@@ -1,4 +1,4 @@
-package com.craiggwilson.mql.ast
+package com.craiggwilson.mql.library.ast
 
 import java.math.BigDecimal
 

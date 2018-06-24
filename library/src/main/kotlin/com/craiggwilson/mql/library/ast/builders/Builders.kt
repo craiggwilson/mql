@@ -1,18 +1,18 @@
-package com.craiggwilson.mql.ast.builders
+package com.craiggwilson.mql.library.ast.builders
 
-import com.craiggwilson.mql.ast.Expression
-import com.craiggwilson.mql.ast.FieldDeclaration
-import com.craiggwilson.mql.ast.FieldName
-import com.craiggwilson.mql.ast.FieldReferenceExpression
-import com.craiggwilson.mql.ast.FunctionArgumentName
-import com.craiggwilson.mql.ast.FunctionCallExpression
-import com.craiggwilson.mql.ast.FunctionName
-import com.craiggwilson.mql.ast.LetExpression
-import com.craiggwilson.mql.ast.NewArrayExpression
-import com.craiggwilson.mql.ast.NewDocumentExpression
-import com.craiggwilson.mql.ast.SubtractExpression
-import com.craiggwilson.mql.ast.VariableName
-import com.craiggwilson.mql.ast.VariableReferenceExpression
+import com.craiggwilson.mql.library.ast.Expression
+import com.craiggwilson.mql.library.ast.FieldDeclaration
+import com.craiggwilson.mql.library.ast.FieldName
+import com.craiggwilson.mql.library.ast.FieldReferenceExpression
+import com.craiggwilson.mql.library.ast.FunctionArgumentName
+import com.craiggwilson.mql.library.ast.FunctionCallExpression
+import com.craiggwilson.mql.library.ast.FunctionName
+import com.craiggwilson.mql.library.ast.LetExpression
+import com.craiggwilson.mql.library.ast.NewArrayExpression
+import com.craiggwilson.mql.library.ast.NewDocumentExpression
+import com.craiggwilson.mql.library.ast.SubtractExpression
+import com.craiggwilson.mql.library.ast.VariableName
+import com.craiggwilson.mql.library.ast.VariableReferenceExpression
 
 fun fieldReference(parent: Expression, name: String) = FieldReferenceExpression(parent, FieldName(name))
 

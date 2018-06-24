@@ -10,7 +10,7 @@ pipeline: FROM collection_name stage+;
 
 // STAGES
 stage:
-  GROUP field_assignment (COMMA field_assignment)* BY expression (COMMA expression)*   #groupStage
+  GROUP field_assignment (COMMA field_assignment)* (BY expression)?                    #groupStage
 | LIMIT INT                                                                            #limitStage
 | LOOKUP
     (LET variable_assignment (COMMA variable_assignment)* )?

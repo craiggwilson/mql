@@ -1,4 +1,4 @@
-package com.craiggwilson.mql.ast
+package com.craiggwilson.mql.library.ast
 
 abstract class Visitor<T> {
     open fun visit(n: Node?): T? {
@@ -52,6 +52,7 @@ abstract class Visitor<T> {
 
     // Stages
 
+    open fun visit(n: GroupStage): T = throw NotImplementedError()
     open fun visit(n: LimitStage): T = throw NotImplementedError()
     open fun visit(n: MatchStage): T = throw NotImplementedError()
     open fun visit(n: ProjectStage): T = throw NotImplementedError()
@@ -249,9 +250,14 @@ abstract class NodeVisitor : Visitor<Node>() {
 
     override fun visit(n: Statement): Node = n.update(
         n.collectionName,
-        visit(n.pipeline))
+        visit(n.stages))
 
     // Stages
+
+    override fun visit(n: GroupStage): Node = n.update(
+        visit(n.by) as Expression,
+        visit(n.projection) as NewDocumentExpression
+    )
 
     override fun visit(n: LimitStage): Node = n.update(n.limit)
 

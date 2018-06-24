@@ -1,7 +1,7 @@
-package com.craiggwilson.mql.visitors
+package com.craiggwilson.mql.library.visitors
 
-import com.craiggwilson.mql.ast.Node
-import com.craiggwilson.mql.ast.NodeVisitor
+import com.craiggwilson.mql.library.ast.Node
+import com.craiggwilson.mql.library.ast.NodeVisitor
 
 class Rewriter(private val rewriter: NodeRewriter) : NodeVisitor() {
     private val set = rewriter.appliesTo.toSet()

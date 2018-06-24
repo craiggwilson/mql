@@ -1,6 +1,20 @@
-package com.craiggwilson.mql.ast
+package com.craiggwilson.mql.library.ast
+
+import com.craiggwilson.mql.library.ast.FieldDeclaration
 
 sealed class Stage : Node()
+
+data class GroupStage(val by: Expression?, val projection: NewDocumentExpression) : Stage() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(by: Expression?, projection: NewDocumentExpression): GroupStage {
+        if (by !== this.by || projection !== this.projection) {
+            return GroupStage(by, projection)
+        }
+
+        return this
+    }
+}
 
 data class LimitStage(val limit: Long) : Stage() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)

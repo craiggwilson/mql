@@ -1,21 +1,21 @@
-package com.craiggwilson.mql.visitors
+package com.craiggwilson.mql.library.visitors
 
-import com.craiggwilson.mql.ast.ArrayAccessExpression
-import com.craiggwilson.mql.ast.Expression
-import com.craiggwilson.mql.ast.FunctionArgumentName
-import com.craiggwilson.mql.ast.FunctionCallExpression
-import com.craiggwilson.mql.ast.FunctionName
-import com.craiggwilson.mql.ast.Int32Expression
-import com.craiggwilson.mql.ast.LambdaExpression
-import com.craiggwilson.mql.ast.LetExpression
-import com.craiggwilson.mql.ast.Node
-import com.craiggwilson.mql.ast.NodeVisitor
-import com.craiggwilson.mql.ast.StringExpression
-import com.craiggwilson.mql.ast.VariableName
-import com.craiggwilson.mql.ast.VariableReferenceExpression
-import com.craiggwilson.mql.ast.builders.function
-import com.craiggwilson.mql.ast.builders.newArray
-import com.craiggwilson.mql.ast.builders.variableReference
+import com.craiggwilson.mql.library.ast.ArrayAccessExpression
+import com.craiggwilson.mql.library.ast.Expression
+import com.craiggwilson.mql.library.ast.FunctionArgumentName
+import com.craiggwilson.mql.library.ast.FunctionCallExpression
+import com.craiggwilson.mql.library.ast.FunctionName
+import com.craiggwilson.mql.library.ast.Int32Expression
+import com.craiggwilson.mql.library.ast.LambdaExpression
+import com.craiggwilson.mql.library.ast.LetExpression
+import com.craiggwilson.mql.library.ast.Node
+import com.craiggwilson.mql.library.ast.NodeVisitor
+import com.craiggwilson.mql.library.ast.StringExpression
+import com.craiggwilson.mql.library.ast.VariableName
+import com.craiggwilson.mql.library.ast.VariableReferenceExpression
+import com.craiggwilson.mql.library.ast.builders.function
+import com.craiggwilson.mql.library.ast.builders.newArray
+import com.craiggwilson.mql.library.ast.builders.variableReference
 
 object DefaultFunctionNodeRewriter : NodeRewriter {
     private val map = mapOf(

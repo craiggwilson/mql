@@ -1,16 +1,17 @@
-package com.craiggwilson.mql.translators
+package com.craiggwilson.mql.library.translators
 
-import com.craiggwilson.mql.ast.Direction
-import com.craiggwilson.mql.ast.LimitStage
-import com.craiggwilson.mql.ast.MatchStage
-import com.craiggwilson.mql.ast.ProjectStage
-import com.craiggwilson.mql.ast.SkipStage
-import com.craiggwilson.mql.ast.SortStage
-import com.craiggwilson.mql.ast.Statement
-import com.craiggwilson.mql.ast.UnwindStage
-import com.craiggwilson.mql.visitors.DefaultNodeRewriter
-import com.craiggwilson.mql.visitors.NodeRewriter
-import com.craiggwilson.mql.visitors.Rewriter
+import com.craiggwilson.mql.library.ast.Direction
+import com.craiggwilson.mql.library.ast.GroupStage
+import com.craiggwilson.mql.library.ast.LimitStage
+import com.craiggwilson.mql.library.ast.MatchStage
+import com.craiggwilson.mql.library.ast.ProjectStage
+import com.craiggwilson.mql.library.ast.SkipStage
+import com.craiggwilson.mql.library.ast.SortStage
+import com.craiggwilson.mql.library.ast.Statement
+import com.craiggwilson.mql.library.ast.UnwindStage
+import com.craiggwilson.mql.library.visitors.DefaultNodeRewriter
+import com.craiggwilson.mql.library.visitors.NodeRewriter
+import com.craiggwilson.mql.library.visitors.Rewriter
 import org.bson.BsonArray
 import org.bson.BsonBoolean
 import org.bson.BsonDocument
@@ -18,8 +19,23 @@ import org.bson.BsonElement
 import org.bson.BsonInt32
 import org.bson.BsonInt64
 import org.bson.BsonString
+import org.bson.BsonValue
+import org.bson.json.JsonWriterSettings
 
-fun Statement.translate(): BsonArray {
+fun Statement.toShell(): String {
+    val pipeline = translatedPipeline()
+    val settings = JsonWriterSettings.builder().indent(false).build()
+    val dummyDoc = BsonDocument("d", pipeline)
+    val json = dummyDoc.toJson(settings)
+
+    val db = if (collectionName.databaseName != null) {
+        "db.getSiblingDB(\"${collectionName.databaseName}"
+    } else "db"
+
+    return "$db.${collectionName.name}.aggregate(${json.substring(7 until json.length-1)})"
+}
+
+fun Statement.translatedPipeline(): BsonArray {
     return StatementTranslator().visit(this)
 }
 
@@ -31,10 +47,21 @@ class StatementTranslator(rewriter: NodeRewriter = DefaultNodeRewriter) : Abstra
     // Nodes
     override fun visit(n: Statement): BsonArray {
         val stmt = preProcessor.visit(n) as Statement
-        return BsonArray(stmt.pipeline.map { visit(it) })
+        return BsonArray(stmt.stages.map { visit(it) })
     }
 
-    // Stages
+    override fun visit(n: GroupStage): BsonValue {
+        val body = BsonDocument()
+        body["_id"] = aggLanguageTranslator.visit(n.by)
+
+        val aggregates = aggLanguageTranslator.visit(n.projection) as BsonDocument
+        aggregates.forEach { agg ->
+            body[agg.key] = agg.value
+        }
+
+        return BsonDocument("\$group", body)
+    }
+
     override fun visit(n: LimitStage) = BsonDocument("\$limit", BsonInt64(n.limit))
 
     override fun visit(n: MatchStage) = BsonDocument(

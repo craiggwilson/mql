@@ -1,4 +1,4 @@
-package com.craiggwilson.mql.ast
+package com.craiggwilson.mql.library.ast
 
 data class FieldDeclaration(val parent: FieldDeclaration?, val name: FieldName) : Node() {
     constructor(name: FieldName): this(null, name)

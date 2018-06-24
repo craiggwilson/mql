@@ -1,6 +1,6 @@
-package com.craiggwilson.mql.visitors
+package com.craiggwilson.mql.library.visitors
 
-import com.craiggwilson.mql.ast.Node
+import com.craiggwilson.mql.library.ast.Node
 
 class CompositeNodeRewriter(rewriters: List<NodeRewriter>) : NodeRewriter {
     private val map = rewriters.flatMap { t -> t.appliesTo.map { c -> c to t } }.groupBy({ it.first }, { it.second }).toMap()

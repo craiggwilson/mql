@@ -1,14 +1,14 @@
-package com.craiggwilson.mql.translators
+package com.craiggwilson.mql.library.translators
 
-import com.craiggwilson.mql.ast.BooleanExpression
-import com.craiggwilson.mql.ast.DecimalExpression
-import com.craiggwilson.mql.ast.DoubleExpression
-import com.craiggwilson.mql.ast.Int32Expression
-import com.craiggwilson.mql.ast.Int64Expression
-import com.craiggwilson.mql.ast.NewArrayExpression
-import com.craiggwilson.mql.ast.NewDocumentExpression
-import com.craiggwilson.mql.ast.NullExpression
-import com.craiggwilson.mql.ast.StringExpression
+import com.craiggwilson.mql.library.ast.BooleanExpression
+import com.craiggwilson.mql.library.ast.DecimalExpression
+import com.craiggwilson.mql.library.ast.DoubleExpression
+import com.craiggwilson.mql.library.ast.Int32Expression
+import com.craiggwilson.mql.library.ast.Int64Expression
+import com.craiggwilson.mql.library.ast.NewArrayExpression
+import com.craiggwilson.mql.library.ast.NewDocumentExpression
+import com.craiggwilson.mql.library.ast.NullExpression
+import com.craiggwilson.mql.library.ast.StringExpression
 import org.bson.BsonArray
 import org.bson.BsonBoolean
 import org.bson.BsonDecimal128

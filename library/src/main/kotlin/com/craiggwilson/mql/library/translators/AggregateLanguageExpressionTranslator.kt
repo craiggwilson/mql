@@ -1,42 +1,42 @@
-package com.craiggwilson.mql.translators
+package com.craiggwilson.mql.library.translators
 
-import com.craiggwilson.mql.ast.AddExpression
-import com.craiggwilson.mql.ast.AndExpression
-import com.craiggwilson.mql.ast.ArrayAccessExpression
-import com.craiggwilson.mql.ast.ConditionalExpression
-import com.craiggwilson.mql.ast.DivideExpression
-import com.craiggwilson.mql.ast.EqualsExpression
-import com.craiggwilson.mql.ast.FieldDeclaration
-import com.craiggwilson.mql.ast.FieldName
-import com.craiggwilson.mql.ast.FieldReferenceExpression
-import com.craiggwilson.mql.ast.FunctionCallExpression
-import com.craiggwilson.mql.ast.GreaterThanExpression
-import com.craiggwilson.mql.ast.GreaterThanOrEqualsExpression
-import com.craiggwilson.mql.ast.InExpression
-import com.craiggwilson.mql.ast.Int32Expression
-import com.craiggwilson.mql.ast.LambdaExpression
-import com.craiggwilson.mql.ast.LessThanExpression
-import com.craiggwilson.mql.ast.LessThanOrEqualsExpression
-import com.craiggwilson.mql.ast.LetExpression
-import com.craiggwilson.mql.ast.ModExpression
-import com.craiggwilson.mql.ast.MultiplyExpression
-import com.craiggwilson.mql.ast.NewDocumentExpression
-import com.craiggwilson.mql.ast.NotEqualsExpression
-import com.craiggwilson.mql.ast.NotExpression
-import com.craiggwilson.mql.ast.NullExpression
-import com.craiggwilson.mql.ast.OrExpression
-import com.craiggwilson.mql.ast.PowerExpression
-import com.craiggwilson.mql.ast.RangeExpression
-import com.craiggwilson.mql.ast.StringExpression
-import com.craiggwilson.mql.ast.SubtractExpression
-import com.craiggwilson.mql.ast.VariableReferenceExpression
-import com.craiggwilson.mql.ast.builders.fieldReference
-import com.craiggwilson.mql.ast.builders.function
-import com.craiggwilson.mql.ast.builders.let
-import com.craiggwilson.mql.ast.builders.newArray
-import com.craiggwilson.mql.ast.builders.newDocument
-import com.craiggwilson.mql.ast.builders.subtract
-import com.craiggwilson.mql.ast.builders.variableReference
+import com.craiggwilson.mql.library.ast.AddExpression
+import com.craiggwilson.mql.library.ast.AndExpression
+import com.craiggwilson.mql.library.ast.ArrayAccessExpression
+import com.craiggwilson.mql.library.ast.ConditionalExpression
+import com.craiggwilson.mql.library.ast.DivideExpression
+import com.craiggwilson.mql.library.ast.EqualsExpression
+import com.craiggwilson.mql.library.ast.FieldDeclaration
+import com.craiggwilson.mql.library.ast.FieldName
+import com.craiggwilson.mql.library.ast.FieldReferenceExpression
+import com.craiggwilson.mql.library.ast.FunctionCallExpression
+import com.craiggwilson.mql.library.ast.GreaterThanExpression
+import com.craiggwilson.mql.library.ast.GreaterThanOrEqualsExpression
+import com.craiggwilson.mql.library.ast.InExpression
+import com.craiggwilson.mql.library.ast.Int32Expression
+import com.craiggwilson.mql.library.ast.LambdaExpression
+import com.craiggwilson.mql.library.ast.LessThanExpression
+import com.craiggwilson.mql.library.ast.LessThanOrEqualsExpression
+import com.craiggwilson.mql.library.ast.LetExpression
+import com.craiggwilson.mql.library.ast.ModExpression
+import com.craiggwilson.mql.library.ast.MultiplyExpression
+import com.craiggwilson.mql.library.ast.NewDocumentExpression
+import com.craiggwilson.mql.library.ast.NotEqualsExpression
+import com.craiggwilson.mql.library.ast.NotExpression
+import com.craiggwilson.mql.library.ast.NullExpression
+import com.craiggwilson.mql.library.ast.OrExpression
+import com.craiggwilson.mql.library.ast.PowerExpression
+import com.craiggwilson.mql.library.ast.RangeExpression
+import com.craiggwilson.mql.library.ast.StringExpression
+import com.craiggwilson.mql.library.ast.SubtractExpression
+import com.craiggwilson.mql.library.ast.VariableReferenceExpression
+import com.craiggwilson.mql.library.ast.builders.fieldReference
+import com.craiggwilson.mql.library.ast.builders.function
+import com.craiggwilson.mql.library.ast.builders.let
+import com.craiggwilson.mql.library.ast.builders.newArray
+import com.craiggwilson.mql.library.ast.builders.newDocument
+import com.craiggwilson.mql.library.ast.builders.subtract
+import com.craiggwilson.mql.library.ast.builders.variableReference
 import org.bson.BsonString
 import org.bson.BsonValue
 
@@ -155,8 +155,10 @@ internal object AggregateLanguageExpressionTranslator : AbstractExpressionTransl
                 .map { NewDocumentExpression.Element(FieldDeclaration(FieldName(it.name.name)), it.expression) }
 
             newDocument("$" + n.name.name to NewDocumentExpression(elements))
-        } else {
+        } else if (arguments.size > 1) {
             newDocument("$" + n.name.name to newArray(arguments.map { it.expression }))
+        } else {
+            newDocument("$" + n.name.name to arguments[0].expression)
         })
     }
 

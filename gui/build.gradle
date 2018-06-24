@@ -1,0 +1,24 @@
+buildscript {
+    ext {
+        tornadoFxVersion = "1.7.16"
+        richtextFxVersion = "0.9.0"
+    }
+}
+
+apply plugin: "application"
+
+mainClassName = 'com.craiggwilson.mql.gui.MainKt'
+
+dependencies {
+    compile project(":library")
+    compile "no.tornado:tornadofx:$tornadoFxVersion"
+    compile "org.fxmisc.richtext:richtextfx:$richtextFxVersion"
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ["src/main/java"]
+        }
+    }
+}

@@ -1,4 +1,4 @@
-package com.craiggwilson.mql.ast
+package com.craiggwilson.mql.library.ast
 
 data class CollectionName(val databaseName: DatabaseName?, val name: String)
 data class DatabaseName(val name: String)
