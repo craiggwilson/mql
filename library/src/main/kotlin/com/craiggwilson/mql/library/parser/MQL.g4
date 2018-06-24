@@ -31,7 +31,7 @@ limit_stage:
 lookup_stage:
   LOOKUP
   (LET variable_assignment (COMMA variable_assignment)* )?
-  multipart_field_name ASSIGN LPAREN pipeline RPAREN
+  multipart_field_declaration COLON LPAREN pipeline RPAREN
 ;
 
 match_stage:
@@ -43,7 +43,7 @@ project_stage:
 ;
 
 project_item:
-  multipart_field_name (ASSIGN expression)?
+  multipart_field_declaration (COLON expression)?
 ;
 
 skip_stage:
@@ -63,7 +63,7 @@ unwind_stage:
 ;
 
 unwind_option:
-  INDEX multipart_field_name
+  INDEX multipart_field_declaration
 | PRESERVE_NULL_AND_EMPTY
 ;
 
@@ -96,13 +96,13 @@ expression:
 | variable_name                                                         #variableReferenceExpression
 | field_name                                                            #fieldExpression
 | number                                                                #numberExpression
-| STRING                                                                #stringExpression
+| DQ_STRING                                                                #stringExpression
 | (TRUE | FALSE)                                                        #booleanExpression
 | NULL                                                                  #nullExpression
 ;
 
 field_assignment:
-  field_name ASSIGN expression
+  field_declaration COLON expression
 ;
 
 function:
@@ -111,7 +111,7 @@ function:
 
 function_argument:
   expression
-| function_argument_name ASSIGN expression
+| function_argument_name COLON expression
 | lambda_expression;
 
 lambda_argument:
@@ -133,26 +133,28 @@ switch_case:
 ;
 
 variable_assignment:
-  variable_name ASSIGN expression
+  variable_name COLON expression
 ;
 
 // NAMING
 collection_name:
-  id
-| database_name DOT id
+  UNQUOTED_ID
+| database_name DOT UNQUOTED_ID
 ;
 
-database_name: QUOTED_ID | UNQUOTED_ID;
+database_name: UNQUOTED_ID;
 
-field_name: id;
+field_declaration: DQ_STRING | field_name;
+
+multipart_field_declaration: field_declaration (DOT field_declaration)*;
+
+field_name: UNQUOTED_ID;
 
 function_name: UNQUOTED_ID;
 
-function_argument_name: id;
+function_argument_name: UNQUOTED_ID;
 
 multipart_field_name: field_name (DOT field_name)*;
-
-id: QUOTED_ID | UNQUOTED_ID;
 
 variable_name: VARIABLE_ID;
 
@@ -162,7 +164,6 @@ variable_name: VARIABLE_ID;
 
 AND_SYMBOL: '&&';
 ARROW:      '=>';
-ASSIGN:     ':=';
 CARET:      '^';
 COLON:      ':';
 COMMA:      ',';
@@ -239,8 +240,7 @@ LONG: INT L;
 BIN: '0' B BIN_DIGIT BIN_DIGIT_OR_SEPARATOR* L?;
 HEX: '0' X HEX_DIGIT HEX_DIGIT_OR_SEPARATOR* L?;
 
-STRING: '\'' ('\\'. | '\'\'' | ~('\'' | '\\'))* '\'';
-QUOTED_ID: '`' ('\\'. | '``' | ~('`' | '\\'))* '`';
+DQ_STRING: '"' ('\\'. | '""' | ~('"' | '\\'))* '"';
 UNQUOTED_ID: [_a-zA-Z] [_a-zA-Z0-9]*;
 VARIABLE_ID: '$' [a-z][_a-zA-Z0-9]*;
 WS: ( ' ' | '\t' | '\r' | '\n' )+ -> skip;

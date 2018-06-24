@@ -16,6 +16,14 @@ data class FieldDeclaration(val parent: FieldDeclaration?, val name: FieldName) 
         return update(null, name)
     }
 
+    fun toFieldReferenceExpression(): FieldReferenceExpression {
+        val parentFieldReference = if (parent != null) {
+            parent.toFieldReferenceExpression()
+        } else null
+
+        return FieldReferenceExpression(parentFieldReference, name)
+    }
+
     fun update(parent: FieldDeclaration?, name: FieldName): FieldDeclaration {
         if (parent !== this.parent || name !== this.name) {
             return FieldDeclaration(parent, name)

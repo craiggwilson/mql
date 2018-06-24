@@ -124,12 +124,13 @@ class MQLTreeParser() {
 
     private fun parseProjectStage(ctx: MQLParser.Project_stageContext): ProjectStage {
         val items = ctx.project_item().map { item ->
+            val fieldDeclaration = getFieldDeclaration(item.multipart_field_declaration())
+
             val expression = when {
                 item.expression() != null -> parseExpression(item.expression())
-                else -> getFieldReferenceExpression(item.multipart_field_name())
+                else -> fieldDeclaration.toFieldReferenceExpression()
             }
 
-            val fieldDeclaration = getFieldDeclaration(item.multipart_field_name())
             ProjectStage.Item(fieldDeclaration, expression)
         }
 
@@ -165,7 +166,7 @@ class MQLTreeParser() {
             ctx.unwind_option().forEach {
                 when {
                     it.PRESERVE_NULL_AND_EMPTY() != null -> preserveNullAndEmpty = true
-                    it.INDEX() != null -> indexField = getFieldDeclaration(it.multipart_field_name())
+                    it.INDEX() != null -> indexField = getFieldDeclaration(it.multipart_field_declaration())
                 }
             }
         }
@@ -283,7 +284,7 @@ class MQLTreeParser() {
             }
             is MQLParser.NewDocumentExpressionContext -> {
                 val elements = ctx.field_assignment().map { fa ->
-                    val field = getFieldDeclaration(fa.field_name())
+                    val field = getFieldDeclaration(fa.field_declaration())
                     val expression = parseExpression(fa.expression())
 
                     NewDocumentExpression.Element(field, expression)
@@ -352,18 +353,22 @@ class MQLTreeParser() {
     private fun parseFunction(ctx: MQLParser.FunctionContext): FunctionCallExpression {
         val name = getFunctionName(ctx.function_name())
         val arguments = ctx.function_argument().map { fa ->
-            if (fa.function_argument_name() != null) {
-                val argName = getFunctionArgumentName(fa.function_argument_name())
-                val expression = parseExpression(fa.expression())
+            when {
+                fa.function_argument_name() != null -> {
+                    val argName = getFunctionArgumentName(fa.function_argument_name())
+                    val expression = parseExpression(fa.expression())
 
-                FunctionCallExpression.Argument.Named(argName, expression)
-            } else if (fa.expression() != null) {
-                val expression = parseExpression(fa.expression())
-                FunctionCallExpression.Argument.Positional(expression)
-            } else {
-                val parameters = fa.lambda_expression().lambda_argument().map { getVariableName(it.variable_name()) }
-                val expression = parseExpression(fa.lambda_expression().expression())
-                FunctionCallExpression.Argument.Positional(LambdaExpression(parameters, expression))
+                    FunctionCallExpression.Argument.Named(argName, expression)
+                }
+                fa.expression() != null -> {
+                    val expression = parseExpression(fa.expression())
+                    FunctionCallExpression.Argument.Positional(expression)
+                }
+                else -> {
+                    val parameters = fa.lambda_expression().lambda_argument().map { getVariableName(it.variable_name()) }
+                    val expression = parseExpression(fa.lambda_expression().expression())
+                    FunctionCallExpression.Argument.Positional(LambdaExpression(parameters, expression))
+                }
             }
         }
 
@@ -414,60 +419,40 @@ class MQLTreeParser() {
         }
     }
 
-    private fun generateFieldDeclaration(expression: Expression): FieldDeclaration {
-        return when (expression) {
-            is FieldReferenceExpression -> {
-                val parent = if (expression.parent != null) {
-                    generateFieldDeclaration(expression.parent)
-                } else null
-
-                FieldDeclaration(parent, expression.name)
-            }
-            else -> {
-                generatedIdNum++
-                FieldDeclaration(FieldName("__fld$generatedIdNum"))
-            }
-        }
-    }
-
     private fun getCollectionName(ctx: MQLParser.Collection_nameContext): CollectionName {
         var databaseName: DatabaseName? = null
         if (ctx.database_name() != null) {
             databaseName = getDatabaseName(ctx.database_name())
         }
 
-        if (ctx.id().QUOTED_ID() != null) {
-            return CollectionName(databaseName, unquote(ctx.id().text))
-        }
-
-        return CollectionName(databaseName, ctx.id().text)
+        return CollectionName(databaseName, ctx.text)
     }
 
     private fun getDatabaseName(ctx: MQLParser.Database_nameContext): DatabaseName {
-        if (ctx.QUOTED_ID() != null) {
-            return DatabaseName(unquote(ctx.text))
-        }
-
         return DatabaseName(ctx.text)
     }
 
-    private fun getFieldDeclaration(ctx: MQLParser.Multipart_field_nameContext): FieldDeclaration {
-        val fre = ctx.field_name()
+    private fun getFieldDeclaration(ctx: MQLParser.Multipart_field_declarationContext): FieldDeclaration {
+        val fre = ctx.field_declaration()
             .map { getFieldName(it) }
             .fold(null as FieldDeclaration?) { acc, item -> FieldDeclaration(acc, item) }
 
         return fre as FieldDeclaration
     }
 
-    private fun getFieldDeclaration(ctx: MQLParser.Field_nameContext): FieldDeclaration {
+    private fun getFieldDeclaration(ctx: MQLParser.Field_declarationContext): FieldDeclaration {
         return FieldDeclaration(null, getFieldName(ctx))
     }
 
-    private fun getFieldName(ctx: MQLParser.Field_nameContext): FieldName {
-        if (ctx.id().QUOTED_ID() != null) {
+    private fun getFieldName(ctx: MQLParser.Field_declarationContext): FieldName {
+        if (ctx.DQ_STRING() != null) {
             return FieldName(unquote(ctx.text))
         }
 
+        return FieldName(ctx.text)
+    }
+
+    private fun getFieldName(ctx: MQLParser.Field_nameContext): FieldName {
         return FieldName(ctx.text)
     }
 

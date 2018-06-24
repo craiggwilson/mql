@@ -13,7 +13,7 @@ class StatementTranslatorTest {
     fun testAggExpressions(mql: String, expected: String) {
         val actualExpected = BsonArray.parse("[{ \"\$project\": { \"test\": $expected } }]")
 
-        val parsed = parseMQL("FROM bar PROJECT test := $mql")[0]
+        val parsed = parseMQL("FROM bar PROJECT test: $mql")[0]
         val actual = parsed.translate()
 
         assertEquals(actualExpected, actual)
@@ -24,7 +24,7 @@ class StatementTranslatorTest {
     fun testFunctions(mql: String, expected: String) {
         val actualExpected = BsonArray.parse("[{ \"\$project\": { \"test\": $expected } }]")
 
-        val parsed = parseMQL("FROM bar PROJECT test := $mql")[0]
+        val parsed = parseMQL("FROM bar PROJECT test: $mql")[0]
         val actual = parsed.translate()
 
         assertEquals(actualExpected, actual)
@@ -95,18 +95,18 @@ class StatementTranslatorTest {
                 test("1000000000000000000", "NumberLong(\"1000000000000000000\")"),
                 test("-1000000000000000000", "NumberLong(\"-1000000000000000000\")"),
                 test("null", "null"),
-                test("'one'", "\"one\""),
+                test("\"one\"", "\"one\""),
 
                 // field references
                 test("a", "\"\$a\""),
                 test("a[0].b", "{ \"\$let\": { \"vars\": { \"parent\": { \"\$arrayElemAt\": [ \"\$a\", NumberInt(\"0\") ] } }, \"in\": \"\$\$parent.b\" } }"),
-                test("{a:= false}.a", "{ \"\$let\": { \"vars\": { \"parent\": { \"a\": false } }, \"in\": \"\$\$parent.a\" } }"),
+                test("{a: false}.a", "{ \"\$let\": { \"vars\": { \"parent\": { \"a\": false } }, \"in\": \"\$\$parent.a\" } }"),
 
                 // arrays
                 test("[true, false, true]", "[ true, false, true ]"),
 
                 // documents
-                test("{ a:= 1.0, b:= 2.0 }", "{ \"a\": 1.0, \"b\": 2.0 }"),
+                test("{ a: 1.0, b: 2.0 }", "{ \"a\": 1.0, \"b\": 2.0 }"),
 
                 // binary expression
                 test("1.0 + 2.0", "{ \"\$add\": [ 1.0, 2.0 ] }"),
@@ -151,13 +151,13 @@ class StatementTranslatorTest {
                 test("switch case true then false case false then true else null", "{ \"\$switch\": { \"branches\": [ { \"case\": true, \"then\": false }, { \"case\": false, \"then\": true } ], \"default\": null } }"),
 
                 // let
-                test("let \$x := true, \$y := false => \$x and \$y", "{ \"\$let\": { \"vars\": { \"x\": true, \"y\": false }, \"in\": { \"\$and\": [ \"\$\$x\", \"\$\$y\" ] } } }"),
+                test("let \$x: true, \$y: false => \$x and \$y", "{ \"\$let\": { \"vars\": { \"x\": true, \"y\": false }, \"in\": { \"\$and\": [ \"\$\$x\", \"\$\$y\" ] } } }"),
 
                 // functions
                 test("testFunc(a, 1.0)", "{ \"\$testFunc\": [ \"\$a\", 1.0 ] }"),
-                test("testFunc(arg1 := a, arg2 := 1.0)", "{ \"\$testFunc\": { \"arg1\": \"\$a\", \"arg2\": 1.0 } }"),
+                test("testFunc(arg1: a, arg2: 1.0)", "{ \"\$testFunc\": { \"arg1\": \"\$a\", \"arg2\": 1.0 } }"),
                 test("a.testFunc(1.0)", "{ \"\$testFunc\": [ \"\$a\", 1.0 ] }"),
-                test("a.testFunc(arg2 := 1.0)", "{ \"\$testFunc\": [ \"\$a\", 1.0 ] }")
+                test("a.testFunc(arg2: 1.0)", "{ \"\$testFunc\": [ \"\$a\", 1.0 ] }")
             )
         }
 
@@ -171,7 +171,7 @@ class StatementTranslatorTest {
                 test("a.zip([1,2,3], (\$x, \$y) => \$x + \$y)", "{ \"\$map\" : { \"input\" : { \"\$zip\" : { \"inputs\" : [\"\$a\", [1, 2, 3]] } }, \"as\" : \"x\", \"in\" : { \"\$add\" : [{ \"\$arrayElemAt\" : [\"\$\$x\", 0] }, { \"\$arrayElemAt\" : [\"\$\$x\", 1] }] } } }"),
 
                 // renaming closed variable
-                test("let \$this := 1 => a.reduce(2, (\$acc, \$x) => \$acc + \$x + \$this)", "{ \"\$let\": { \"vars\": { \"this\": NumberInt(\"1\") }, \"in\": { \"\$let\": { \"vars\": { \"closed_this0\": \"\$\$this\" }, \"in\": { \"\$reduce\": { \"input\": \"\$a\", \"initialValue\": NumberInt(\"2\"), \"in\": { \"\$add\": [ { \"\$add\": [ \"\$\$value\", \"\$\$this\" ] }, \"\$\$closed_this0\" ] } } } } } } }")
+                test("let \$this: 1 => a.reduce(2, (\$acc, \$x) => \$acc + \$x + \$this)", "{ \"\$let\": { \"vars\": { \"this\": NumberInt(\"1\") }, \"in\": { \"\$let\": { \"vars\": { \"closed_this0\": \"\$\$this\" }, \"in\": { \"\$reduce\": { \"input\": \"\$a\", \"initialValue\": NumberInt(\"2\"), \"in\": { \"\$add\": [ { \"\$add\": [ \"\$\$value\", \"\$\$this\" ] }, \"\$\$closed_this0\" ] } } } } } } }")
             )
         }
 
@@ -197,10 +197,10 @@ class StatementTranslatorTest {
                 test("NOT NOT (a = 10)", "{ \"a\": { \"\$eq\": 10 } }"),
 
                 // element query operators
-                test("{ a := { `\$exists` := true } }", "{ \"a\": { \"\$exists\": true } }"),
+                test("{ a: { \"\$exists\": true } }", "{ \"a\": { \"\$exists\": true } }"),
                 test("a.exists(true)", "{ \"a\": { \"\$exists\": true } }"),
                 test("exists(a, true)", "{ \"a\": { \"\$exists\": true } }"),
-                test("{ a := { `\$type` := 1 } }", "{ \"a\": { \"\$type\": 1 } }"),
+                test("{ a: { \"\$type\": 1 } }", "{ \"a\": { \"\$type\": 1 } }"),
                 test("a.type(1)", "{ \"a\": { \"\$type\": 1 } }"),
                 test("type(a, 1)", "{ \"a\": { \"\$type\": 1 } }"),
 
@@ -220,12 +220,12 @@ class StatementTranslatorTest {
 
                 // PROJECT
                 test(
-                    "FROM bar PROJECT a, b.c, `c`",
+                    "FROM bar PROJECT a, b.c, c",
                     "[{ \$project: { \"a\": \"\$a\", \"b.c\": \"\$b.c\", \"c\": \"\$c\" } }]"
                 ),
 
                 test(
-                    "FROM bar PROJECT a := a, b_c := b.c, C := `c`",
+                    "FROM bar PROJECT a: a, b_c: b.c, C: c",
                     "[{ \$project: { \"a\": \"\$a\", \"b_c\": \"\$b.c\", \"C\": \"\$c\" } }]"
                 ),
 
@@ -267,7 +267,7 @@ class StatementTranslatorTest {
                 test("""
                     FROM bar
                     MATCH a > 10 OR a < 20
-                    PROJECT a, b := { c := g.d[0..36 step 12], e := f.map(@x => @x + 5) }
+                    PROJECT a, b: { c: g.d[0..36 step 12], e: f.map(@x => @x + 5) }
                     """.replace("@", "\$"),
                     "[{ \"\$match\" : { \"\$or\" : [{ \"a\" : { \"\$gt\" : 10 } }, { \"a\" : { \"\$lt\" : 20 } }] } }, { \"\$project\" : { \"a\" : \"\$a\", \"b\" : { \"c\" : { \"\$let\" : { \"vars\" : { \"array\" : { \"\$slice\" : [\"\$g.d\", 0, { \"\$subtract\" : [36, 0] }] } }, \"in\" : { \"\$map\" : { \"input\" : { \"\$filter\" : { \"input\" : { \"\$zip\" : { \"inputs\" : [{ \"\$range\" : [0, { \"\$size\" : [\"\$\$array\"] }] }, \"\$\$array\"] } }, \"as\" : \"x\", \"cond\" : { \"\$eq\" : [0, { \"\$mod\" : [{ \"\$arrayElemAt\" : [\"\$\$x\", 0] }, 12] }] } } }, \"as\" : \"x\", \"in\" : { \"\$arrayElemAt\" : [\"\$\$x\", 1] } } } } }, \"e\" : { \"\$map\" : { \"input\" : \"\$f\", \"as\" : \"x\", \"in\" : { \"\$add\" : [\"\$\$x\", 5] } } } } } }]")
             )
