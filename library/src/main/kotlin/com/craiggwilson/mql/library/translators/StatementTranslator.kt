@@ -46,10 +46,14 @@ class StatementTranslator(rewriter: NodeRewriter = DefaultNodeRewriter) : Abstra
         "\$project",
         BsonDocument(
             n.items.map { item ->
-                BsonElement(
-                    item.field.flatten().name.name,
-                    aggLanguageTranslator.visit(item.expression)
-                )
+                val name = item.field.flatten().name.name
+                when (item) {
+                    is ProjectStage.Item.Exclude -> BsonElement(name, BsonInt32(0))
+                    is ProjectStage.Item.Include -> BsonElement(
+                        item.field.flatten().name.name,
+                        aggLanguageTranslator.visit(item.expression)
+                    )
+                }
             }
         )
     )

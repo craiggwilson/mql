@@ -33,11 +33,22 @@ data class ProjectStage(val items: List<Item>) : Stage() {
         } else this
     }
 
-    data class Item(val field: FieldDeclaration, val expression: Expression) {
-        fun update(field: FieldDeclaration, expression: Expression): Item {
-            return if (field !== this.field || expression !== this.expression) {
-                return Item(field, expression)
-            } else this
+    sealed class Item {
+        abstract val field: FieldDeclaration
+
+        data class Exclude(override val field: FieldDeclaration): ProjectStage.Item() {
+            fun update(field: FieldDeclaration): Exclude {
+                return if (field !== this.field) {
+                    return Exclude(field)
+                } else this
+            }
+        }
+        data class Include(override val field: FieldDeclaration, val expression: Expression): ProjectStage.Item() {
+            fun update(field: FieldDeclaration, expression: Expression): Include {
+                return if (field !== this.field || expression !== this.expression) {
+                    return Include(field, expression)
+                } else this
+            }
         }
     }
 }

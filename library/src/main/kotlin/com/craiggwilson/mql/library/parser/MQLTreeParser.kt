@@ -126,12 +126,16 @@ class MQLTreeParser() {
         val items = ctx.project_item().map { item ->
             val fieldDeclaration = getFieldDeclaration(item.multipart_field_declaration())
 
-            val expression = when {
-                item.expression() != null -> parseExpression(item.expression())
-                else -> fieldDeclaration.toFieldReferenceExpression()
-            }
+            if (item.NOT_SYMBOL() != null) {
+                ProjectStage.Item.Exclude(fieldDeclaration)
+            } else {
+                val expression = when {
+                    item.expression() != null -> parseExpression(item.expression())
+                    else -> fieldDeclaration.toFieldReferenceExpression()
+                }
 
-            ProjectStage.Item(fieldDeclaration, expression)
+                ProjectStage.Item.Include(fieldDeclaration, expression)
+            }
         }
 
         return ProjectStage(items)

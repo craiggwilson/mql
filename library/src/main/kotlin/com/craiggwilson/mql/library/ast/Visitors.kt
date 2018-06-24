@@ -163,6 +163,7 @@ abstract class NodeVisitor : Visitor<Node>() {
         n.parameters,
         visit(n.expression) as Expression
     )
+
     override fun visit(n: LessThanExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
@@ -258,10 +259,17 @@ abstract class NodeVisitor : Visitor<Node>() {
 
     override fun visit(n: ProjectStage): Node = n.update(
         visit(n.items) { item ->
-            item.update(
-                visit(item.field) as FieldDeclaration,
-                visit(item.expression) as Expression
-            )
+            when (item) {
+                is ProjectStage.Item.Exclude ->
+                    item.update(
+                        visit(item.field) as FieldDeclaration
+                    )
+                is ProjectStage.Item.Include ->
+                    item.update(
+                        visit(item.field) as FieldDeclaration,
+                        visit(item.expression) as Expression
+                    )
+            }
         }
     )
 

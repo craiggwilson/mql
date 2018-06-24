@@ -220,8 +220,8 @@ class StatementTranslatorTest {
 
                 // PROJECT
                 test(
-                    "FROM bar PROJECT a, b.c, c",
-                    "[{ \$project: { \"a\": \"\$a\", \"b.c\": \"\$b.c\", \"c\": \"\$c\" } }]"
+                    "FROM bar PROJECT a, b.c, c, !d",
+                    "[{ \$project: { \"a\": \"\$a\", \"b.c\": \"\$b.c\", \"c\": \"\$c\", \"d\": 0 } }]"
                 ),
 
                 test(

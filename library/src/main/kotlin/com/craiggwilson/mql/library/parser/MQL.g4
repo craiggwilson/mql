@@ -43,7 +43,8 @@ project_stage:
 ;
 
 project_item:
-  multipart_field_declaration (COLON expression)?
+  NOT_SYMBOL? multipart_field_declaration
+| multipart_field_declaration COLON expression
 ;
 
 skip_stage:
