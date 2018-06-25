@@ -23,6 +23,8 @@ class MainView : View() {
     }
 
     override val root = vbox {
+        setPrefSize(667.0, 376.0)
+
         shortcut("SHIFT+ENTER") {
             outputArea.replaceText(controller.translate(inputArea.text))
         }
