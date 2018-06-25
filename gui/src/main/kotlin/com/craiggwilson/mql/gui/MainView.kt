@@ -4,24 +4,17 @@ import org.fxmisc.richtext.CodeArea
 import tornadofx.View
 import tornadofx.action
 import tornadofx.button
-import tornadofx.task
 import tornadofx.vbox
 import java.time.Duration
 
 class MainView : View() {
     val controller: MainController by inject()
     val inputArea = CodeArea().apply {
+
         plainTextChanges()
-            .successionEnds(Duration.ofMillis(500))
-            .supplyTask {
-                val saveText = text
-                task {
-                    controller.computeSyntaxSpans(saveText)
-                }
-            }
-            .awaitLatest()
-            .subscribe { span ->
-                setStyleSpans(0, span.get())
+            .successionEnds(Duration.ofMillis(100))
+            .subscribe {
+                setStyleSpans(0, controller.computeSyntaxSpans(text))
             }
     }
 

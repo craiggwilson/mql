@@ -127,10 +127,7 @@ multipart_field_name: field_name (DOT field_name)*;
 
 variable_name: VARIABLE_ID;
 
-/////////////
 // LEXER
-/////////////
-
 AND_SYMBOL: '&&';
 ARROW:      '=>';
 CARET:      '^';

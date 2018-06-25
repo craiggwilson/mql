@@ -1,5 +1,6 @@
 package com.craiggwilson.mql.gui
 
+import com.craiggwilson.mql.library.parser.MQLLexer
 import com.craiggwilson.mql.library.parser.lexMQL
 import com.craiggwilson.mql.library.parser.parseMQL
 import com.craiggwilson.mql.library.translators.toShell
@@ -12,10 +13,21 @@ class MainController : Controller() {
         val builder = StyleSpansBuilder<Collection<String>>()
 
         val lexer = lexMQL(text)
+
+        var lastKWend = 0
         while (!lexer._hitEOF) {
             val token = lexer.nextToken()
-            builder.add(listOf("keyword"), token.stopIndex - token.startIndex)
+
+            val cssClasses = when (token.type) {
+                MQLLexer.FROM -> listOf("keyword")
+                MQLLexer.PROJECT -> listOf("keyword", "stage")
+                else -> emptyList()
+            }
+            builder.add(emptyList(), token.startIndex - lastKWend)
+            builder.add(cssClasses, token.stopIndex - token.startIndex + 1)
+            lastKWend = token.stopIndex + 1
         }
+        builder.add(emptyList(), text.length - lastKWend)
         return builder.create()
     }
 

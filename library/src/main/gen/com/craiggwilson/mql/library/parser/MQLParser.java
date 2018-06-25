@@ -37,7 +37,7 @@ public class MQLParser extends Parser {
 		RULE_field_name = 20, RULE_function_name = 21, RULE_function_argument_name = 22, 
 		RULE_multipart_field_name = 23, RULE_variable_name = 24;
 	public static final String[] ruleNames = {
-		"parse", "statement", "stages", "stage", "project_item", "sort_field",
+		"parse", "statement", "pipeline", "stage", "project_item", "sort_field", 
 		"unwind_option", "expression", "field_assignment", "function", "function_argument", 
 		"lambda_argument", "lambda_expression", "number", "switch_case", "variable_assignment", 
 		"collection_name", "database_name", "field_declaration", "multipart_field_declaration", 
