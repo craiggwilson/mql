@@ -12,11 +12,5 @@ class MainStyleSheet : Stylesheet() {
 
             padding = box(10.px)
         }
-
-        s(button) {
-            startMargin = 10.px
-            endMargin = 10.px
-        }
-
     }
 }
