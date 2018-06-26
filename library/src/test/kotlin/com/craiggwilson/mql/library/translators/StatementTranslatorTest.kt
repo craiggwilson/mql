@@ -73,105 +73,106 @@ class StatementTranslatorTest {
         private fun aggExpressions(): Collection<Array<String>> {
             return listOf(
                 // order of operations
-                test("true AND false", "{ \"\$and\": [ true, false ] }"),
-                test("true AND false OR true", "{ \"\$or\": [ { \"\$and\": [ true, false ] }, true ] }"),
-                test("true AND (false OR true)", "{ \"\$and\": [ true, { \"\$or\": [ false, true ] } ] }"),
+                test("true AND false", "{ \"\$and\": [ { \"\$literal\": true}, {\"\$literal\": false} ] }"),
+                test("true AND false OR true", "{ \"\$or\": [ { \"\$and\": [ { \"\$literal\": true }, { \"\$literal\": false}] }, { \"\$literal\": true} ] }"),
+                test("true AND (false OR true)", "{ \"\$and\": [ { \"\$literal\": true }, { \"\$or\": [ { \"\$literal\": false }, { \"\$literal\": true } ] } ] }"),
 
                 // constants
-                test("false", "false"),
-                test("true", "true"),
-                test("1", "NumberInt(\"1\")"),
-                test("-1", "NumberInt(\"-1\")"),
-                test("1L", "NumberLong(\"1\")"),
-                test("-1L", "NumberLong(\"-1\")"),
-                test("-1M", "NumberDecimal(\"-1\")"),
-                test("1M", "NumberDecimal(\"1\")"),
-                test("1.234E12", "NumberDecimal(\"1.234E+12\")"),
-                test("-1.234E12", "NumberDecimal(\"-1.234E+12\")"),
-                test("1.234", "1.234"),
-                test("-1.234", "-1.234"),
-                test("1.234M", "NumberDecimal(\"1.234\")"),
-                test("-1.234M", "NumberDecimal(\"-1.234\")"),
-                test("1000000000000000000", "NumberLong(\"1000000000000000000\")"),
-                test("-1000000000000000000", "NumberLong(\"-1000000000000000000\")"),
+                test("false", "{ \"\$literal\": false }"),
+                test("true", "{ \"\$literal\": true }"),
+                test("1", "{ \"\$literal\": 1}"),
+                test("-1", "{ \"\$literal\": -1 }"),
+                test("1L", "{ \"\$literal\": NumberLong(\"1\") }"),
+                test("-1L", "{ \"\$literal\": NumberLong(\"-1\") }"),
+                test("-1M", "{ \"\$literal\": NumberDecimal(\"-1\") }"),
+                test("1M", "{ \"\$literal\": NumberDecimal(\"1\") }"),
+                test("1.234E12", "{ \"\$literal\": NumberDecimal(\"1.234E+12\") }"),
+                test("-1.234E12", "{ \"\$literal\": NumberDecimal(\"-1.234E+12\") }"),
+                test("1.234", "{ \"\$literal\": 1.234 }"),
+                test("-1.234", "{ \"\$literal\": -1.234 }"),
+                test("1.234M", "{ \"\$literal\": NumberDecimal(\"1.234\") }"),
+                test("-1.234M", "{ \"\$literal\": NumberDecimal(\"-1.234\") }"),
+                test("1000000000000000000", "{ \"\$literal\": NumberLong(\"1000000000000000000\") }"),
+                test("-1000000000000000000", "{ \"\$literal\": NumberLong(\"-1000000000000000000\") }"),
                 test("null", "null"),
                 test("\"one\"", "\"one\""),
+                test("\"\$one\"", "{ \"\$literal\": \"\$one\" }"),
 
                 // field references
                 test("a", "\"\$a\""),
-                test("a[0].b", "{ \"\$let\": { \"vars\": { \"parent\": { \"\$arrayElemAt\": [ \"\$a\", NumberInt(\"0\") ] } }, \"in\": \"\$\$parent.b\" } }"),
-                test("{a: false}.a", "{ \"\$let\": { \"vars\": { \"parent\": { \"a\": false } }, \"in\": \"\$\$parent.a\" } }"),
+                test("a[0].b", "{ \"\$let\": { \"vars\": { \"parent\": { \"\$arrayElemAt\": [ \"\$a\", { \"\$literal\": NumberInt(\"0\") } ] } }, \"in\": \"\$\$parent.b\" } }"),
+                test("{a: false}.a", "{ \"\$let\": { \"vars\": { \"parent\": { \"a\": { \"\$literal\": false } } }, \"in\": \"\$\$parent.a\" } }"),
 
                 // arrays
-                test("[true, false, true]", "[ true, false, true ]"),
+                test("[true, false, true]", "[ { \"\$literal\": true }, { \"\$literal\": false }, { \"\$literal\": true }]"),
 
                 // documents
-                test("{ a: 1.0, b: 2.0 }", "{ \"a\": 1.0, \"b\": 2.0 }"),
+                test("{ a: 1.0, b: 2.0 }", "{ \"a\": { \"\$literal\": 1.0 }, \"b\": { \"\$literal\": 2.0 } }"),
 
                 // binary expression
-                test("1.0 + 2.0", "{ \"\$add\": [ 1.0, 2.0 ] }"),
-                test("1.0 and 2.0", "{ \"\$and\": [ 1.0, 2.0 ] }"),
-                test("1.0 && 2.0", "{ \"\$and\": [ 1.0, 2.0 ] }"),
-                test("1.0 / 2.0", "{ \"\$divide\": [ 1.0, 2.0 ] }"),
-                test("1.0 = 2.0", "{ \"\$eq\": [ 1.0, 2.0 ] }"),
-                test("1.0 > 2.0", "{ \"\$gt\": [ 1.0, 2.0 ] }"),
-                test("1.0 >= 2.0", "{ \"\$gte\": [ 1.0, 2.0 ] }"),
-                test("1.0 < 2.0", "{ \"\$lt\": [ 1.0, 2.0 ] }"),
-                test("1.0 <= 2.0", "{ \"\$lte\": [ 1.0, 2.0 ] }"),
-                test("1.0 % 2.0", "{ \"\$mod\": [ 1.0, 2.0 ] }"),
-                test("1.0 * 2.0", "{ \"\$multiply\": [ 1.0, 2.0 ] }"),
-                test("1.0 != 2.0", "{ \"\$ne\": [ 1.0, 2.0 ] }"),
-                test("1.0 or 2.0", "{ \"\$or\": [ 1.0, 2.0 ] }"),
-                test("1.0 || 2.0", "{ \"\$or\": [ 1.0, 2.0 ] }"),
-                test("1.0^2.0", "{ \"\$pow\": [ 1.0, 2.0 ] }"),
-                test("1.0 - 2.0", "{ \"\$subtract\": [ 1.0, 2.0 ] }"),
+                test("1.0 + 2.0", "{ \"\$add\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
+                test("1.0 and 2.0", "{ \"\$and\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 }] }"),
+                test("1.0 && 2.0", "{ \"\$and\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
+                test("1.0 / 2.0", "{ \"\$divide\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 }] }"),
+                test("1.0 = 2.0", "{ \"\$eq\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
+                test("1.0 > 2.0", "{ \"\$gt\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
+                test("1.0 >= 2.0", "{ \"\$gte\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
+                test("1.0 < 2.0", "{ \"\$lt\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 }] }"),
+                test("1.0 <= 2.0", "{ \"\$lte\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 }] }"),
+                test("1.0 % 2.0", "{ \"\$mod\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
+                test("1.0 * 2.0", "{ \"\$multiply\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
+                test("1.0 != 2.0", "{ \"\$ne\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
+                test("1.0 or 2.0", "{ \"\$or\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
+                test("1.0 || 2.0", "{ \"\$or\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
+                test("1.0^2.0", "{ \"\$pow\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 }] }"),
+                test("1.0 - 2.0", "{ \"\$subtract\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 }] }"),
 
                 // in expression
-                test("a in [10,11]", "{ \"\$in\": [\"\$a\", [ 10, 11 ] ] }"),
-                test("a not in [10,11]", "{ \"\$not\": { \"\$in\": [\"\$a\", [ 10, 11 ] ] } }"),
+                test("a in [10,11]", "{ \"\$in\": [\"\$a\", [ { \"\$literal\": 10 }, { \"\$literal\": 11 }] ] }"),
+                test("a not in [10,11]", "{ \"\$not\": { \"\$in\": [\"\$a\", [ { \"\$literal\": 10 }, { \"\$literal\": 11 } ] ] } }"),
 
                 // unary expression
-                test("NOT true", "{ \"\$not\": true }"),
+                test("NOT true", "{ \"\$not\": { \"\$literal\": true } }"),
 
                 // array access expression
-                test("a[0]", "{ \"\$arrayElemAt\": [ \"\$a\", NumberInt(\"0\") ] }"),
-                test("a[-4]", "{ \"\$arrayElemAt\": [ \"\$a\", NumberInt(\"-4\") ] }"),
-                test("a[2..4]", "{ \"\$slice\": [ \"\$a\", NumberInt(\"2\"), { \"\$subtract\": [ NumberInt(\"4\"), NumberInt(\"2\") ] } ] }"),
-                test("a[2:4]", "{ \"\$slice\": [ \"\$a\", NumberInt(\"2\"), { \"\$subtract\": [ NumberInt(\"4\"), NumberInt(\"2\") ] } ] }"),
-                test("a[2:]", "{ \"\$let\": { \"vars\": { \"array\": \"\$a\" }, \"in\": { \"\$slice\": [ \"\$\$array\", { \"\$subtract\": [ NumberInt(\"2\"), { \"\$size\": \"\$\$array\" } ] } ] } } }"),
-                test("a[:8]", "{ \"\$slice\": [ \"\$a\", NumberInt(\"8\") ] }"),
-                test("a[1..10 step 3]", "{ \"\$let\" : { \"vars\" : { \"array\" : { \"\$slice\" : [\"\$a\", 1, { \"\$subtract\" : [10, 1] }] } }, \"in\" : { \"\$map\" : { \"input\" : { \"\$filter\" : { \"input\" : { \"\$zip\" : { \"inputs\" : [{ \"\$range\" : [0, { \"\$size\" : \"\$\$array\" }] }, \"\$\$array\"] } }, \"as\" : \"x\", \"cond\" : { \"\$eq\" : [0, { \"\$mod\" : [{ \"\$arrayElemAt\" : [\"\$\$x\", 0] }, 3] }] } } }, \"as\" : \"x\", \"in\" : { \"\$arrayElemAt\" : [\"\$\$x\", 1] } } } } }"),
+                test("a[0]", "{ \"\$arrayElemAt\": [ \"\$a\", { \"\$literal\": 0 } ] }"),
+                test("a[-4]", "{ \"\$arrayElemAt\": [ \"\$a\", { \"\$literal\": -4 } ] }"),
+                test("a[2..4]", "{ \"\$slice\": [ \"\$a\", { \"\$literal\": 2 }, { \"\$subtract\": [ { \"\$literal\": 4 }, { \"\$literal\": 2 }] } ] }"),
+                test("a[2:4]", "{ \"\$slice\": [ \"\$a\", { \"\$literal\": 2 }, { \"\$subtract\": [ { \"\$literal\": 4 }, { \"\$literal\": 2 } ] } ] }"),
+                test("a[2:]", "{ \"\$let\": { \"vars\": { \"array\": \"\$a\" }, \"in\": { \"\$slice\": [ \"\$\$array\", { \"\$subtract\": [ { \"\$literal\": 2 }, { \"\$size\": \"\$\$array\" } ] } ] } } }"),
+                test("a[:8]", "{ \"\$slice\": [ \"\$a\", { \"\$literal\": 8 } ] }"),
+                test("a[1..10 step 3]", "{ \"\$let\" : { \"vars\" : { \"array\" : { \"\$slice\" : [\"\$a\", { \"\$literal\" : 1 }, { \"\$subtract\" : [{ \"\$literal\" : 10 }, { \"\$literal\" : 1 }] }] } }, \"in\" : { \"\$map\" : { \"input\" : { \"\$filter\" : { \"input\" : { \"\$zip\" : { \"inputs\" : [{ \"\$range\" : [{ \"\$literal\" : 0 }, { \"\$size\" : \"\$\$array\" }] }, \"\$\$array\"] } }, \"as\" : \"x\", \"cond\" : { \"\$eq\" : [{ \"\$literal\" : 0 }, { \"\$mod\" : [{ \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 0 }] }, { \"\$literal\" : 3 }] }] } } }, \"as\" : \"x\", \"in\" : { \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 1 }] } } } } }"),
 
                 // range expression
-                test("1..4", "{ \"\$range\": [ NumberInt(\"1\"), NumberInt(\"4\") ] }"),
-                test("1..4 step 2", "{ \"\$range\": [ NumberInt(\"1\"), NumberInt(\"4\"), NumberInt(\"2\") ] }"),
+                test("1..4", "{ \"\$range\": [ { \"\$literal\": 1 }, { \"\$literal\": 4 } ] }"),
+                test("1..4 step 2", "{ \"\$range\": [ { \"\$literal\": 1 }, { \"\$literal\": 4 }, { \"\$literal\": 2 } ] }"),
 
                 // conditionals
-                test("if true then false else true", "{ \"\$cond\": [ true, false, true ] }"),
-                test("switch case true then false case false then true else null", "{ \"\$switch\": { \"branches\": [ { \"case\": true, \"then\": false }, { \"case\": false, \"then\": true } ], \"default\": null } }"),
+                test("if true then false else true", "{ \"\$cond\": [ { \"\$literal\": true }, { \"\$literal\": false }, { \"\$literal\": true }] }"),
+                test("switch case true then false case false then true else null", "{ \"\$switch\": { \"branches\": [ { \"case\": { \"\$literal\": true }, \"then\": { \"\$literal\": false }}, { \"case\": { \"\$literal\": false }, \"then\": { \"\$literal\": true }} ], \"default\": null } }"),
 
                 // let
-                test("let \$x: true, \$y: false => \$x and \$y", "{ \"\$let\": { \"vars\": { \"x\": true, \"y\": false }, \"in\": { \"\$and\": [ \"\$\$x\", \"\$\$y\" ] } } }"),
+                test("let \$x: true, \$y: false => \$x and \$y", "{ \"\$let\": { \"vars\": { \"x\": { \"\$literal\": true }, \"y\": { \"\$literal\": false }}, \"in\": { \"\$and\": [ \"\$\$x\", \"\$\$y\" ] } } }"),
 
                 // functions
-                test("testFunc(a, 1.0)", "{ \"\$testFunc\": [ \"\$a\", 1.0 ] }"),
-                test("testFunc(arg1: a, arg2: 1.0)", "{ \"\$testFunc\": { \"arg1\": \"\$a\", \"arg2\": 1.0 } }"),
-                test("a.testFunc(1.0)", "{ \"\$testFunc\": [ \"\$a\", 1.0 ] }"),
-                test("a.testFunc(arg2: 1.0)", "{ \"\$testFunc\": [ \"\$a\", 1.0 ] }")
+                test("testFunc(a, 1.0)", "{ \"\$testFunc\": [ \"\$a\", { \"\$literal\": 1.0 } ] }"),
+                test("testFunc(arg1: a, arg2: 1.0)", "{ \"\$testFunc\": { \"arg1\": \"\$a\", \"arg2\": { \"\$literal\": 1.0 } } }"),
+                test("a.testFunc(1.0)", "{ \"\$testFunc\": [ \"\$a\", { \"\$literal\": 1.0 } ] }"),
+                test("a.testFunc(arg2: 1.0)", "{ \"\$testFunc\": [ \"\$a\", { \"\$literal\": 1.0 } ] }")
             )
         }
 
         @JvmStatic
         private fun functions(): Collection<Array<String>> {
             return listOf(
-                test("a.filter(\$x => \$x = true)", "{ \"\$filter\" : { \"input\" : \"\$a\", \"as\" : \"x\", \"cond\" : { \"\$eq\" : [\"\$\$x\", true] } } }"),
-                test("map(a,\$x => \$x.b + 1)", "{ \"\$map\": { \"input\": \"\$a\", \"as\": \"x\", \"in\": { \"\$add\": [ \"\$\$x.b\", NumberInt(\"1\") ] } } }"),
-                test("reduce(a, 10, (\$acc, \$current) => \$acc + \$current.b)", "{ \"\$reduce\": { \"input\": \"\$a\", \"initialValue\": NumberInt(\"10\"), \"in\": { \"\$add\": [ \"\$\$value\", \"\$\$this.b\" ] } } }"),
-                test("a.map(\$x => \$x.b).reduce(10, (\$acc, \$current) => \$acc + \$current)", "{ \"\$reduce\": { \"input\": { \"\$map\": { \"input\": \"\$a\", \"as\": \"x\", \"in\": \"\$\$x.b\" } }, \"initialValue\": NumberInt(\"10\"), \"in\": { \"\$add\": [ \"\$\$value\", \"\$\$this\" ] } } }"),
-                test("a.zip([1,2,3], (\$x, \$y) => \$x + \$y)", "{ \"\$map\" : { \"input\" : { \"\$zip\" : { \"inputs\" : [\"\$a\", [1, 2, 3]] } }, \"as\" : \"x\", \"in\" : { \"\$add\" : [{ \"\$arrayElemAt\" : [\"\$\$x\", 0] }, { \"\$arrayElemAt\" : [\"\$\$x\", 1] }] } } }"),
+                test("a.filter(\$x => \$x = true)", "{ \"\$filter\" : { \"input\" : \"\$a\", \"as\" : \"x\", \"cond\" : { \"\$eq\" : [\"\$\$x\", { \"\$literal\": true }] } } }"),
+                test("map(a,\$x => \$x.b + 1)", "{ \"\$map\": { \"input\": \"\$a\", \"as\": \"x\", \"in\": { \"\$add\": [ \"\$\$x.b\", { \"\$literal\": 1 } ] } } }"),
+                test("reduce(a, 10, (\$acc, \$current) => \$acc + \$current.b)", "{ \"\$reduce\": { \"input\": \"\$a\", \"initialValue\": { \"\$literal\": 10 }, \"in\": { \"\$add\": [ \"\$\$value\", \"\$\$this.b\" ] } } }"),
+                test("a.map(\$x => \$x.b).reduce(10, (\$acc, \$current) => \$acc + \$current)", "{ \"\$reduce\": { \"input\": { \"\$map\": { \"input\": \"\$a\", \"as\": \"x\", \"in\": \"\$\$x.b\" } }, \"initialValue\": { \"\$literal\": 10 }, \"in\": { \"\$add\": [ \"\$\$value\", \"\$\$this\" ] } } }"),
+                test("a.zip([1,2,3], (\$x, \$y) => \$x + \$y)", "{ \"\$map\" : { \"input\" : { \"\$zip\" : { \"inputs\" : [\"\$a\", [{ \"\$literal\" : 1 }, { \"\$literal\" : 2 }, { \"\$literal\" : 3 }]] } }, \"as\" : \"x\", \"in\" : { \"\$add\" : [{ \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 0 }] }, { \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 1 }] }] } } }"),
 
                 // renaming closed variable
-                test("let \$this: 1 => a.reduce(2, (\$acc, \$x) => \$acc + \$x + \$this)", "{ \"\$let\": { \"vars\": { \"this\": NumberInt(\"1\") }, \"in\": { \"\$let\": { \"vars\": { \"closed_this0\": \"\$\$this\" }, \"in\": { \"\$reduce\": { \"input\": \"\$a\", \"initialValue\": NumberInt(\"2\"), \"in\": { \"\$add\": [ { \"\$add\": [ \"\$\$value\", \"\$\$this\" ] }, \"\$\$closed_this0\" ] } } } } } } }")
+                test("let \$this: 1 => a.reduce(2, (\$acc, \$x) => \$acc + \$x + \$this)", "{ \"\$let\": { \"vars\": { \"this\": { \"\$literal\": 1 } }, \"in\": { \"\$let\": { \"vars\": { \"closed_this0\": \"\$\$this\" }, \"in\": { \"\$reduce\": { \"input\": \"\$a\", \"initialValue\": { \"\$literal\": 2 }, \"in\": { \"\$add\": [ { \"\$add\": [ \"\$\$value\", \"\$\$this\" ] }, \"\$\$closed_this0\" ] } } } } } } }")
             )
         }
 
@@ -280,7 +281,7 @@ class StatementTranslatorTest {
                     MATCH a > 10 OR a < 20
                     PROJECT a, b: { c: g.d[0..36 step 12], e: f.map(@x => @x + 5) }
                     """.replace("@", "\$"),
-                    "[{ \"\$match\" : { \"\$or\" : [{ \"a\" : { \"\$gt\" : 10 } }, { \"a\" : { \"\$lt\" : 20 } }] } }, { \"\$project\" : { \"a\" : \"\$a\", \"b\" : { \"c\" : { \"\$let\" : { \"vars\" : { \"array\" : { \"\$slice\" : [\"\$g.d\", 0, { \"\$subtract\" : [36, 0] }] } }, \"in\" : { \"\$map\" : { \"input\" : { \"\$filter\" : { \"input\" : { \"\$zip\" : { \"inputs\" : [{ \"\$range\" : [0, { \"\$size\" : \"\$\$array\" }] }, \"\$\$array\"] } }, \"as\" : \"x\", \"cond\" : { \"\$eq\" : [0, { \"\$mod\" : [{ \"\$arrayElemAt\" : [\"\$\$x\", 0] }, 12] }] } } }, \"as\" : \"x\", \"in\" : { \"\$arrayElemAt\" : [\"\$\$x\", 1] } } } } }, \"e\" : { \"\$map\" : { \"input\" : \"\$f\", \"as\" : \"x\", \"in\" : { \"\$add\" : [\"\$\$x\", 5] } } } } } }]")
+                    "[{ \"\$match\" : { \"\$or\" : [{ \"a\" : { \"\$gt\" : 10 } }, { \"a\" : { \"\$lt\" : 20 } }] } }, { \"\$project\" : { \"a\" : \"\$a\", \"b\" : { \"c\" : { \"\$let\" : { \"vars\" : { \"array\" : { \"\$slice\" : [\"\$g.d\", { \"\$literal\" : 0 }, { \"\$subtract\" : [{ \"\$literal\" : 36 }, { \"\$literal\" : 0 }] }] } }, \"in\" : { \"\$map\" : { \"input\" : { \"\$filter\" : { \"input\" : { \"\$zip\" : { \"inputs\" : [{ \"\$range\" : [{ \"\$literal\" : 0 }, { \"\$size\" : \"\$\$array\" }] }, \"\$\$array\"] } }, \"as\" : \"x\", \"cond\" : { \"\$eq\" : [{ \"\$literal\" : 0 }, { \"\$mod\" : [{ \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 0 }] }, { \"\$literal\" : 12 }] }] } } }, \"as\" : \"x\", \"in\" : { \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 1 }] } } } } }, \"e\" : { \"\$map\" : { \"input\" : \"\$f\", \"as\" : \"x\", \"in\" : { \"\$add\" : [\"\$\$x\", { \"\$literal\" : 5 }] } } } } } }]")
             )
         }
     }
