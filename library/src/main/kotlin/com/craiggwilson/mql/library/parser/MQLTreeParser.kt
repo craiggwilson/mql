@@ -52,8 +52,13 @@ import com.craiggwilson.mql.library.ast.SubtractExpression
 import com.craiggwilson.mql.library.ast.UnwindStage
 import com.craiggwilson.mql.library.ast.VariableName
 import com.craiggwilson.mql.library.ast.VariableReferenceExpression
+import org.antlr.v4.runtime.BailErrorStrategy
+import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.DefaultErrorStrategy
+import org.antlr.v4.runtime.RecognitionException
+import org.antlr.v4.runtime.Recognizer
 import org.antlr.v4.runtime.atn.PredictionMode
 
 fun lexMQL(mql: String): MQLLexer {
@@ -72,28 +77,34 @@ object MQLTreeParser {
         val tokens = CommonTokenStream(lexer)
         val p = MQLParser(tokens)
         p.interpreter.predictionMode = PredictionMode.SLL
+        p.errorHandler = BailErrorStrategy()
+        p.removeErrorListeners()
 
-        var parseCtx: MQLParser.ParseContext
+        val errors = mutableListOf<String>()
+        p.addErrorListener(object : BaseErrorListener() {
+            override fun syntaxError(recognizer: Recognizer<*, *>?, offendingSymbol: Any?, line: Int, charPositionInLine: Int, msg: String?, e: RecognitionException?) {
+                errors.add("$msg on line $line, character $charPositionInLine")
+            }
+        })
+
         try {
-            parseCtx = p.parse()
+            val statements = p.parse().statement().map { parseStatement(it) }
+            if (errors.size > 0) {
+                throw ParseException(errors.first())
+            }
+            return statements
         } catch (t: Throwable) {
-            tokens.seek(0)
+            errors.clear()
             p.reset()
             p.interpreter.predictionMode = PredictionMode.LL
+            p.errorHandler = DefaultErrorStrategy()
 
-            try {
-                parseCtx = p.parse()
-            } catch (t: Throwable) {
-                throw ParseException(t)
+            val statements = p.parse().statement().map { parseStatement(it) }
+            if (errors.size > 0) {
+                throw ParseException(errors.first())
             }
+            return statements
         }
-
-        val statements = mutableListOf<Statement>()
-        for (stmt in parseCtx.statement()) {
-            statements += parseStatement(stmt)
-        }
-
-        return statements
     }
 
     private fun parseStatement(ctx: MQLParser.StatementContext): Statement {

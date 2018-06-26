@@ -29,9 +29,13 @@ class MainController : Controller() {
         return builder.create()
     }
 
-    fun translate(input: String): String {
-        val statement = parseMQL(input)[0]
-        return statement.toShell()
+    fun translate(input: String, prettyPrint: Boolean): String {
+        return try {
+            val statement = parseMQL(input)[0]
+            statement.toShell(prettyPrint)
+        } catch (t: Throwable) {
+            t.message ?: "unknown error"
+        }
     }
 
     private fun Token.cssClasses(): List<String> {

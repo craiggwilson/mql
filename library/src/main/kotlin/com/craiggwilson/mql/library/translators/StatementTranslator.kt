@@ -20,11 +20,12 @@ import org.bson.BsonInt32
 import org.bson.BsonInt64
 import org.bson.BsonString
 import org.bson.BsonValue
+import org.bson.json.JsonMode
 import org.bson.json.JsonWriterSettings
 
-fun Statement.toShell(): String {
+fun Statement.toShell(pretty: Boolean = false): String {
     val pipeline = translatedPipeline()
-    val settings = JsonWriterSettings.builder().indent(false).build()
+    val settings = JsonWriterSettings.builder().outputMode(JsonMode.SHELL).indent(pretty).build()
     val dummyDoc = BsonDocument("d", pipeline)
     val json = dummyDoc.toJson(settings)
 

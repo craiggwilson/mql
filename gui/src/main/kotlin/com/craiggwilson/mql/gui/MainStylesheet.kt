@@ -1,45 +1,22 @@
 package com.craiggwilson.mql.gui
 
-import javafx.scene.paint.Color
-import javafx.scene.text.FontPosture
-import javafx.scene.text.FontWeight
 import tornadofx.Stylesheet
-import tornadofx.cssclass
+import tornadofx.box
+import tornadofx.px
 
 class MainStyleSheet : Stylesheet() {
     init {
+        root {
+            prefHeight = 600.px
+            prefWidth = 800.px
 
-        brace {
-            fill = Color.TEAL
-            fontWeight = FontWeight.BOLD
+            padding = box(10.px)
         }
-        bracket {
-            fill = Color.TEAL
-            fontWeight = FontWeight.BOLD
-        }
-        id {
-            fill = Color.DARKGREEN
-            fontStyle = FontPosture.ITALIC
-        }
-        keyword {
-            fill = Color.PURPLE
-            fontWeight = FontWeight.BOLD
-        }
-        paren {
-            fill = Color.TEAL
-            fontWeight = FontWeight.BOLD
-        }
-        string {
-            fill = Color.BLUE
-        }
-    }
 
-    companion object {
-        val brace by cssclass()
-        val bracket by cssclass()
-        val keyword by cssclass()
-        val id by cssclass()
-        val paren by cssclass()
-        val string by cssclass()
+        s(button) {
+            startMargin = 10.px
+            endMargin = 10.px
+        }
+
     }
 }
