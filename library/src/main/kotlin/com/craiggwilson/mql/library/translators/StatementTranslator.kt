@@ -33,7 +33,8 @@ fun Statement.toShell(pretty: Boolean = false): String {
         "db.getSiblingDB(\"${collectionName.databaseName}"
     } else "db"
 
-    return "$db.${collectionName.name}.aggregate(${json.substring(7 until json.length-1)})"
+    val startIndex = json.indexOf('[')
+    return "$db.${collectionName.name}.aggregate(${json.substring(startIndex until json.length-1)})"
 }
 
 fun Statement.translatedPipeline(): BsonArray {
