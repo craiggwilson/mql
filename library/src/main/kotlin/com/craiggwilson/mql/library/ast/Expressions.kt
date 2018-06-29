@@ -1,5 +1,6 @@
 package com.craiggwilson.mql.library.ast
 
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.RegularExpression
 import java.math.BigDecimal
 
 sealed class Expression : Node()
@@ -304,6 +305,16 @@ data class LetExpression(val variables: List<Variable>, val expression: Expressi
                 Variable(name, expression)
             } else this
         }
+    }
+}
+
+data class LikeExpression(val left: Expression, val right: RegexExpression) : Expression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(left: Expression, right: RegexExpression): LikeExpression {
+        return if (left !== this.left || right !== this.right) {
+            LikeExpression(left, right)
+        } else this
     }
 }
 

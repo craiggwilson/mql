@@ -18,6 +18,7 @@ import com.craiggwilson.mql.library.ast.Int64Expression
 import com.craiggwilson.mql.library.ast.LessThanExpression
 import com.craiggwilson.mql.library.ast.LessThanOrEqualsExpression
 import com.craiggwilson.mql.library.ast.LetExpression
+import com.craiggwilson.mql.library.ast.LikeExpression
 import com.craiggwilson.mql.library.ast.ModExpression
 import com.craiggwilson.mql.library.ast.MultiplyExpression
 import com.craiggwilson.mql.library.ast.Node
@@ -228,6 +229,11 @@ private object QueryLanguageExpressionTranslator : AbstractExpressionTranslator(
 
     override fun visit(n: LetExpression): BsonValue {
         throw UnsupportedOperationException("$n is not allowed in a \$match clause")
+    }
+
+    override fun visit(n: LikeExpression): BsonValue {
+        val fieldName = getFieldName(n.left)
+        return BsonDocument(fieldName, visit(n.right))
     }
 
     override fun visit(n: ModExpression): BsonValue {

@@ -29,6 +29,7 @@ import com.craiggwilson.mql.library.ast.LambdaExpression
 import com.craiggwilson.mql.library.ast.LessThanExpression
 import com.craiggwilson.mql.library.ast.LessThanOrEqualsExpression
 import com.craiggwilson.mql.library.ast.LetExpression
+import com.craiggwilson.mql.library.ast.LikeExpression
 import com.craiggwilson.mql.library.ast.LimitStage
 import com.craiggwilson.mql.library.ast.MatchStage
 import com.craiggwilson.mql.library.ast.ModExpression
@@ -260,6 +261,12 @@ object MQLTreeParser {
 
                 LetExpression(variables, expression)
             }
+            is MQLParser.LikeExpressionContext -> {
+                val left = parseExpression(ctx.expression())
+                val right = parseRegex(ctx.regex())
+
+                LikeExpression(left, right)
+            }
             is MQLParser.MemberExpressionContext -> {
                 val parent = parseExpression(ctx.expression())
 
@@ -330,15 +337,7 @@ object MQLTreeParser {
 
                 RangeExpression(start, end, step)
             }
-            is MQLParser.RegexExpressionContext -> {
-                val text = ctx.text
-                val lastIndex = text.lastIndexOf('/')
-                val options = if (lastIndex == text.length - 1) {
-                    null
-                } else text.substring(lastIndex + 1)
-
-                RegexExpression(ctx.text.substring(1 until lastIndex).replace("\\/", "/"), options)
-            }
+            is MQLParser.RegexExpressionContext -> parseRegex(ctx.regex())
             is MQLParser.StringExpressionContext -> StringExpression(unquote(ctx.text))
             is MQLParser.SwitchExpressionContext -> {
                 val cases = ctx.switch_case().map { case ->
@@ -436,6 +435,16 @@ object MQLTreeParser {
             }
             else -> throw ParseException("unsupported number: ${ctx.text}")
         }
+    }
+
+    private fun parseRegex(ctx: MQLParser.RegexContext): RegexExpression {
+        val text = ctx.text
+        val lastIndex = text.lastIndexOf('/')
+        val options = if (lastIndex == text.length - 1) {
+            null
+        } else text.substring(lastIndex + 1)
+
+        return RegexExpression(ctx.text.substring(1 until lastIndex).replace("\\/", "/"), options)
     }
 
     private fun getCollectionName(ctx: MQLParser.Collection_nameContext): CollectionName {

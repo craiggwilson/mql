@@ -48,6 +48,7 @@ expression:
       | (start=expression)? COLON (end=expression)? (COLON step=expression)?
     ) RBRACK                                                            #arrayAccessExpression
 | expression RANGE expression (STEP expression)?                        #rangeExpression
+| expression LIKE regex                                                 #likeExpression
 | expression op=(MULT | DIV | MOD) expression                           #multiplicationExpression
 | expression op=(PLUS | MINUS) expression                               #additionExpression
 | expression op=(EQ | GT | GTE | LT | LTE | NEQ) expression             #comparisonExpression
@@ -67,7 +68,7 @@ expression:
 | DQ_STRING                                                             #stringExpression
 | (TRUE | FALSE)                                                        #booleanExpression
 | NULL                                                                  #nullExpression
-| REGEX                                                                 #regexExpression
+| regex                                                                 #regexExpression
 ;
 
 field_assignment:
@@ -96,6 +97,8 @@ lambda_expression:
 number:
   (INT | LONG | DECIMAL | BIN | HEX)
 ;
+
+regex: REGEX;
 
 switch_case:
   CASE expression THEN expression
@@ -172,6 +175,7 @@ IF:       I F;
 IN:       I N;
 INDEX:    I N D E X;
 LET:      L E T;
+LIKE:     L I K E;
 LIMIT:    L I M I T;
 LOOKUP:   L O O K U P;
 MATCH:    M A T C H;

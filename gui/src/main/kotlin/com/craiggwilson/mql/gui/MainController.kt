@@ -51,6 +51,7 @@ class MainController : Controller() {
             MQLLexer.IN,
             MQLLexer.INDEX,
             MQLLexer.LET,
+            MQLLexer.LIKE,
             MQLLexer.NOT,
             MQLLexer.OR,
             MQLLexer.STEP,

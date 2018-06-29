@@ -98,7 +98,7 @@ class StatementTranslatorTest {
                 test("\"one\"", "\"one\""),
                 test("\"\$one\"", "{ \"\$literal\": \"\$one\" }"),
                 test("/foo/i", "/foo/i"),
-                test("/fo\\/o/i", "/fo\\/o/i"),
+                test("/fo\\/o/i", "{ \"\$regex\": \"fo/o\", \"\$options\": \"i\" }"),
 
                 // field references
                 test("a", "\"\$a\""),
@@ -199,6 +199,7 @@ class StatementTranslatorTest {
                 test("10 > a", "{ \"a\": { \"\$lt\": 10 } }"),
                 test("10 >= a", "{ \"a\": { \"\$lte\": 10 } }"),
                 test("10 != a", "{ \"a\": { \"\$ne\": 10 } }"),
+                test("a like /foo.*/i", "{ \"a\": /foo.*/i }"),
 
                 // logical query operators
                 test("a = 10 AND b = 11", "{ \"a\": { \"\$eq\": 10 }, \"b\": { \"\$eq\": 11 } }"),

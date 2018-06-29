@@ -31,6 +31,7 @@ abstract class Visitor<T> {
     open fun visit(n: LessThanExpression): T = throw NotImplementedError()
     open fun visit(n: LessThanOrEqualsExpression): T = throw NotImplementedError()
     open fun visit(n: LetExpression): T = throw NotImplementedError()
+    open fun visit(n: LikeExpression): T = throw NotImplementedError()
     open fun visit(n: MultiplyExpression): T = throw NotImplementedError()
     open fun visit(n: ModExpression): T = throw NotImplementedError()
     open fun visit(n: NewArrayExpression): T = throw NotImplementedError()
@@ -189,6 +190,11 @@ abstract class NodeVisitor : Visitor<Node>() {
             )
         },
         visit(n.expression) as Expression
+    )
+
+    override fun visit(n: LikeExpression): Node = n.update(
+        visit(n.left) as Expression,
+        visit(n.right) as RegexExpression
     )
 
     override fun visit(n: ModExpression): Node = n.update(
