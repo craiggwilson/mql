@@ -41,6 +41,7 @@ abstract class Visitor<T> {
     open fun visit(n: OrExpression): T = throw NotImplementedError()
     open fun visit(n: PowerExpression): T = throw NotImplementedError()
     open fun visit(n: RangeExpression): T = throw NotImplementedError()
+    open fun visit(n: RegexExpression): T = throw NotImplementedError()
     open fun visit(n: SubtractExpression): T = throw NotImplementedError()
     open fun visit(n: StringExpression): T = throw NotImplementedError()
     open fun visit(n: VariableReferenceExpression): T = throw NotImplementedError()
@@ -101,6 +102,7 @@ abstract class NodeVisitor : Visitor<Node>() {
     )
 
     override fun visit(n: BooleanExpression): Node = n
+
     override fun visit(n: ConditionalExpression): Node = n.update(
         visit(n.cases) { case ->
             case.update(
@@ -112,12 +114,14 @@ abstract class NodeVisitor : Visitor<Node>() {
     )
 
     override fun visit(n: DecimalExpression): Node = n
+
     override fun visit(n: DivideExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
 
     override fun visit(n: DoubleExpression): Node = n
+
     override fun visit(n: EqualsExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
@@ -159,7 +163,9 @@ abstract class NodeVisitor : Visitor<Node>() {
     )
 
     override fun visit(n: Int32Expression): Node = n
+
     override fun visit(n: Int64Expression): Node = n
+
     override fun visit(n: LambdaExpression): Node = n.update(
         n.parameters,
         visit(n.expression) as Expression
@@ -218,6 +224,7 @@ abstract class NodeVisitor : Visitor<Node>() {
     )
 
     override fun visit(n: NullExpression): Node = n
+
     override fun visit(n: OrExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
@@ -234,12 +241,15 @@ abstract class NodeVisitor : Visitor<Node>() {
         visit(n.step) as Expression?
     )
 
+    override fun visit(n: RegexExpression): Node = n
+
     override fun visit(n: SubtractExpression): Node = n.update(
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
 
     override fun visit(n: StringExpression): Node = n
+
     override fun visit(n: VariableReferenceExpression): Node = n
 
     // Nodes

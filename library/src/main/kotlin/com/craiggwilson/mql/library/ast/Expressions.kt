@@ -426,6 +426,16 @@ data class RangeExpression(val start: Expression, val end: Expression, val step:
     }
 }
 
+data class RegexExpression(val pattern: String, val options: String? = null) : LiteralExpression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(pattern: String, options: String): RegexExpression {
+        return if (pattern != this.pattern || options != this.options) {
+            RegexExpression(pattern, options)
+        } else this
+    }
+}
+
 data class SubtractExpression(override val left: Expression, override val right: Expression) : BinaryExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 

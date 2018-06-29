@@ -77,7 +77,7 @@ class StatementTranslatorTest {
                 test("true AND false OR true", "{ \"\$or\": [ { \"\$and\": [ { \"\$literal\": true }, { \"\$literal\": false}] }, { \"\$literal\": true} ] }"),
                 test("true AND (false OR true)", "{ \"\$and\": [ { \"\$literal\": true }, { \"\$or\": [ { \"\$literal\": false }, { \"\$literal\": true } ] } ] }"),
 
-                // constants
+                // literals
                 test("false", "{ \"\$literal\": false }"),
                 test("true", "{ \"\$literal\": true }"),
                 test("1", "{ \"\$literal\": 1}"),
@@ -97,6 +97,8 @@ class StatementTranslatorTest {
                 test("null", "null"),
                 test("\"one\"", "\"one\""),
                 test("\"\$one\"", "{ \"\$literal\": \"\$one\" }"),
+                test("/foo/i", "/foo/i"),
+                test("/fo\\/o/i", "/fo\\/o/i"),
 
                 // field references
                 test("a", "\"\$a\""),

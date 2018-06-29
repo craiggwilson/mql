@@ -43,6 +43,7 @@ import com.craiggwilson.mql.library.ast.OrExpression
 import com.craiggwilson.mql.library.ast.PowerExpression
 import com.craiggwilson.mql.library.ast.ProjectStage
 import com.craiggwilson.mql.library.ast.RangeExpression
+import com.craiggwilson.mql.library.ast.RegexExpression
 import com.craiggwilson.mql.library.ast.SkipStage
 import com.craiggwilson.mql.library.ast.SortStage
 import com.craiggwilson.mql.library.ast.Stage
@@ -328,6 +329,15 @@ object MQLTreeParser {
                 } else null
 
                 RangeExpression(start, end, step)
+            }
+            is MQLParser.RegexExpressionContext -> {
+                val text = ctx.text
+                val lastIndex = text.lastIndexOf('/')
+                val options = if (lastIndex == text.length - 1) {
+                    null
+                } else text.substring(lastIndex + 1)
+
+                RegexExpression(ctx.text.substring(1 until lastIndex).replace("\\/", "/"), options)
             }
             is MQLParser.StringExpressionContext -> StringExpression(unquote(ctx.text))
             is MQLParser.SwitchExpressionContext -> {

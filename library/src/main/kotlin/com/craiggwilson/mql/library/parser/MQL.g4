@@ -67,6 +67,7 @@ expression:
 | DQ_STRING                                                             #stringExpression
 | (TRUE | FALSE)                                                        #booleanExpression
 | NULL                                                                  #nullExpression
+| REGEX                                                                 #regexExpression
 ;
 
 field_assignment:
@@ -191,6 +192,8 @@ PRESERVE_NULL_AND_EMPTY: P R E S E R V E '_' N U L L '_' A N D '_' E M P T Y;
 
 
 // TYPES
+REGEX: '/' ('\\''/' | ~('/'))* '/' [a-zA-Z]*;
+
 INT: DEC_DIGIT DEC_DIGIT_OR_SEPARATOR*;
 DECIMAL:
   INT M
