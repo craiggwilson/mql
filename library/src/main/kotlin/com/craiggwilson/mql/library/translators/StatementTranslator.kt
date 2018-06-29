@@ -43,8 +43,6 @@ fun Statement.translatedPipeline(): BsonArray {
 
 class StatementTranslator(rewriter: NodeRewriter = DefaultNodeRewriter) : AbstractTranslator() {
     private val preProcessor = Rewriter(rewriter)
-    private val aggLanguageTranslator = AggregateLanguageExpressionTranslator
-    private val queryLanguageTranslator = QueryLanguageExpressionTranslator
 
     // Nodes
     override fun visit(n: Statement): BsonArray {
@@ -54,9 +52,9 @@ class StatementTranslator(rewriter: NodeRewriter = DefaultNodeRewriter) : Abstra
 
     override fun visit(n: GroupStage): BsonValue {
         val body = BsonDocument()
-        body["_id"] = aggLanguageTranslator.visit(n.by)
+        body["_id"] = translateToAggregationLanguage(n.by)
 
-        val aggregates = aggLanguageTranslator.visit(n.projection) as BsonDocument
+        val aggregates = translateToAggregationLanguage(n.projection) as BsonDocument
         aggregates.forEach { agg ->
             body[agg.key] = agg.value
         }
@@ -68,7 +66,7 @@ class StatementTranslator(rewriter: NodeRewriter = DefaultNodeRewriter) : Abstra
 
     override fun visit(n: MatchStage) = BsonDocument(
         "\$match",
-        queryLanguageTranslator.visit(n.expression) as BsonDocument
+        translateToQueryLanguage(n.expression) as BsonDocument
     )
 
     override fun visit(n: ProjectStage) = BsonDocument(
@@ -80,7 +78,7 @@ class StatementTranslator(rewriter: NodeRewriter = DefaultNodeRewriter) : Abstra
                     is ProjectStage.Item.Exclude -> BsonElement(name, BsonInt32(0))
                     is ProjectStage.Item.Include -> BsonElement(
                         item.field.flatten().name.name,
-                        aggLanguageTranslator.visit(item.expression)
+                        translateToAggregationLanguage(item.expression)
                     )
                 }
             }

@@ -7,17 +7,21 @@ import com.craiggwilson.mql.library.ast.ConditionalExpression
 import com.craiggwilson.mql.library.ast.DivideExpression
 import com.craiggwilson.mql.library.ast.EqualsExpression
 import com.craiggwilson.mql.library.ast.Expression
+import com.craiggwilson.mql.library.ast.FieldName
 import com.craiggwilson.mql.library.ast.FieldReferenceExpression
 import com.craiggwilson.mql.library.ast.FunctionCallExpression
 import com.craiggwilson.mql.library.ast.GreaterThanExpression
 import com.craiggwilson.mql.library.ast.GreaterThanOrEqualsExpression
 import com.craiggwilson.mql.library.ast.InExpression
+import com.craiggwilson.mql.library.ast.Int32Expression
+import com.craiggwilson.mql.library.ast.Int64Expression
 import com.craiggwilson.mql.library.ast.LessThanExpression
 import com.craiggwilson.mql.library.ast.LessThanOrEqualsExpression
 import com.craiggwilson.mql.library.ast.LetExpression
 import com.craiggwilson.mql.library.ast.ModExpression
 import com.craiggwilson.mql.library.ast.MultiplyExpression
 import com.craiggwilson.mql.library.ast.Node
+import com.craiggwilson.mql.library.ast.NodeVisitor
 import com.craiggwilson.mql.library.ast.NotEqualsExpression
 import com.craiggwilson.mql.library.ast.NotExpression
 import com.craiggwilson.mql.library.ast.OrExpression
@@ -27,9 +31,82 @@ import com.craiggwilson.mql.library.ast.SubtractExpression
 import com.craiggwilson.mql.library.ast.VariableReferenceExpression
 import org.bson.BsonArray
 import org.bson.BsonDocument
+import org.bson.BsonString
 import org.bson.BsonValue
 
-internal object QueryLanguageExpressionTranslator : AbstractExpressionTranslator() {
+internal fun translateToQueryLanguage(n: Node?): BsonValue? {
+    return QueryLanguageExpressionTranslator.visit(n)
+}
+
+private object QueryLanguageNormalizer : NodeVisitor() {
+
+    override fun visit(n: ArrayAccessExpression): Node {
+        if (n.array is FieldReferenceExpression) {
+            when (n.accessor) {
+                is Int32Expression -> return n.array.update(
+                    n.array.parent,
+                    FieldName("${n.array.name.name}.${n.accessor.value}"))
+                is Int64Expression -> return n.array.update(
+                    n.array.parent,
+                    FieldName("${n.array.name.name}.${n.accessor.value}"))
+            }
+        }
+
+        return super.visit(n)
+    }
+
+    override fun visit(n: EqualsExpression): Node {
+        val left = visit(n.left) as Expression
+        val right = visit(n.right) as Expression
+        return if (right is FieldReferenceExpression) {
+            EqualsExpression(right, left)
+        } else if (right is ModExpression && right.left is FieldReferenceExpression) {
+            EqualsExpression(right, left)
+        } else n.update(left, right)
+    }
+
+    override fun visit(n: GreaterThanExpression): Node {
+        val left = visit(n.left) as Expression
+        val right = visit(n.right) as Expression
+        return if (right is FieldReferenceExpression) {
+            LessThanExpression(right, left)
+        } else n.update(left, right)
+    }
+
+    override fun visit(n: GreaterThanOrEqualsExpression): Node {
+        val left = visit(n.left) as Expression
+        val right = visit(n.right) as Expression
+        return if (right is FieldReferenceExpression) {
+            LessThanOrEqualsExpression(right, left)
+        } else n.update(left, right)
+    }
+
+    override fun visit(n: LessThanExpression): Node {
+        val left = visit(n.left) as Expression
+        val right = visit(n.right) as Expression
+        return if (right is FieldReferenceExpression) {
+            GreaterThanExpression(right, left)
+        } else n.update(left, right)
+    }
+
+    override fun visit(n: LessThanOrEqualsExpression): Node {
+        val left = visit(n.left) as Expression
+        val right = visit(n.right) as Expression
+        return if (right is FieldReferenceExpression) {
+            GreaterThanOrEqualsExpression(right, left)
+        } else n.update(left, right)
+    }
+
+    override fun visit(n: NotEqualsExpression): Node {
+        val left = visit(n.left) as Expression
+        val right = visit(n.right) as Expression
+        return if (right is FieldReferenceExpression) {
+            NotEqualsExpression(right, left)
+        } else n.update(left, right)
+    }
+}
+
+private object QueryLanguageExpressionTranslator : AbstractExpressionTranslator() {
 
     override fun visit(n: Node?): BsonValue? {
         if (n == null) {
@@ -37,7 +114,8 @@ internal object QueryLanguageExpressionTranslator : AbstractExpressionTranslator
         }
 
         return try {
-            super.visit(n)
+            val normalized = QueryLanguageNormalizer.visit(n)
+            super.visit(normalized)
         } catch (e: UnsupportedOperationException) {
             if (n is Expression) {
                 BsonDocument("\$expr", AggregateLanguageExpressionTranslator.visit(n))
@@ -77,6 +155,14 @@ internal object QueryLanguageExpressionTranslator : AbstractExpressionTranslator
     }
 
     override fun visit(n: ArrayAccessExpression): BsonValue {
+        if (n.array is FieldReferenceExpression) {
+            val fieldName = getFieldName(n.array)
+            when (n.accessor) {
+                is Int32Expression -> return BsonString("$fieldName.${n.accessor.value}")
+                is Int64Expression -> return BsonString("$fieldName.${n.accessor.value}")
+            }
+        }
+
         throw UnsupportedOperationException("$n is not allowed in a \$match clause")
     }
 

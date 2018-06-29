@@ -4,7 +4,7 @@ import tornadofx.Stylesheet
 import tornadofx.box
 import tornadofx.px
 
-class MainStyleSheet : Stylesheet() {
+class MainStylesheet : Stylesheet() {
     init {
         root {
             prefHeight = 600.px

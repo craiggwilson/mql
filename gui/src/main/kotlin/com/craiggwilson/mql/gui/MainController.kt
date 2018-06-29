@@ -40,16 +40,34 @@ class MainController : Controller() {
 
     private fun Token.cssClasses(): List<String> {
         return when (type) {
+            // KEYWORDS
+            MQLLexer.AND,
+            MQLLexer.ASC,
+            MQLLexer.BY,
+            MQLLexer.CASE,
+            MQLLexer.DESC,
+            MQLLexer.ELSE,
+            MQLLexer.IF,
+            MQLLexer.IN,
+            MQLLexer.INDEX,
+            MQLLexer.LET,
+            MQLLexer.NOT,
+            MQLLexer.OR,
+            MQLLexer.STEP,
+            MQLLexer.SWITCH,
+            MQLLexer.THEN,
+            MQLLexer.WITH -> listOf("keyword")
+
         // SYMBOLS
             MQLLexer.LPAREN,
-            MQLLexer.RPAREN -> listOf("paren")
+            MQLLexer.RPAREN -> listOf("symbol", "paren")
             MQLLexer.LBRACE,
-            MQLLexer.RBRACE -> listOf("brace")
+            MQLLexer.RBRACE -> listOf("symbol", "brace")
             MQLLexer.LBRACK,
-            MQLLexer.RBRACK -> listOf("bracket")
+            MQLLexer.RBRACK -> listOf("symbol", "bracket")
 
-        // KEYWORDS
-            MQLLexer.FROM -> listOf("keyword")
+        // STAGES
+            MQLLexer.FROM,
             MQLLexer.GROUP,
             MQLLexer.LIMIT,
             MQLLexer.LOOKUP,
@@ -58,9 +76,20 @@ class MainController : Controller() {
             MQLLexer.SKIP_,
             MQLLexer.UNWIND -> listOf("keyword", "stage")
 
+            // LITERALS
+            MQLLexer.BIN,
+            MQLLexer.DECIMAL,
+            MQLLexer.DQ_STRING,
+            MQLLexer.FALSE,
+            MQLLexer.HEX,
+            MQLLexer.INT,
+            MQLLexer.LONG,
+            MQLLexer.NULL,
+            MQLLexer.TRUE -> listOf("literal")
+
             // OTHER
-            MQLLexer.DQ_STRING -> listOf("string")
             MQLLexer.UNQUOTED_ID -> listOf("id")
+            MQLLexer.VARIABLE_ID -> listOf("id")
             else -> emptyList()
         }
     }

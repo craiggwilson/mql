@@ -29,16 +29,21 @@ class MainView : View("MQL Transpiler") {
     override val root = BorderPane()
     private val controller: MainController by inject()
     private val inputArea = CodeArea().apply {
-        importStylesheet(CodeAreaStyleSheet::class)
+        importStylesheet(CodeAreaStylesheet::class)
         paragraphGraphicFactory = LineNumberFactory.get(this)
 
         plainTextChanges()
             .successionEnds(Duration.ofMillis(100))
             .subscribe {
                 try {
-                    setStyleSpans(0, controller.computeSyntaxSpans(text))
+                    val spans = controller.computeSyntaxSpans(text)
+                    setStyleSpans(0, spans)
                 } catch (t: Throwable) {
-                    setStyleSpans(0, StyleSpansBuilder<Collection<String>>().add(emptyList(), text.length).create())
+                    try {
+                        setStyleSpans(0, StyleSpansBuilder<Collection<String>>().add(emptyList(), text.length).create())
+                    } catch (t2: Throwable) {
+                        // do nothing
+                    }
                 }
             }
     }

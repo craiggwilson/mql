@@ -6,14 +6,14 @@ statement:
   pipeline
 ;
 
-pipeline: FROM collection_name stage+;
+pipeline: FROM collection_name stage*;
 
 // STAGES
 stage:
   GROUP field_assignment (COMMA field_assignment)* (BY expression)?                    #groupStage
 | LIMIT INT                                                                            #limitStage
 | LOOKUP
-    (LET variable_assignment (COMMA variable_assignment)* )?
+    (LET variable_assignment (COMMA variable_assignment)* ARROW)?
     multipart_field_declaration COLON LPAREN pipeline RPAREN                           #lookupStage
 | MATCH expression                                                                     #matchStage
 | PROJECT project_item (COMMA project_item)*                                           #projectStage
@@ -45,8 +45,7 @@ expression:
 | expression DOT (field_name | function)                                #memberExpression
 | expression LBRACK (
         start=expression
-      | start=expression COLON end=expression?
-      | start=expression? COLON end=expression
+      | (start=expression)? COLON (end=expression)? (COLON step=expression)?
     ) RBRACK                                                            #arrayAccessExpression
 | expression RANGE expression (STEP expression)?                        #rangeExpression
 | expression op=(MULT | DIV | MOD) expression                           #multiplicationExpression
@@ -65,7 +64,7 @@ expression:
 | variable_name                                                         #variableReferenceExpression
 | field_name                                                            #fieldExpression
 | number                                                                #numberExpression
-| DQ_STRING                                                                #stringExpression
+| DQ_STRING                                                             #stringExpression
 | (TRUE | FALSE)                                                        #booleanExpression
 | NULL                                                                  #nullExpression
 ;
@@ -181,7 +180,6 @@ OR:       O R;
 PROJECT:  P R O J E C T;
 SKIP_:    S K I P;
 SORT:     S O R T;
-STARTING: S T A R T I N G;
 STEP:     S T E P;
 SWITCH:   S W I T C H;
 THEN:     T H E N;

@@ -179,6 +179,9 @@ class StatementTranslatorTest {
         @JvmStatic
         private fun matchExpressions(): Collection<Array<String>> {
             return listOf(
+                // array accessor
+                test("a[1] = 10", "{ \"a.1\": { \"\$eq\": 10 } }"),
+
                 // comparison query operators
                 test("a = 10", "{ \"a\": { \"\$eq\": 10 } }"),
                 test("a > 10", "{ \"a\": { \"\$gt\": 10 } }"),
@@ -188,6 +191,12 @@ class StatementTranslatorTest {
                 test("a != 10", "{ \"a\": { \"\$ne\": 10 } }"),
                 test("a in [10,11]", "{ \"a\": { \"\$in\": [ 10, 11 ] } }"),
                 test("a not in [10,11]", "{ \"a\": { \"\$nin\": [ 10, 11 ] } }"),
+                test("10 = a", "{ \"a\": { \"\$eq\": 10 } }"),
+                test("10 < a", "{ \"a\": { \"\$gt\": 10 } }"),
+                test("10 <= a", "{ \"a\": { \"\$gte\": 10 } }"),
+                test("10 > a", "{ \"a\": { \"\$lt\": 10 } }"),
+                test("10 >= a", "{ \"a\": { \"\$lte\": 10 } }"),
+                test("10 != a", "{ \"a\": { \"\$ne\": 10 } }"),
 
                 // logical query operators
                 test("a = 10 AND b = 11", "{ \"a\": { \"\$eq\": 10 }, \"b\": { \"\$eq\": 11 } }"),
@@ -195,6 +204,7 @@ class StatementTranslatorTest {
                 test("a = 10 OR a = 11", "{ \"\$or\": [{ \"a\": { \"\$eq\": 10 } }, { \"a\": { \"\$eq\": 11 } }] }"),
                 test("NOT (a != 10)", "{ \"a\": { \"\$eq\": 10 } }"),
                 test("NOT (a = 10)", "{ \"a\": { \"\$ne\": 10 } }"),
+                test("NOT (10 = a)", "{ \"a\": { \"\$ne\": 10 } }"),
                 test("NOT NOT (a = 10)", "{ \"a\": { \"\$eq\": 10 } }"),
 
                 // element query operators
@@ -206,7 +216,8 @@ class StatementTranslatorTest {
                 test("type(a, 1)", "{ \"a\": { \"\$type\": 1 } }"),
 
                 // evaluation query operators
-                test("a % 10 = 4", "{ \"a\" : { \"\$mod\" : [10, 4] } }")
+                test("a % 10 = 4", "{ \"a\" : { \"\$mod\" : [10, 4] } }"),
+                test("4 = a % 10", "{ \"a\" : { \"\$mod\" : [10, 4] } }")
             )
         }
 

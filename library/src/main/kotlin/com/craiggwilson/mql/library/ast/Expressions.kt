@@ -3,8 +3,8 @@ package com.craiggwilson.mql.library.ast
 import java.math.BigDecimal
 
 sealed class Expression : Node()
-sealed class ConstantExpression : Expression()
-sealed class NumberExpression : ConstantExpression() {
+sealed class LiteralExpression : Expression()
+sealed class NumberExpression : LiteralExpression() {
     abstract fun negate(): NumberExpression
 }
 
@@ -61,7 +61,7 @@ data class ArrayAccessExpression(val array: Expression, val accessor: Expression
     }
 }
 
-data class BooleanExpression(val value: Boolean) : ConstantExpression() {
+data class BooleanExpression(val value: Boolean) : LiteralExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
     fun update(value: Boolean): BooleanExpression {
@@ -375,7 +375,7 @@ data class NotExpression(val expression: Expression) : Expression() {
     }
 }
 
-object NullExpression : ConstantExpression() {
+object NullExpression : LiteralExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 }
 
@@ -436,7 +436,7 @@ data class SubtractExpression(override val left: Expression, override val right:
     }
 }
 
-data class StringExpression(val value: String) : ConstantExpression() {
+data class StringExpression(val value: String) : LiteralExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
     fun update(value: String): StringExpression {

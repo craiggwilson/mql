@@ -203,11 +203,12 @@ object MQLTreeParser {
             is MQLParser.ArrayAccessExpressionContext -> {
                 val array = parseExpression(ctx.expression(0))
                 val start = ctx.start?.let { parseExpression(it) } ?: NullExpression
-                if (ctx.COLON() == null) {
+                if (ctx.COLON().size == 0) {
                     ArrayAccessExpression(array, start)
                 } else {
                     val end = ctx.end?.let { parseExpression(it) } ?: NullExpression
-                    val range = RangeExpression(start, end)
+                    val step = ctx.step?.let { parseExpression(it) }
+                    val range = RangeExpression(start, end, step)
                     ArrayAccessExpression(array, range)
                 }
             }

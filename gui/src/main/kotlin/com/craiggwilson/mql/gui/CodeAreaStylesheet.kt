@@ -6,14 +6,15 @@ import javafx.scene.text.FontWeight
 import tornadofx.Stylesheet
 import tornadofx.cssclass
 
-class CodeAreaStyleSheet : Stylesheet() {
+class CodeAreaStylesheet : Stylesheet() {
     companion object {
         val brace by cssclass()
         val bracket by cssclass()
         val keyword by cssclass()
         val id by cssclass()
+        val literal by cssclass()
         val paren by cssclass()
-        val string by cssclass()
+        val stage by cssclass()
     }
 
     init {
@@ -31,14 +32,16 @@ class CodeAreaStyleSheet : Stylesheet() {
         }
         keyword {
             fill = Color.PURPLE
-            fontWeight = FontWeight.BOLD
+        }
+        literal {
+            fill = Color.BLUE
         }
         paren {
             fill = Color.TEAL
             fontWeight = FontWeight.BOLD
         }
-        string {
-            fill = Color.BLUE
+        stage {
+            fontWeight = FontWeight.BOLD
         }
     }
 }
