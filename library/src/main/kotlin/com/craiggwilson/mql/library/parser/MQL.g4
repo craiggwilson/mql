@@ -16,7 +16,10 @@ stage:
     (LET variable_assignment (COMMA variable_assignment)* ARROW)?
     multipart_field_declaration COLON LPAREN pipeline RPAREN                           #lookupStage
 | MATCH expression                                                                     #matchStage
-| PROJECT project_item (COMMA project_item)*                                           #projectStage
+| PROJECT (
+    project_item (COMMA project_item)*
+  | LBRACE project_item (COMMA project_item)* RBRACE
+  )                                                                                    #projectStage
 | SKIP_ INT                                                                            #skipStage
 | SORT sort_field (COMMA sort_field)*                                                  #sortStage
 | UNWIND multipart_field_name (WITH unwind_option+)?                                   #unwindStage
@@ -124,7 +127,7 @@ field_name: UNQUOTED_ID;
 
 function_name: UNQUOTED_ID;
 
-function_argument_name: UNQUOTED_ID;
+function_argument_name: DQ_STRING | UNQUOTED_ID;
 
 multipart_field_name: field_name (DOT field_name)*;
 

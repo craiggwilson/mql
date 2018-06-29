@@ -497,7 +497,9 @@ object MQLTreeParser {
     }
 
     private fun getFunctionArgumentName(ctx: MQLParser.Function_argument_nameContext): FunctionArgumentName {
-        return FunctionArgumentName(ctx.text)
+        return if (ctx.DQ_STRING() != null) {
+            FunctionArgumentName(unquote(ctx.text))
+        } else FunctionArgumentName(ctx.text)
     }
 
     private fun getVariableName(ctx: MQLParser.Variable_nameContext): VariableName {
