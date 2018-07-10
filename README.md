@@ -17,19 +17,6 @@ built around asserting that we have generated the expected agg query. Hence,
 this was a simple language that let me express the aggregation framework in a more natural
 syntax.
 
-## Progress
-
-Obviously, this is a WIP and mostly an experiment, so while the below
-items may be checked off, it doesn't mean they are "finished", just that
-the major scaffolding is done and changes are allowed and will probably
-be made.
-
-- [x] Parser
-- [x] Aggregation Expression Translation
-- [ ] Query Language Translation (partial)
-- [ ] Command Line Interface
-- [ ] GUI
-
 ## Examples
 
 ```
