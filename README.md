@@ -20,64 +20,97 @@ syntax.
 ## Examples
 
 ```
-    FROM bar
-    MATCH a > 10 OR a < 20
-    PROJECT a, b := { c := g.d[0..36 step 12], e := f.map($x => $x + 5) }
+FROM bar
+MATCH a > 10 OR a < 20
+PROJECT a, b: { c: g.d[0..36 step 12], e: f.map($x => $x + 5) }
 ```
 
 ```json
-[
-   {
-      "$match":{
-        "$or":[
-            { "a":{ "$gt":10 } },
-            { "a":{ "$lt":20 } }
-         ]
-      }
-   },
-   {
-      "$project":{
-         "a":"$a",
-         "b":{
-            "c":{
-               "$let":{
-                  "vars":{
-                     "array":{ "$slice":["$g.d", 0, { "$subtract":[ 36, 0 ] } ]
-                     }
-                  },
-                  "in":{
-                     "$map":{
-                        "input":{
-                           "$filter":{
-                              "input":{
-                                 "$zip":{
-                                    "inputs":[
-                                       { "$range":[0, { "$size": ["$$array"] } ] },
-                                       "$$array"
-                                    ]
-                                 }
-                              },
-                              "as":"x",
-                              "cond":{
-                                 "$eq": [0, { "$mod":[{"$arrayElemAt": ["$$x", 0] }, 12]}]
-                              }
-                           }
-                        },
-                        "as":"x",
-                        "in": { "$arrayElemAt": ["$$x", 1 ]}
-                     }
-                  }
-               }
-            },
-            "e":{
-               "$map":{
-                  "input":"$f",
-                  "as":"x",
-                  "in":{ "$add": ["$$x", 5] }
-               }
+db.bar.aggregate([{
+      "$match" : {
+        "$or" : [{
+            "a" : {
+              "$gt" : 10
             }
-         }
+          }, {
+            "a" : {
+              "$lt" : 20
+            }
+          }]
       }
-   }
-]
+    }, {
+      "$project" : {
+        "a" : "$a",
+        "b" : {
+          "c" : {
+            "$let" : {
+              "vars" : {
+                "array" : {
+                  "$slice" : ["$g.d", {
+                      "$literal" : 0
+                    }, {
+                      "$subtract" : [{
+                          "$literal" : 36
+                        }, {
+                          "$literal" : 0
+                        }]
+                    }]
+                }
+              },
+              "in" : {
+                "$map" : {
+                  "input" : {
+                    "$filter" : {
+                      "input" : {
+                        "$zip" : {
+                          "inputs" : [{
+                              "$range" : [{
+                                  "$literal" : 0
+                                }, {
+                                  "$size" : "$$array"
+                                }]
+                            }, "$$array"]
+                        }
+                      },
+                      "as" : "x",
+                      "cond" : {
+                        "$eq" : [{
+                            "$literal" : 0
+                          }, {
+                            "$mod" : [{
+                                "$arrayElemAt" : ["$$x", {
+                                    "$literal" : 0
+                                  }]
+                              }, {
+                                "$literal" : 12
+                              }]
+                          }]
+                      }
+                    }
+                  },
+                  "as" : "x",
+                  "in" : {
+                    "$arrayElemAt" : ["$$x", {
+                        "$literal" : 1
+                      }]
+                  }
+                }
+              }
+            }
+          },
+          "e" : {
+            "$map" : {
+              "input" : "$f",
+              "as" : "x",
+              "in" : {
+                "$add" : ["$$x", {
+                    "$literal" : 5
+                  }]
+              }
+            }
+          }
+        }
+      }
+    }]
+)
 ```
