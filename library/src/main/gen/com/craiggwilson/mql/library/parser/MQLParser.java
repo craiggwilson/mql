@@ -1070,10 +1070,8 @@ public class MQLParser extends Parser {
 		}
 		public TerminalNode LBRACK() { return getToken(MQLParser.LBRACK, 0); }
 		public TerminalNode RBRACK() { return getToken(MQLParser.RBRACK, 0); }
-		public List<TerminalNode> COLON() { return getTokens(MQLParser.COLON); }
-		public TerminalNode COLON(int i) {
-			return getToken(MQLParser.COLON, i);
-		}
+		public TerminalNode RANGE() { return getToken(MQLParser.RANGE, 0); }
+		public TerminalNode COLON() { return getToken(MQLParser.COLON, 0); }
 		public ArrayAccessExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
 	}
 	public static class VariableReferenceExpressionContext extends ExpressionContext {
@@ -1090,7 +1088,7 @@ public class MQLParser extends Parser {
 			return getRuleContext(ExpressionContext.class,i);
 		}
 		public TerminalNode RANGE() { return getToken(MQLParser.RANGE, 0); }
-		public TerminalNode STEP() { return getToken(MQLParser.STEP, 0); }
+		public TerminalNode COLON() { return getToken(MQLParser.COLON, 0); }
 		public RangeExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
 	}
 	public static class RegexExpressionContext extends ExpressionContext {
@@ -1614,7 +1612,7 @@ public class MQLParser extends Parser {
 							}
 
 							setState(284);
-							match(COLON);
+							match(RANGE);
 							setState(286);
 							_errHandler.sync(this);
 							_la = _input.LA(1);
@@ -1660,7 +1658,7 @@ public class MQLParser extends Parser {
 						case 1:
 							{
 							setState(298);
-							match(STEP);
+							match(COLON);
 							setState(299);
 							expression(0);
 							}
@@ -2669,15 +2667,15 @@ public class MQLParser extends Parser {
 		"\u0117\5,\27\2\u0115\u0117\5\24\13\2\u0116\u0114\3\2\2\2\u0116\u0115\3"+
 		"\2\2\2\u0117\u0134\3\2\2\2\u0118\u0119\f\31\2\2\u0119\u0126\7\16\2\2\u011a"+
 		"\u0127\5\20\t\2\u011b\u011d\5\20\t\2\u011c\u011b\3\2\2\2\u011c\u011d\3"+
-		"\2\2\2\u011d\u011e\3\2\2\2\u011e\u0120\7\6\2\2\u011f\u0121\5\20\t\2\u0120"+
+		"\2\2\2\u011d\u011e\3\2\2\2\u011e\u0120\7\32\2\2\u011f\u0121\5\20\t\2\u0120"+
 		"\u011f\3\2\2\2\u0120\u0121\3\2\2\2\u0121\u0124\3\2\2\2\u0122\u0123\7\6"+
 		"\2\2\u0123\u0125\5\20\t\2\u0124\u0122\3\2\2\2\u0124\u0125\3\2\2\2\u0125"+
 		"\u0127\3\2\2\2\u0126\u011a\3\2\2\2\u0126\u011c\3\2\2\2\u0127\u0128\3\2"+
 		"\2\2\u0128\u0134\7\34\2\2\u0129\u012a\f\30\2\2\u012a\u012b\7\32\2\2\u012b"+
-		"\u012e\5\20\t\2\u012c\u012d\7\67\2\2\u012d\u012f\5\20\t\2\u012e\u012c"+
-		"\3\2\2\2\u012e\u012f\3\2\2\2\u012f\u0134\3\2\2\2\u0130\u0131\f\27\2\2"+
-		"\u0131\u0132\7-\2\2\u0132\u0134\5\36\20\2\u0133\u00fa\3\2\2\2\u0133\u00fd"+
-		"\3\2\2\2\u0133\u0100\3\2\2\2\u0133\u0103\3\2\2\2\u0133\u0106\3\2\2\2\u0133"+
+		"\u012e\5\20\t\2\u012c\u012d\7\6\2\2\u012d\u012f\5\20\t\2\u012e\u012c\3"+
+		"\2\2\2\u012e\u012f\3\2\2\2\u012f\u0134\3\2\2\2\u0130\u0131\f\27\2\2\u0131"+
+		"\u0132\7-\2\2\u0132\u0134\5\36\20\2\u0133\u00fa\3\2\2\2\u0133\u00fd\3"+
+		"\2\2\2\u0133\u0100\3\2\2\2\u0133\u0103\3\2\2\2\u0133\u0106\3\2\2\2\u0133"+
 		"\u0109\3\2\2\2\u0133\u010c\3\2\2\2\u0133\u0112\3\2\2\2\u0133\u0118\3\2"+
 		"\2\2\u0133\u0129\3\2\2\2\u0133\u0130\3\2\2\2\u0134\u0137\3\2\2\2\u0135"+
 		"\u0133\3\2\2\2\u0135\u0136\3\2\2\2\u0136\21\3\2\2\2\u0137\u0135\3\2\2"+

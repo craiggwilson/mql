@@ -48,9 +48,9 @@ expression:
 | expression DOT (field_name | function)                                #memberExpression
 | expression LBRACK (
         start=expression
-      | (start=expression)? COLON (end=expression)? (COLON step=expression)?
+      | (start=expression)? RANGE (end=expression)? (COLON step=expression)?
     ) RBRACK                                                            #arrayAccessExpression
-| expression RANGE expression (STEP expression)?                        #rangeExpression
+| expression RANGE expression (COLON expression)?                       #rangeExpression
 | expression LIKE regex                                                 #likeExpression
 | expression op=(MULT | DIV | MOD) expression                           #multiplicationExpression
 | expression op=(PLUS | MINUS) expression                               #additionExpression

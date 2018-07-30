@@ -137,17 +137,18 @@ class StatementTranslatorTest {
                 test("NOT true", "{ \"\$not\": { \"\$literal\": true } }"),
 
                 // array access expression
+                test("a[..]", "\"\$a\""),
+                test("a[..:2]", "{ \"\$let\" : { \"vars\" : { \"array\" : \"\$a\" }, \"in\" : { \"\$map\" : { \"input\" : { \"\$filter\" : { \"input\" : { \"\$zip\" : { \"inputs\" : [{ \"\$range\" : [{ \"\$literal\" : 0 }, { \"\$size\" : \"\$\$array\" }] }, \"\$\$array\"] } }, \"as\" : \"x\", \"cond\" : { \"\$eq\" : [{ \"\$literal\" : 0 }, { \"\$mod\" : [{ \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 0 }] }, { \"\$literal\" : 2 }] }] } } }, \"as\" : \"x\", \"in\" : { \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 1 }] } } } } }"),
                 test("a[0]", "{ \"\$arrayElemAt\": [ \"\$a\", { \"\$literal\": 0 } ] }"),
                 test("a[-4]", "{ \"\$arrayElemAt\": [ \"\$a\", { \"\$literal\": -4 } ] }"),
                 test("a[2..4]", "{ \"\$slice\": [ \"\$a\", { \"\$literal\": 2 }, { \"\$subtract\": [ { \"\$literal\": 4 }, { \"\$literal\": 2 }] } ] }"),
-                test("a[2:4]", "{ \"\$slice\": [ \"\$a\", { \"\$literal\": 2 }, { \"\$subtract\": [ { \"\$literal\": 4 }, { \"\$literal\": 2 } ] } ] }"),
-                test("a[2:]", "{ \"\$let\": { \"vars\": { \"array\": \"\$a\" }, \"in\": { \"\$slice\": [ \"\$\$array\", { \"\$subtract\": [ { \"\$literal\": 2 }, { \"\$size\": \"\$\$array\" } ] } ] } } }"),
-                test("a[:8]", "{ \"\$slice\": [ \"\$a\", { \"\$literal\": 8 } ] }"),
-                test("a[1..10 step 3]", "{ \"\$let\" : { \"vars\" : { \"array\" : { \"\$slice\" : [\"\$a\", { \"\$literal\" : 1 }, { \"\$subtract\" : [{ \"\$literal\" : 10 }, { \"\$literal\" : 1 }] }] } }, \"in\" : { \"\$map\" : { \"input\" : { \"\$filter\" : { \"input\" : { \"\$zip\" : { \"inputs\" : [{ \"\$range\" : [{ \"\$literal\" : 0 }, { \"\$size\" : \"\$\$array\" }] }, \"\$\$array\"] } }, \"as\" : \"x\", \"cond\" : { \"\$eq\" : [{ \"\$literal\" : 0 }, { \"\$mod\" : [{ \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 0 }] }, { \"\$literal\" : 3 }] }] } } }, \"as\" : \"x\", \"in\" : { \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 1 }] } } } } }"),
+                test("a[2..]", "{ \"\$let\": { \"vars\": { \"array\": \"\$a\" }, \"in\": { \"\$slice\": [ \"\$\$array\", { \"\$subtract\": [ { \"\$literal\": 2 }, { \"\$size\": \"\$\$array\" } ] } ] } } }"),
+                test("a[..8]", "{ \"\$slice\": [ \"\$a\", { \"\$literal\": 8 } ] }"),
+                test("a[1..10:3]", "{ \"\$let\" : { \"vars\" : { \"array\" : { \"\$slice\" : [\"\$a\", { \"\$literal\" : 1 }, { \"\$subtract\" : [{ \"\$literal\" : 10 }, { \"\$literal\" : 1 }] }] } }, \"in\" : { \"\$map\" : { \"input\" : { \"\$filter\" : { \"input\" : { \"\$zip\" : { \"inputs\" : [{ \"\$range\" : [{ \"\$literal\" : 0 }, { \"\$size\" : \"\$\$array\" }] }, \"\$\$array\"] } }, \"as\" : \"x\", \"cond\" : { \"\$eq\" : [{ \"\$literal\" : 0 }, { \"\$mod\" : [{ \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 0 }] }, { \"\$literal\" : 3 }] }] } } }, \"as\" : \"x\", \"in\" : { \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 1 }] } } } } }"),
 
                 // range expression
                 test("1..4", "{ \"\$range\": [ { \"\$literal\": 1 }, { \"\$literal\": 4 } ] }"),
-                test("1..4 step 2", "{ \"\$range\": [ { \"\$literal\": 1 }, { \"\$literal\": 4 }, { \"\$literal\": 2 } ] }"),
+                test("1..4 : 2", "{ \"\$range\": [ { \"\$literal\": 1 }, { \"\$literal\": 4 }, { \"\$literal\": 2 } ] }"),
 
                 // conditionals
                 test("if true then false else true", "{ \"\$cond\": [ { \"\$literal\": true }, { \"\$literal\": false }, { \"\$literal\": true }] }"),
@@ -293,7 +294,7 @@ class StatementTranslatorTest {
                 test("""
                     FROM bar
                     MATCH a > 10 OR a < 20
-                    PROJECT a, b: { c: g.d[0..36 step 12], e: f.map(@x => @x + 5) }
+                    PROJECT a, b: { c: g.d[0..36:12], e: f.map(@x => @x + 5) }
                     """.replace("@", "\$"),
                     "[{ \"\$match\" : { \"\$or\" : [{ \"a\" : { \"\$gt\" : 10 } }, { \"a\" : { \"\$lt\" : 20 } }] } }, { \"\$project\" : { \"a\" : \"\$a\", \"b\" : { \"c\" : { \"\$let\" : { \"vars\" : { \"array\" : { \"\$slice\" : [\"\$g.d\", { \"\$literal\" : 0 }, { \"\$subtract\" : [{ \"\$literal\" : 36 }, { \"\$literal\" : 0 }] }] } }, \"in\" : { \"\$map\" : { \"input\" : { \"\$filter\" : { \"input\" : { \"\$zip\" : { \"inputs\" : [{ \"\$range\" : [{ \"\$literal\" : 0 }, { \"\$size\" : \"\$\$array\" }] }, \"\$\$array\"] } }, \"as\" : \"x\", \"cond\" : { \"\$eq\" : [{ \"\$literal\" : 0 }, { \"\$mod\" : [{ \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 0 }] }, { \"\$literal\" : 12 }] }] } } }, \"as\" : \"x\", \"in\" : { \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 1 }] } } } } }, \"e\" : { \"\$map\" : { \"input\" : \"\$f\", \"as\" : \"x\", \"in\" : { \"\$add\" : [\"\$\$x\", { \"\$literal\" : 5 }] } } } } } }]")
             )

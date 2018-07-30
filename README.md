@@ -22,7 +22,7 @@ syntax.
 ```
 FROM bar
 MATCH a > 10 OR a < 20
-PROJECT a, b: { c: g.d[0..36 step 12], e: f.map($x => $x + 5) }
+PROJECT a, b: { c: g.d[0..36:12], e: f.map($x => $x + 5) }
 ```
 
 ```json
