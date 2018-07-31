@@ -56,6 +56,7 @@ abstract class Visitor<T> {
 
     open fun visit(n: GroupStage): T = throw NotImplementedError()
     open fun visit(n: LimitStage): T = throw NotImplementedError()
+    open fun visit(n: LookupStage): T = throw NotImplementedError()
     open fun visit(n: MatchStage): T = throw NotImplementedError()
     open fun visit(n: ProjectStage): T = throw NotImplementedError()
     open fun visit(n: SkipStage): T = throw NotImplementedError()
@@ -276,6 +277,17 @@ abstract class NodeVisitor : Visitor<Node>() {
     )
 
     override fun visit(n: LimitStage): Node = n.update(n.limit)
+
+    override fun visit(n: LookupStage): Node = n.update(
+        visit(n.field) as FieldDeclaration,
+        visit(n.variables) { variable ->
+            variable.update(
+                variable.name,
+                visit(variable.expression) as Expression
+            )
+        },
+        visit(n.statement) as Statement
+    )
 
     override fun visit(n: MatchStage): Node = n.update(visit(n.expression) as Expression)
 

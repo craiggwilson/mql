@@ -31,6 +31,7 @@ import com.craiggwilson.mql.library.ast.LessThanOrEqualsExpression
 import com.craiggwilson.mql.library.ast.LetExpression
 import com.craiggwilson.mql.library.ast.LikeExpression
 import com.craiggwilson.mql.library.ast.LimitStage
+import com.craiggwilson.mql.library.ast.LookupStage
 import com.craiggwilson.mql.library.ast.MatchStage
 import com.craiggwilson.mql.library.ast.ModExpression
 import com.craiggwilson.mql.library.ast.MultiplyExpression
@@ -129,6 +130,18 @@ object MQLTreeParser {
                 GroupStage(by, NewDocumentExpression(elements))
             }
             is MQLParser.LimitStageContext -> LimitStage(ctx.INT().text.toLong())
+            is MQLParser.LookupStageContext -> {
+                val field = getFieldDeclaration(ctx.multipart_field_declaration())
+                val variables = ctx.variable_assignment().map { variable ->
+                    LookupStage.Variable(
+                        getVariableName(variable.variable_name()),
+                        parseExpression(variable.expression())
+                    )
+                }
+                val statement = parseStatement(ctx.statement())
+
+                LookupStage(field, variables, statement)
+            }
             is MQLParser.MatchStageContext -> MatchStage(parseExpression(ctx.expression()))
             is MQLParser.ProjectStageContext -> {
                 val items = ctx.project_item().map { item ->
@@ -180,7 +193,7 @@ object MQLTreeParser {
 
                 UnwindStage(field, indexField, preserveNullAndEmpty)
             }
-            else -> throw ParseException("unsupported stage $ctx")
+            else -> throw ParseException("unsupported stage ${ctx.text}")
         }
     }
 

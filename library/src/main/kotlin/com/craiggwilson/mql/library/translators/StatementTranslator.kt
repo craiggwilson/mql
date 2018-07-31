@@ -3,6 +3,7 @@ package com.craiggwilson.mql.library.translators
 import com.craiggwilson.mql.library.ast.Direction
 import com.craiggwilson.mql.library.ast.GroupStage
 import com.craiggwilson.mql.library.ast.LimitStage
+import com.craiggwilson.mql.library.ast.LookupStage
 import com.craiggwilson.mql.library.ast.MatchStage
 import com.craiggwilson.mql.library.ast.ProjectStage
 import com.craiggwilson.mql.library.ast.SkipStage
@@ -63,6 +64,25 @@ class StatementTranslator(rewriter: NodeRewriter = DefaultNodeRewriter) : Abstra
     }
 
     override fun visit(n: LimitStage) = BsonDocument("\$limit", BsonInt64(n.limit))
+
+    override fun visit(n: LookupStage): BsonDocument {
+        val body = BsonDocument()
+        body.append("from", BsonString(n.statement.collectionName.name))
+        if (n.variables.isNotEmpty()) {
+            val letDocument = BsonDocument()
+            body.append("let", letDocument)
+            n.variables.forEach { variable ->
+                letDocument.append(
+                    variable.name.name,
+                    translateToAggregationLanguage(variable.expression)
+                )
+            }
+        }
+        body.append("pipeline", visit(n.statement))
+        body.append("as", BsonString(n.field.flatten().name.name))
+
+        return BsonDocument("\$lookup", body)
+    }
 
     override fun visit(n: MatchStage) = BsonDocument(
         "\$match",

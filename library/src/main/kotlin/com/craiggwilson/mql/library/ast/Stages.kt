@@ -1,7 +1,5 @@
 package com.craiggwilson.mql.library.ast
 
-import com.craiggwilson.mql.library.ast.FieldDeclaration
-
 sealed class Stage : Node()
 
 data class GroupStage(val by: Expression?, val projection: NewDocumentExpression) : Stage() {
@@ -25,6 +23,24 @@ data class LimitStage(val limit: Long) : Stage() {
         }
 
         return this
+    }
+}
+
+data class LookupStage(val field: FieldDeclaration, val variables: List<Variable>, val statement: Statement) : Stage() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(field: FieldDeclaration, variables: List<Variable>, statement: Statement): LookupStage {
+        return if (field !== this.field || variables !== this.variables || statement !== this.statement) {
+            LookupStage(field, variables, statement)
+        } else this
+    }
+
+    data class Variable(val name: VariableName, val expression: Expression) {
+        fun update(variableName: VariableName, expression: Expression): Variable {
+            return if (variableName != this.name || expression !== this.expression) {
+                Variable(variableName, expression)
+            } else this
+        }
     }
 }
 

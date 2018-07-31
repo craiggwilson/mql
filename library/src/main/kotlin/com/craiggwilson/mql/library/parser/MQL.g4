@@ -12,9 +12,11 @@ pipeline: FROM collection_name stage*;
 stage:
   GROUP field_assignment (COMMA field_assignment)* (BY expression)?                    #groupStage
 | LIMIT INT                                                                            #limitStage
-| LOOKUP
-    (LET variable_assignment (COMMA variable_assignment)* ARROW)?
-    multipart_field_declaration COLON LPAREN pipeline RPAREN                           #lookupStage
+| LOOKUP multipart_field_declaration COLON
+    LPAREN
+      (LET variable_assignment (COMMA variable_assignment)*)?
+      statement
+    RPAREN                                                             #lookupStage
 | MATCH expression                                                                     #matchStage
 | PROJECT (
     project_item (COMMA project_item)*
