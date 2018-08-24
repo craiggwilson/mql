@@ -134,7 +134,6 @@ abstract class NodeVisitor : Visitor<Node>() {
         n.name)
 
     override fun visit(n: FunctionCallExpression): Node = n.update(
-        visit(n.parent) as Expression?,
         n.name,
         visit(n.arguments) { argument ->
             when (argument) {

@@ -35,22 +35,20 @@ object DefaultFunctionNodeRewriter : NodeRewriter {
 
 private object FilterFunctionHandler : NodeHandler<FunctionCallExpression> {
     override fun visit(n: FunctionCallExpression): Node {
-        val args = shiftArgs(n)
-
-        if (args.size != 2 || args[1].expression !is LambdaExpression) {
+        if (n.arguments.size != 2 || n.arguments[1].expression !is LambdaExpression) {
             return n
         }
 
-        val lambda = args[1].expression as LambdaExpression
+        val lambda = n.arguments[1].expression as LambdaExpression
         if (lambda.parameters.size != 1) {
             return n
         }
 
-        val input = args[0].expression
+        val input = n.arguments[0].expression
         val az = StringExpression(lambda.parameters[0].name)
         val cond = lambda.expression
 
-        return FunctionCallExpression(null, n.name, listOf(
+        return FunctionCallExpression(n.name, listOf(
             FunctionCallExpression.Argument.Named(FunctionArgumentName("input"), input),
             FunctionCallExpression.Argument.Named(FunctionArgumentName("as"), az),
             FunctionCallExpression.Argument.Named(FunctionArgumentName("cond"), cond)
@@ -60,20 +58,18 @@ private object FilterFunctionHandler : NodeHandler<FunctionCallExpression> {
 
 private object MapFunctionHandler : NodeHandler<FunctionCallExpression> {
     override fun visit(n: FunctionCallExpression): Node {
-        val args = shiftArgs(n)
-
-        if (args.size != 2 || args[1].expression !is LambdaExpression) {
+        if (n.arguments.size != 2 || n.arguments[1].expression !is LambdaExpression) {
             return n
         }
 
-        val lambda = args[1].expression as LambdaExpression
+        val lambda = n.arguments[1].expression as LambdaExpression
         if (lambda.parameters.size != 1) {
             return n
         }
 
         return function(
             "map",
-            "input" to args[0].expression,
+            "input" to n.arguments[0].expression,
             "as" to StringExpression(lambda.parameters[0].name),
             "in" to lambda.expression
         )
@@ -82,19 +78,17 @@ private object MapFunctionHandler : NodeHandler<FunctionCallExpression> {
 
 private object ReduceFunctionHandler : NodeHandler<FunctionCallExpression> {
     override fun visit(n: FunctionCallExpression): Node {
-        val args = shiftArgs(n)
-
-        if (args.size != 3 || args[2].expression !is LambdaExpression) {
+        if (n.arguments.size != 3 || n.arguments[2].expression !is LambdaExpression) {
             return n
         }
 
-        val lambda = args[2].expression as LambdaExpression
+        val lambda = n.arguments[2].expression as LambdaExpression
         if (lambda.parameters.size != 2) {
             return n
         }
 
-        val input = args[0].expression
-        val initialValue = args[1].expression
+        val input = n.arguments[0].expression
+        val initialValue = n.arguments[1].expression
 
         val newVariableNames = listOf(VariableName("value"), VariableName("this"))
         val renames = lambda.parameters
@@ -136,13 +130,11 @@ private object ReduceFunctionHandler : NodeHandler<FunctionCallExpression> {
 
 private object ZipFunctionHandler : NodeHandler<FunctionCallExpression> {
     override fun visit(n: FunctionCallExpression): Node {
-        val args = shiftArgs(n)
-
-        if (args.size != 3 || args[2].expression !is LambdaExpression) {
+        if (n.arguments.size != 3 || n.arguments[2].expression !is LambdaExpression) {
             return n
         }
 
-        val lambda = args[2].expression as LambdaExpression
+        val lambda = n.arguments[2].expression as LambdaExpression
         if (lambda.parameters.size != 2) {
             return n
         }
@@ -151,7 +143,7 @@ private object ZipFunctionHandler : NodeHandler<FunctionCallExpression> {
             "map",
             "input" to function(
                 "zip",
-                "inputs" to newArray(args[0].expression, args[1].expression)
+                "inputs" to newArray(n.arguments[0].expression, n.arguments[1].expression)
             ),
             "as" to StringExpression("x"),
             "in" to replaceExpressions(
@@ -175,10 +167,4 @@ private fun findUsedVariables(n: Node): Set<VariableName> {
     }.visit(n)
 
     return usedVariables
-}
-
-private fun shiftArgs(n: FunctionCallExpression): List<FunctionCallExpression.Argument> {
-    return if (n.parent != null) {
-        listOf(FunctionCallExpression.Argument.Positional(n.parent)) + n.arguments
-    } else n.arguments
 }

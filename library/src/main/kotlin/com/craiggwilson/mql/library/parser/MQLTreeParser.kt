@@ -291,9 +291,8 @@ object MQLTreeParser {
                     val function = parseFunction(ctx.function())
 
                     function.update(
-                        parent,
                         function.name,
-                        function.arguments
+                        listOf(FunctionCallExpression.Argument.Positional(parent)) + function.arguments
                     )
                 }
             }
@@ -404,7 +403,7 @@ object MQLTreeParser {
             }
         }
 
-        return FunctionCallExpression(null, name, arguments)
+        return FunctionCallExpression(name, arguments)
     }
 
     private fun parseNumber(ctx: MQLParser.NumberContext): NumberExpression {

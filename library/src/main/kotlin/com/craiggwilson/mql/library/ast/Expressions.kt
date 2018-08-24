@@ -1,6 +1,5 @@
 package com.craiggwilson.mql.library.ast
 
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.RegularExpression
 import java.math.BigDecimal
 
 sealed class Expression : Node()
@@ -165,20 +164,12 @@ data class FieldReferenceExpression(val parent: Expression?, val name: FieldName
     }
 }
 
-data class FunctionCallExpression(val parent: Expression?, val name: FunctionName, val arguments: List<Argument>) : Expression() {
-    constructor(name: FunctionName, arguments: List<Argument>): this(null, name, arguments)
-
+data class FunctionCallExpression(val name: FunctionName, val arguments: List<Argument>) : Expression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
-    fun shift(): FunctionCallExpression {
-        return if (parent != null) {
-            update(null, name, listOf(Argument.Positional(parent)) + arguments)
-        } else this
-    }
-
-    fun update(parent: Expression?, name: FunctionName, arguments: List<Argument>): FunctionCallExpression {
-        return if (parent !== this.parent || name !== this.name || arguments !== this.arguments) {
-            FunctionCallExpression(parent, name, arguments)
+    fun update(name: FunctionName, arguments: List<Argument>): FunctionCallExpression {
+        return if (name !== this.name || arguments !== this.arguments) {
+            FunctionCallExpression(name, arguments)
         } else this
     }
 

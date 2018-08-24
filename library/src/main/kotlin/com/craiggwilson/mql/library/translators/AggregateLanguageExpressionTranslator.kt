@@ -161,22 +161,16 @@ internal object AggregateLanguageExpressionTranslator : AbstractExpressionTransl
     }
 
     override fun visit(n: FunctionCallExpression): BsonValue {
-        // shift parent to first position
-        var arguments = n.arguments
-        if (n.parent != null) {
-            arguments = listOf(FunctionCallExpression.Argument.Positional(n.parent)) + arguments
-        }
+        return visit(when {
+            n.arguments.all { it is FunctionCallExpression.Argument.Named } -> {
+                val elements = n.arguments
+                    .filterIsInstance<FunctionCallExpression.Argument.Named>()
+                    .map { NewDocumentExpression.Element(FieldDeclaration(FieldName(it.name.name)), it.expression) }
 
-        return visit(if (arguments.all { it is FunctionCallExpression.Argument.Named }) {
-            val elements = arguments
-                .filterIsInstance<FunctionCallExpression.Argument.Named>()
-                .map { NewDocumentExpression.Element(FieldDeclaration(FieldName(it.name.name)), it.expression) }
-
-            newDocument("$" + n.name.name to NewDocumentExpression(elements))
-        } else if (arguments.size > 1) {
-            newDocument("$" + n.name.name to newArray(arguments.map { it.expression }))
-        } else {
-            newDocument("$" + n.name.name to arguments[0].expression)
+                newDocument("$" + n.name.name to NewDocumentExpression(elements))
+            }
+            n.arguments.size > 1 -> newDocument("$" + n.name.name to newArray(n.arguments.map { it.expression }))
+            else -> newDocument("$" + n.name.name to n.arguments[0].expression)
         })
     }
 

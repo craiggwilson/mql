@@ -192,11 +192,10 @@ private object QueryLanguageExpressionTranslator : AbstractExpressionTranslator(
     }
 
     override fun visit(n: FunctionCallExpression): BsonValue {
-        val function = n.shift()
-        if (function.arguments.size == 2) {
-            val fieldName = getFieldName(function.arguments[0].expression)
-            val value = visit(function.arguments[1].expression)
-            return BsonDocument(fieldName, BsonDocument("\$${function.name.name}", value))
+        if (n.arguments.size == 2) {
+            val fieldName = getFieldName(n.arguments[0].expression)
+            val value = visit(n.arguments[1].expression)
+            return BsonDocument(fieldName, BsonDocument("\$${n.name.name}", value))
         }
 
         throw UnsupportedOperationException("$n is not allowed in a \$match clause")
