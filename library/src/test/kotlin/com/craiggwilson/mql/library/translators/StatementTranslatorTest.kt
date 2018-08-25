@@ -133,6 +133,12 @@ class StatementTranslatorTest {
                 test("a in [10,11]", "{ \"\$in\": [\"\$a\", [ { \"\$literal\": 10 }, { \"\$literal\": 11 }] ] }"),
                 test("a not in [10,11]", "{ \"\$not\": { \"\$in\": [\"\$a\", [ { \"\$literal\": 10 }, { \"\$literal\": 11 } ] ] } }"),
 
+                // null coalesce
+                test("a ?? b", "{ \"\$ifNull\": [\"\$a\", \"\$b\"] }"),
+                test("a ?? b ?? c", "{ \"\$ifNull\": [{ \"\$ifNull\": [\"\$a\", \"\$b\"] }, \"\$c\"] }"),
+                test("a ?? b + c", "{ \"\$ifNull\": [ \"\$a\", { \"\$add\": [\"\$b\", \"\$c\"] }] }"),
+                test("a + b ?? c", "{ \"\$ifNull\": [{ \"\$add\": [\"\$a\", \"\$b\"] }, \"\$c\"] }"),
+
                 // unary expression
                 test("NOT true", "{ \"\$not\": { \"\$literal\": true } }"),
 

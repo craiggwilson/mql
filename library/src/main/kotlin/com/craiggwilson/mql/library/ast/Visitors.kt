@@ -38,6 +38,7 @@ abstract class Visitor<T> {
     open fun visit(n: NewDocumentExpression): T = throw NotImplementedError()
     open fun visit(n: NotEqualsExpression): T = throw NotImplementedError()
     open fun visit(n: NotExpression): T = throw NotImplementedError()
+    open fun visit(n: NullCoalesceExpression): T = throw NotImplementedError()
     open fun visit(n: NullExpression): T = throw NotImplementedError()
     open fun visit(n: OrExpression): T = throw NotImplementedError()
     open fun visit(n: PowerExpression): T = throw NotImplementedError()
@@ -230,6 +231,11 @@ abstract class NodeVisitor : Visitor<Node>() {
     )
 
     override fun visit(n: NullExpression): Node = n
+
+    override fun visit(n: NullCoalesceExpression): Node = n.update(
+        visit(n.left) as Expression,
+        visit(n.right) as Expression
+    )
 
     override fun visit(n: OrExpression): Node = n.update(
         visit(n.left) as Expression,

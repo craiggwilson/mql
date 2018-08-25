@@ -39,6 +39,7 @@ import com.craiggwilson.mql.library.ast.NewArrayExpression
 import com.craiggwilson.mql.library.ast.NewDocumentExpression
 import com.craiggwilson.mql.library.ast.NotEqualsExpression
 import com.craiggwilson.mql.library.ast.NotExpression
+import com.craiggwilson.mql.library.ast.NullCoalesceExpression
 import com.craiggwilson.mql.library.ast.NullExpression
 import com.craiggwilson.mql.library.ast.NumberExpression
 import com.craiggwilson.mql.library.ast.OrExpression
@@ -325,6 +326,12 @@ object MQLTreeParser {
             is MQLParser.NotExpressionContext -> {
                 val expression = parseExpression(ctx.expression())
                 return NotExpression(expression)
+            }
+            is MQLParser.NullCoalesceExpressionContext -> {
+                val left = parseExpression(ctx.expression(0))
+                val right = parseExpression(ctx.expression(1))
+
+                NullCoalesceExpression(left, right)
             }
             is MQLParser.NullExpressionContext -> NullExpression
             is MQLParser.NumberExpressionContext -> parseNumber(ctx.number())

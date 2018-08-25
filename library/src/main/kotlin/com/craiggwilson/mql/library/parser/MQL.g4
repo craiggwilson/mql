@@ -59,6 +59,7 @@ expression:
 | expression op=(EQ | GT | GTE | LT | LTE | NEQ) expression             #comparisonExpression
 | expression (AND | AND_SYMBOL) expression                              #andExpression
 | expression (OR | OR_SYMBOL) expression                                #orExpression
+| expression DQUESTION expression                                       #nullCoalesceExpression
 | expression NOT? IN expression                                         #inExpression
 | SWITCH switch_case+ (ELSE expression)?                                #switchExpression
 | IF expression THEN expression ELSE expression                         #conditionalExpression
@@ -143,6 +144,7 @@ COLON:      ':';
 COMMA:      ',';
 DIV:        '/';
 DOT:        '.';
+DQUESTION:  '??';
 EQ:         '=';
 GT:         '>';
 GTE:        '>=';

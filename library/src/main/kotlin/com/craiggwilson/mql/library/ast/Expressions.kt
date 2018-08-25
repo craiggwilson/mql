@@ -381,6 +381,16 @@ object NullExpression : LiteralExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 }
 
+data class NullCoalesceExpression(override val left: Expression, override val right: Expression) : BinaryExpression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(left: Expression, right: Expression): NullCoalesceExpression {
+        return if (left !== this.left || right !== this.right) {
+            NullCoalesceExpression(left, right)
+        } else this
+    }
+}
+
 data class OrExpression(override val left: Expression, override val right: Expression) : BinaryExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 

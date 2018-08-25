@@ -28,6 +28,7 @@ import com.craiggwilson.mql.library.ast.NewDocumentExpression
 import com.craiggwilson.mql.library.ast.Node
 import com.craiggwilson.mql.library.ast.NotEqualsExpression
 import com.craiggwilson.mql.library.ast.NotExpression
+import com.craiggwilson.mql.library.ast.NullCoalesceExpression
 import com.craiggwilson.mql.library.ast.NullExpression
 import com.craiggwilson.mql.library.ast.OrExpression
 import com.craiggwilson.mql.library.ast.PowerExpression
@@ -223,6 +224,10 @@ internal object AggregateLanguageExpressionTranslator : AbstractExpressionTransl
 
     override fun visit(n: NotExpression): BsonValue {
         return visit(function("not", n.expression))
+    }
+
+    override fun visit(n: NullCoalesceExpression): BsonValue {
+        return visit(function("ifNull", n.left, n.right))
     }
 
     override fun visit(n: OrExpression): BsonValue {
