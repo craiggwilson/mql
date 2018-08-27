@@ -76,6 +76,7 @@ expression:
 | (TRUE | FALSE)                                                        #booleanExpression
 | NULL                                                                  #nullExpression
 | OID                                                                   #oidExpression
+| DATE_TIME                                                             #dateTimeExpression
 | regex                                                                 #regexExpression
 ;
 
@@ -218,20 +219,6 @@ LONG: INT L;
 BIN: '0' B BIN_DIGIT BIN_DIGIT_OR_SEPARATOR* L?;
 HEX: '0' X HEX_DIGIT HEX_DIGIT_OR_SEPARATOR* L?;
 
-OID:
-  O I D '"' HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 '"'
-| O I D '\'' HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 '\'';
-
-ID: UNQUOTED_ID | QUOTED_ID;
-STRING: DQ_STRING | SQ_STRING;
-VARIABLE_ID: '$' [a-z][_a-zA-Z0-9]*;
-WS: ( ' ' | '\t' | '\r' | '\n' )+ -> skip;
-
-fragment DQ_STRING: '"' ('\\'. | '""' | ~('"' | '\\'))* '"';
-fragment SQ_STRING: '\'' ('\\'. | '\'\'' | ~('\'' | '\\'))* '\'';
-fragment QUOTED_ID: '`' ('\\'. | '``' | ~('`' | '\\'))* '`';
-fragment UNQUOTED_ID: [_a-zA-Z] [_a-zA-Z0-9]*;
-
 fragment BIN_DIGIT:             [01];
 fragment BIN_DIGIT_OR_SEPARATOR: BIN_DIGIT | UNDERSCORE;
 fragment DEC_DIGIT:             [0-9];
@@ -240,6 +227,39 @@ fragment HEX_DIGIT:             [0-9a-fA-F];
 fragment HEX_DIGIT_OR_SEPARATOR: HEX_DIGIT | UNDERSCORE;
 fragment DEC_DIGIT_OR_SEPARATOR: DEC_DIGIT | UNDERSCORE;
 fragment HEX_DIGIT_4: HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT;
+
+OID:
+  O I D '"' HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 '"'
+| O I D '\'' HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 '\'';
+
+ID: UNQUOTED_ID | QUOTED_ID;
+fragment UNQUOTED_ID: [_a-zA-Z] [_a-zA-Z0-9]*;
+fragment QUOTED_ID: '`' ('\\'. | '``' | ~('`' | '\\'))* '`';
+
+STRING: DQ_STRING | SQ_STRING;
+fragment DQ_STRING: '"' ('\\'. | '""' | ~('"' | '\\'))* '"';
+fragment SQ_STRING: '\'' ('\\'. | '\'\'' | ~('\'' | '\\'))* '\'';
+
+VARIABLE_ID: '$' [a-z][_a-zA-Z0-9]*;
+WS: ( ' ' | '\t' | '\r' | '\n' )+ -> skip;
+
+// RFC 3339
+DATE_TIME:
+  D T '"' FULL_DATE T FULL_TIME '"'
+| D T '\'' FULL_DATE T FULL_TIME '\'';
+
+fragment DATE_FULLYEAR: DEC_DIGIT DEC_DIGIT DEC_DIGIT DEC_DIGIT;
+fragment DATE_MONTH: DEC_DIGIT DEC_DIGIT;
+fragment DATE_MDAY: DEC_DIGIT DEC_DIGIT;
+fragment TIME_HOUR: DEC_DIGIT DEC_DIGIT;
+fragment TIME_MINUTE: DEC_DIGIT DEC_DIGIT;
+fragment TIME_SECOND: DEC_DIGIT DEC_DIGIT;
+fragment TIME_SECOND_FRACTION: '.' DEC_DIGIT+;
+fragment TIME_NUM_OFFSET: ('+' | '-') TIME_HOUR COLON TIME_MINUTE;
+fragment TIME_OFFSET: Z | TIME_NUM_OFFSET;
+fragment PARTIAL_TIME: TIME_HOUR ':' TIME_MINUTE ':' TIME_SECOND TIME_SECOND_FRACTION?;
+fragment FULL_DATE: DATE_FULLYEAR '-' DATE_MONTH '-' DATE_MDAY;
+fragment FULL_TIME: PARTIAL_TIME TIME_OFFSET;
 
 // CASE-INSENSITIVE LETTERS
 fragment A:('a'|'A');

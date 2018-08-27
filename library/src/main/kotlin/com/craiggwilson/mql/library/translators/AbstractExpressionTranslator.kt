@@ -1,6 +1,7 @@
 package com.craiggwilson.mql.library.translators
 
 import com.craiggwilson.mql.library.ast.BooleanExpression
+import com.craiggwilson.mql.library.ast.DateTimeExpression
 import com.craiggwilson.mql.library.ast.DecimalExpression
 import com.craiggwilson.mql.library.ast.DoubleExpression
 import com.craiggwilson.mql.library.ast.Int32Expression
@@ -13,6 +14,7 @@ import com.craiggwilson.mql.library.ast.RegexExpression
 import com.craiggwilson.mql.library.ast.StringExpression
 import org.bson.BsonArray
 import org.bson.BsonBoolean
+import org.bson.BsonDateTime
 import org.bson.BsonDecimal128
 import org.bson.BsonDocument
 import org.bson.BsonDouble
@@ -45,6 +47,10 @@ internal abstract class AbstractExpressionTranslator : AbstractTranslator() {
 
     override fun visit(n: BooleanExpression): BsonValue {
         return BsonBoolean(n.value)
+    }
+
+    override fun visit(n: DateTimeExpression): BsonValue {
+        return BsonDateTime(n.value.toEpochMilli())
     }
 
     override fun visit(n: DecimalExpression): BsonValue {

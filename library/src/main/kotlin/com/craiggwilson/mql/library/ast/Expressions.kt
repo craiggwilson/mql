@@ -2,11 +2,11 @@ package com.craiggwilson.mql.library.ast
 
 import org.bson.types.ObjectId
 import java.math.BigDecimal
-import java.util.UUID
+import java.time.Instant
 
 sealed class Expression : Node()
-sealed class LiteralExpression : Expression()
-sealed class NumberExpression : LiteralExpression() {
+sealed class ValueExpression : Expression()
+sealed class NumberExpression : ValueExpression() {
     abstract fun negate(): NumberExpression
 }
 
@@ -63,7 +63,7 @@ data class ArrayAccessExpression(val array: Expression, val accessor: Expression
     }
 }
 
-data class BooleanExpression(val value: Boolean) : LiteralExpression() {
+data class BooleanExpression(val value: Boolean) : ValueExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
     fun update(value: Boolean): BooleanExpression {
@@ -117,6 +117,16 @@ data class ConditionalExpression(val cases: List<Case>, val fallback: Expression
                 Case(condition, then)
             } else this
         }
+    }
+}
+
+data class DateTimeExpression(val value: Instant) : ValueExpression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(value: Instant): DateTimeExpression {
+        return if (value != this.value) {
+            DateTimeExpression(value)
+        } else this
     }
 }
 
@@ -406,7 +416,7 @@ data class NotExpression(val expression: Expression) : Expression() {
     }
 }
 
-object NullExpression : LiteralExpression() {
+object NullExpression : ValueExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 }
 
@@ -420,7 +430,7 @@ data class NullCoalesceExpression(override val left: Expression, override val ri
     }
 }
 
-data class ObjectIdExpression(val value: ObjectId) : LiteralExpression() {
+data class ObjectIdExpression(val value: ObjectId) : ValueExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
     fun update(value: ObjectId): ObjectIdExpression {
@@ -477,7 +487,7 @@ data class RangeExpression(val start: Expression, val end: Expression, val step:
     }
 }
 
-data class RegexExpression(val pattern: String, val options: String? = null) : LiteralExpression() {
+data class RegexExpression(val pattern: String, val options: String? = null) : ValueExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
     fun update(pattern: String, options: String): RegexExpression {
@@ -497,7 +507,7 @@ data class SubtractExpression(override val left: Expression, override val right:
     }
 }
 
-data class StringExpression(val value: String) : LiteralExpression() {
+data class StringExpression(val value: String) : ValueExpression() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
     fun update(value: String): StringExpression {

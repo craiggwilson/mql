@@ -17,6 +17,7 @@ abstract class Visitor<T> {
     open fun visit(n: BooleanExpression): T = throw NotImplementedError()
     open fun visit(n: ConcatExpression): T = throw NotImplementedError()
     open fun visit(n: ConditionalExpression): T = throw NotImplementedError()
+    open fun visit(n: DateTimeExpression): T = throw NotImplementedError()
     open fun visit(n: DecimalExpression): T = throw NotImplementedError()
     open fun visit(n: DivideExpression): T = throw NotImplementedError()
     open fun visit(n: DoubleExpression): T = throw NotImplementedError()
@@ -122,6 +123,8 @@ abstract class NodeVisitor : Visitor<Node>() {
         },
         visit(n.fallback) as Expression?
     )
+
+    override fun visit(n: DateTimeExpression): Node = n
 
     override fun visit(n: DecimalExpression): Node = n
 

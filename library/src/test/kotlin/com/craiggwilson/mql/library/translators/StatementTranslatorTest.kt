@@ -101,6 +101,8 @@ class StatementTranslatorTest {
                 test("/foo/i", "/foo/i"),
                 test("/fo\\/o/i", "{ \"\$regex\": \"fo/o\", \"\$options\": \"i\" }"),
                 test("oid'507f1f77bcf86cd799439011'", "{ \"\$oid\" : \"507f1f77bcf86cd799439011\" }"),
+                test("dt'2000-01-01T12:00:00Z'", "{ \"\$date\" : 946728000000 }"),
+                test("dt'2000-01-01T12:00:00+00:00'", "{ \"\$date\" : 946728000000 }"),
 
                 // field references
                 test("a", "\"\$a\""),

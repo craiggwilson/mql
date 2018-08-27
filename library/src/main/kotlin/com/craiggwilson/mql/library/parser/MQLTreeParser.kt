@@ -8,6 +8,7 @@ import com.craiggwilson.mql.library.ast.CollectionName
 import com.craiggwilson.mql.library.ast.ConcatExpression
 import com.craiggwilson.mql.library.ast.ConditionalExpression
 import com.craiggwilson.mql.library.ast.DatabaseName
+import com.craiggwilson.mql.library.ast.DateTimeExpression
 import com.craiggwilson.mql.library.ast.DecimalExpression
 import com.craiggwilson.mql.library.ast.Direction
 import com.craiggwilson.mql.library.ast.DivideExpression
@@ -67,7 +68,8 @@ import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
 import org.antlr.v4.runtime.atn.PredictionMode
 import org.bson.types.ObjectId
-import java.util.UUID
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
 fun lexMQL(mql: String): MQLLexer {
     val input = CharStreams.fromString(mql)
@@ -260,6 +262,12 @@ object MQLTreeParser {
                 val fallback = parseExpression(ctx.expression(2))
 
                 ConditionalExpression(condition, then, fallback)
+            }
+            is MQLParser.DateTimeExpressionContext -> {
+                val txt = ctx.text.substring(3, ctx.text.length - 1)
+                val fmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+                val dt = OffsetDateTime.parse(txt, fmt)
+                DateTimeExpression(dt.toInstant())
             }
             is MQLParser.FieldExpressionContext -> FieldReferenceExpression(null, getFieldName(ctx.field_name()))
             is MQLParser.FunctionCallExpressionContext -> {
