@@ -80,7 +80,7 @@ class MainController : Controller() {
             // LITERALS
             MQLLexer.BIN,
             MQLLexer.DECIMAL,
-            MQLLexer.DQ_STRING,
+            MQLLexer.STRING,
             MQLLexer.FALSE,
             MQLLexer.HEX,
             MQLLexer.INT,
@@ -89,7 +89,7 @@ class MainController : Controller() {
             MQLLexer.TRUE -> listOf("literal")
 
             // OTHER
-            MQLLexer.UNQUOTED_ID -> listOf("id")
+            MQLLexer.ID -> listOf("id")
             MQLLexer.VARIABLE_ID -> listOf("id")
             else -> emptyList()
         }

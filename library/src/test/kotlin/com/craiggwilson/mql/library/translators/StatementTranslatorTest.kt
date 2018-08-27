@@ -13,7 +13,7 @@ class StatementTranslatorTest {
     fun testAggExpressions(mql: String, expected: String) {
         val actualExpected = BsonArray.parse("[{ \"\$project\": { \"test\": $expected } }]")
 
-        val parsed = parseMQL("FROM bar PROJECT test: $mql")[0]
+        val parsed = parseMQL("FROM bar PROJECT { test: $mql }")[0]
         val actual = parsed.translatedPipeline()
 
         assertEquals(actualExpected, actual)
@@ -24,7 +24,7 @@ class StatementTranslatorTest {
     fun testFunctions(mql: String, expected: String) {
         val actualExpected = BsonArray.parse("[{ \"\$project\": { \"test\": $expected } }]")
 
-        val parsed = parseMQL("FROM bar PROJECT test: $mql")[0]
+        val parsed = parseMQL("FROM bar PROJECT { test: $mql }")[0]
         val actual = parsed.translatedPipeline()
 
         assertEquals(actualExpected, actual)
@@ -240,12 +240,12 @@ class StatementTranslatorTest {
             return listOf(
                 // GROUP
                 test(
-                    "FROM bar GROUP sum_a: sum(a), min_a: min(a) BY c",
+                    "FROM bar GROUP { sum_a: sum(a), min_a: min(a) } BY c",
                     "[{ \$group: { _id: \"\$c\", sum_a: { \$sum: \"\$a\" }, min_a: { \$min: \"\$a\" } } }]"
                 ),
 
                 test(
-                    "FROM bar GROUP sum_a: sum(a), min_a: min(a) BY { c: c, d: d }",
+                    "FROM bar GROUP { sum_a: sum(a), min_a: min(a) } BY { c: c, d: d }",
                     "[{ \$group: { _id: { c:\"\$c\", d: \"\$d\" }, sum_a: { \$sum: \"\$a\" }, min_a: { \$min: \"\$a\" } } }]"
                 ),
 
@@ -257,12 +257,12 @@ class StatementTranslatorTest {
 
                 // PROJECT
                 test(
-                    "FROM bar PROJECT a, b.c, c, !d",
+                    "FROM bar PROJECT { a, b.c, c, !d }",
                     "[{ \$project: { \"a\": \"\$a\", \"b.c\": \"\$b.c\", \"c\": \"\$c\", \"d\": 0 } }]"
                 ),
 
                 test(
-                    "FROM bar PROJECT a: a, b_c: b.c, C: c",
+                    "FROM bar PROJECT { a: a, b_c: b.c, C: c }",
                     "[{ \$project: { \"a\": \"\$a\", \"b_c\": \"\$b.c\", \"C\": \"\$c\" } }]"
                 ),
 
@@ -304,7 +304,7 @@ class StatementTranslatorTest {
                 test("""
                     FROM bar
                     MATCH a > 10 OR a < 20
-                    PROJECT a, b: { c: g.d[0..36:12], e: f.map(@x => @x + 5) }
+                    PROJECT { a, b: { c: g.d[0..36:12], e: f.map(@x => @x + 5) } }
                     """.replace("@", "\$"),
                     "[{ \"\$match\" : { \"\$or\" : [{ \"a\" : { \"\$gt\" : 10 } }, { \"a\" : { \"\$lt\" : 20 } }] } }, { \"\$project\" : { \"a\" : \"\$a\", \"b\" : { \"c\" : { \"\$let\" : { \"vars\" : { \"array\" : { \"\$slice\" : [\"\$g.d\", { \"\$literal\" : 0 }, { \"\$subtract\" : [{ \"\$literal\" : 36 }, { \"\$literal\" : 0 }] }] } }, \"in\" : { \"\$map\" : { \"input\" : { \"\$filter\" : { \"input\" : { \"\$zip\" : { \"inputs\" : [{ \"\$range\" : [{ \"\$literal\" : 0 }, { \"\$size\" : \"\$\$array\" }] }, \"\$\$array\"] } }, \"as\" : \"x\", \"cond\" : { \"\$eq\" : [{ \"\$literal\" : 0 }, { \"\$mod\" : [{ \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 0 }] }, { \"\$literal\" : 12 }] }] } } }, \"as\" : \"x\", \"in\" : { \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 1 }] } } } } }, \"e\" : { \"\$map\" : { \"input\" : \"\$f\", \"as\" : \"x\", \"in\" : { \"\$add\" : [\"\$\$x\", { \"\$literal\" : 5 }] } } } } } }]")
             )

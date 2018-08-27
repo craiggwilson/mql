@@ -10,18 +10,15 @@ pipeline: FROM collection_name stage*;
 
 // STAGES
 stage:
-  GROUP field_assignment (COMMA field_assignment)* (BY expression)?                    #groupStage
+  GROUP LBRACE field_assignment (COMMA field_assignment)* RBRACE (BY expression)?      #groupStage
 | LIMIT INT                                                                            #limitStage
 | LOOKUP multipart_field_declaration COLON
     LPAREN
-      (LET variable_assignment (COMMA variable_assignment)*)?
+      (LET variable_assignment (COMMA variable_assignment)* ARROW)?
       statement
     RPAREN                                                                             #lookupStage
 | MATCH expression                                                                     #matchStage
-| PROJECT (
-    project_item (COMMA project_item)*
-  | LBRACE project_item (COMMA project_item)* RBRACE
-  )                                                                                    #projectStage
+| PROJECT LBRACE project_item (COMMA project_item)* RBRACE                             #projectStage
 | SKIP_ INT                                                                            #skipStage
 | SORT sort_field (COMMA sort_field)*                                                  #sortStage
 | UNWIND multipart_field_name (WITH unwind_option+)?                                   #unwindStage
