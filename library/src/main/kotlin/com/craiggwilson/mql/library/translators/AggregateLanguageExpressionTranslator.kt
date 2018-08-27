@@ -4,6 +4,7 @@ import com.craiggwilson.mql.library.ast.AddExpression
 import com.craiggwilson.mql.library.ast.AndExpression
 import com.craiggwilson.mql.library.ast.ArrayAccessExpression
 import com.craiggwilson.mql.library.ast.BooleanExpression
+import com.craiggwilson.mql.library.ast.ConcatExpression
 import com.craiggwilson.mql.library.ast.ConditionalExpression
 import com.craiggwilson.mql.library.ast.DecimalExpression
 import com.craiggwilson.mql.library.ast.DivideExpression
@@ -64,7 +65,8 @@ internal object AggregateLanguageExpressionTranslator : AbstractExpressionTransl
     }
 
     override fun visit(n: AndExpression): BsonValue {
-        return visit(function("and", n.left, n.right))
+        var args = n.flatten()
+        return visit(function("and", *args.toTypedArray()))
     }
 
     override fun visit(n: ArrayAccessExpression): BsonValue {
@@ -112,6 +114,11 @@ internal object AggregateLanguageExpressionTranslator : AbstractExpressionTransl
         } else {
             function("arrayElemAt", n.array, n.accessor)
         }) as BsonValue
+    }
+
+    override fun visit(n: ConcatExpression): BsonValue {
+        val args = n.flatten()
+        return visit(function("concat", *args.toTypedArray()))
     }
 
     override fun visit(n: ConditionalExpression): BsonValue {
@@ -231,7 +238,8 @@ internal object AggregateLanguageExpressionTranslator : AbstractExpressionTransl
     }
 
     override fun visit(n: OrExpression): BsonValue {
-        return visit(function("or", n.left, n.right))
+        val args = n.flatten()
+        return visit(function("or", *args.toTypedArray()))
     }
 
     override fun visit(n: PowerExpression): BsonValue {

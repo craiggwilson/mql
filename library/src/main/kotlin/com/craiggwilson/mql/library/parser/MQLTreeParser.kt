@@ -5,6 +5,7 @@ import com.craiggwilson.mql.library.ast.AndExpression
 import com.craiggwilson.mql.library.ast.ArrayAccessExpression
 import com.craiggwilson.mql.library.ast.BooleanExpression
 import com.craiggwilson.mql.library.ast.CollectionName
+import com.craiggwilson.mql.library.ast.ConcatExpression
 import com.craiggwilson.mql.library.ast.ConditionalExpression
 import com.craiggwilson.mql.library.ast.DatabaseName
 import com.craiggwilson.mql.library.ast.DecimalExpression
@@ -148,7 +149,7 @@ object MQLTreeParser {
                 val items = ctx.project_item().map { item ->
                     val fieldDeclaration = getFieldDeclaration(item.multipart_field_declaration())
 
-                    if (item.NOT_SYMBOL() != null) {
+                    if (item.EXCLUDE() != null) {
                         ProjectStage.Item.Exclude(fieldDeclaration)
                     } else {
                         val expression = when {
@@ -243,6 +244,12 @@ object MQLTreeParser {
                     ">=" -> GreaterThanOrEqualsExpression(left, right)
                     else -> throw ParseException("unknown multiplication operator: ${ctx.op.text}")
                 }
+            }
+            is MQLParser.ConcatExpressionContext -> {
+                val left = parseExpression(ctx.expression(0))
+                val right = parseExpression(ctx.expression(1))
+
+                ConcatExpression(left, right)
             }
             is MQLParser.ConditionalExpressionContext -> {
                 val condition = parseExpression(ctx.expression(0))

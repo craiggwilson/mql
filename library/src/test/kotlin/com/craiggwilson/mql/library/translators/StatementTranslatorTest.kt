@@ -113,8 +113,8 @@ class StatementTranslatorTest {
 
                 // binary expression
                 test("1.0 + 2.0", "{ \"\$add\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
+                test("1.0 || 2.0", "{ \"\$concat\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
                 test("1.0 and 2.0", "{ \"\$and\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 }] }"),
-                test("1.0 && 2.0", "{ \"\$and\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
                 test("1.0 / 2.0", "{ \"\$divide\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 }] }"),
                 test("1.0 = 2.0", "{ \"\$eq\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
                 test("1.0 > 2.0", "{ \"\$gt\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
@@ -125,8 +125,7 @@ class StatementTranslatorTest {
                 test("1.0 * 2.0", "{ \"\$multiply\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
                 test("1.0 != 2.0", "{ \"\$ne\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
                 test("1.0 or 2.0", "{ \"\$or\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
-                test("1.0 || 2.0", "{ \"\$or\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 } ] }"),
-                test("1.0^2.0", "{ \"\$pow\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 }] }"),
+                test("1.0**2.0", "{ \"\$pow\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 }] }"),
                 test("1.0 - 2.0", "{ \"\$subtract\": [ { \"\$literal\": 1.0 }, { \"\$literal\": 2.0 }] }"),
 
                 // in expression

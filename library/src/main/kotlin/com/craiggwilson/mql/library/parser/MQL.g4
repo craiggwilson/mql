@@ -16,7 +16,7 @@ stage:
     LPAREN
       (LET variable_assignment (COMMA variable_assignment)*)?
       statement
-    RPAREN                                                             #lookupStage
+    RPAREN                                                                             #lookupStage
 | MATCH expression                                                                     #matchStage
 | PROJECT (
     project_item (COMMA project_item)*
@@ -28,7 +28,7 @@ stage:
 ;
 
 project_item:
-  NOT_SYMBOL? multipart_field_declaration
+  EXCLUDE? multipart_field_declaration
 | multipart_field_declaration COLON expression
 ;
 
@@ -44,9 +44,9 @@ unwind_option:
 
 // EXPRESSIONS
 expression:
-  <assoc=right>expression CARET expression                              #powerExpression
+  <assoc=right>expression POWER expression                              #powerExpression
 | MINUS expression                                                      #unaryMinusExpression
-| (NOT | NOT_SYMBOL) expression                                         #notExpression
+| NOT expression                                                        #notExpression
 | expression DOT (field_name | function)                                #memberExpression
 | expression LBRACK (
         start=expression
@@ -57,8 +57,9 @@ expression:
 | expression op=(MULT | DIV | MOD) expression                           #multiplicationExpression
 | expression op=(PLUS | MINUS) expression                               #additionExpression
 | expression op=(EQ | GT | GTE | LT | LTE | NEQ) expression             #comparisonExpression
-| expression (AND | AND_SYMBOL) expression                              #andExpression
-| expression (OR | OR_SYMBOL) expression                                #orExpression
+| expression AND expression                                             #andExpression
+| expression OR expression                                              #orExpression
+| expression CONCAT expression                                          #concatExpression
 | expression DQUESTION expression                                       #nullCoalesceExpression
 | expression NOT? IN expression                                         #inExpression
 | SWITCH switch_case+ (ELSE expression)?                                #switchExpression
@@ -137,11 +138,10 @@ multipart_field_name: field_name (DOT field_name)*;
 variable_name: VARIABLE_ID;
 
 // LEXER
-AND_SYMBOL: '&&';
 ARROW:      '=>';
-CARET:      '^';
 COLON:      ':';
 COMMA:      ',';
+CONCAT:     '||';
 DIV:        '/';
 DOT:        '.';
 DQUESTION:  '??';
@@ -155,11 +155,10 @@ LT:         '<';
 LTE:        '<=';
 MINUS:      '-';
 MOD:        '%';
+POWER:      '**';
 MULT:       '*';
 NEQ:        '!=';
-NOT_SYMBOL: '!';
-OR_SYMBOL:  '||';
-PIPE:       '|';
+EXCLUDE:    '!';
 PLUS:       '+';
 RANGE:      '..';
 RBRACE:     '}';

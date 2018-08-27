@@ -71,6 +71,33 @@ data class BooleanExpression(val value: Boolean) : LiteralExpression() {
     }
 }
 
+data class ConcatExpression(override val left: Expression, override val right: Expression) : BinaryExpression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun flatten(): List<Expression> {
+        val parts = mutableListOf<Expression>()
+        if (left is ConcatExpression) {
+            parts += left.flatten()
+        } else {
+            parts += left
+        }
+
+        if (right is ConcatExpression) {
+            parts += right.flatten()
+        } else {
+            parts += right
+        }
+
+        return parts
+    }
+
+    fun update(left: Expression, right: Expression): ConcatExpression {
+        return if (left !== this.left || right !== this.right) {
+            ConcatExpression(left, right)
+        } else this
+    }
+}
+
 data class ConditionalExpression(val cases: List<Case>, val fallback: Expression? = null) : Expression() {
     constructor(condition: Expression, then: Expression, fallback: Expression): this(listOf(Case(condition, then)), fallback)
 
