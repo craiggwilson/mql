@@ -165,7 +165,7 @@ class StatementTranslatorTest {
                 test("switch case true then false case false then true else null", "{ \"\$switch\": { \"branches\": [ { \"case\": { \"\$literal\": true }, \"then\": { \"\$literal\": false }}, { \"case\": { \"\$literal\": false }, \"then\": { \"\$literal\": true }} ], \"default\": null } }"),
 
                 // let
-                test("let \$x: true, \$y: false => \$x and \$y", "{ \"\$let\": { \"vars\": { \"x\": { \"\$literal\": true }, \"y\": { \"\$literal\": false }}, \"in\": { \"\$and\": [ \"\$\$x\", \"\$\$y\" ] } } }"),
+                test("{ \$x: true, \$y: false } => \$x and \$y", "{ \"\$let\": { \"vars\": { \"x\": { \"\$literal\": true }, \"y\": { \"\$literal\": false }}, \"in\": { \"\$and\": [ \"\$\$x\", \"\$\$y\" ] } } }"),
 
                 // functions
                 test("testFunc(a, 1.0)", "{ \"\$testFunc\": [ \"\$a\", { \"\$literal\": 1.0 } ] }"),
@@ -185,7 +185,7 @@ class StatementTranslatorTest {
                 test("a.zip([1,2,3], (\$x, \$y) => \$x + \$y)", "{ \"\$map\" : { \"input\" : { \"\$zip\" : { \"inputs\" : [\"\$a\", [{ \"\$literal\" : 1 }, { \"\$literal\" : 2 }, { \"\$literal\" : 3 }]] } }, \"as\" : \"x\", \"in\" : { \"\$add\" : [{ \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 0 }] }, { \"\$arrayElemAt\" : [\"\$\$x\", { \"\$literal\" : 1 }] }] } } }"),
 
                 // renaming closed variable
-                test("let \$this: 1 => a.reduce(2, (\$acc, \$x) => \$acc + \$x + \$this)", "{ \"\$let\": { \"vars\": { \"this\": { \"\$literal\": 1 } }, \"in\": { \"\$let\": { \"vars\": { \"closed_this0\": \"\$\$this\" }, \"in\": { \"\$reduce\": { \"input\": \"\$a\", \"initialValue\": { \"\$literal\": 2 }, \"in\": { \"\$add\": [ { \"\$add\": [ \"\$\$value\", \"\$\$this\" ] }, \"\$\$closed_this0\" ] } } } } } } }")
+                test("{ \$this: 1 } => a.reduce(2, (\$acc, \$x) => \$acc + \$x + \$this)", "{ \"\$let\": { \"vars\": { \"this\": { \"\$literal\": 1 } }, \"in\": { \"\$let\": { \"vars\": { \"closed_this0\": \"\$\$this\" }, \"in\": { \"\$reduce\": { \"input\": \"\$a\", \"initialValue\": { \"\$literal\": 2 }, \"in\": { \"\$add\": [ { \"\$add\": [ \"\$\$value\", \"\$\$this\" ] }, \"\$\$closed_this0\" ] } } } } } } }")
             )
         }
 
@@ -253,6 +253,12 @@ class StatementTranslatorTest {
                 test(
                     "FROM bar LIMIT 10",
                     "[{ \$limit: NumberLong(\"10\") }]"
+                ),
+
+                // LOOKUP
+                test(
+                    "FROM bar LOOKUP {c: {\$a: 10} => from foo project {a: \$a} }",
+                    "[{ \"\$lookup\" : { \"from\" : \"foo\", \"let\" : { \"a\" : { \"\$literal\" : 10 } }, \"pipeline\" : [{ \"\$project\" : { \"a\" : \"\$\$a\" } }], \"as\" : \"c\" } }]"
                 ),
 
                 // PROJECT

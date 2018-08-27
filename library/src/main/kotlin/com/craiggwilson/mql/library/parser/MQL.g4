@@ -12,11 +12,10 @@ pipeline: FROM collection_name stage*;
 stage:
   GROUP LBRACE field_assignment (COMMA field_assignment)* RBRACE (BY expression)?      #groupStage
 | LIMIT INT                                                                            #limitStage
-| LOOKUP multipart_field_declaration COLON
-    LPAREN
-      (LET variable_assignment (COMMA variable_assignment)* ARROW)?
-      statement
-    RPAREN                                                                             #lookupStage
+| LOOKUP LBRACE multipart_field_declaration COLON
+    (LBRACE variable_assignment (COMMA variable_assignment)* RBRACE ARROW)?
+    statement
+  RBRACE                                                                               #lookupStage
 | MATCH expression                                                                     #matchStage
 | PROJECT LBRACE project_item (COMMA project_item)* RBRACE                             #projectStage
 | SKIP_ INT                                                                            #skipStage
@@ -61,7 +60,8 @@ expression:
 | expression NOT? IN expression                                         #inExpression
 | SWITCH switch_case+ (ELSE expression)?                                #switchExpression
 | IF expression THEN expression ELSE expression                         #conditionalExpression
-| LET variable_assignment (COMMA variable_assignment)* ARROW expression #letExpression
+| LBRACE variable_assignment (COMMA variable_assignment)*
+      RBRACE ARROW expression                                           #letExpression
 | LBRACE (field_assignment (COMMA field_assignment)*)? RBRACE           #newDocumentExpression
 | LBRACK (expression (COMMA expression)*)? RBRACK                       #newArrayExpression
 | LPAREN expression RPAREN                                              #parenthesisExpression
