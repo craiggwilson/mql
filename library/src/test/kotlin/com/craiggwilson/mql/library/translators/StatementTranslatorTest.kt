@@ -100,6 +100,7 @@ class StatementTranslatorTest {
                 test("\"\$one\"", "{ \"\$literal\": \"\$one\" }"),
                 test("/foo/i", "/foo/i"),
                 test("/fo\\/o/i", "{ \"\$regex\": \"fo/o\", \"\$options\": \"i\" }"),
+                test("oid'507f1f77bcf86cd799439011'", "{ \"\$oid\" : \"507f1f77bcf86cd799439011\" }"),
 
                 // field references
                 test("a", "\"\$a\""),

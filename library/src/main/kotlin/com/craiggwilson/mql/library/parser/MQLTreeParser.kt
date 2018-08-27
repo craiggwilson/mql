@@ -43,6 +43,7 @@ import com.craiggwilson.mql.library.ast.NotExpression
 import com.craiggwilson.mql.library.ast.NullCoalesceExpression
 import com.craiggwilson.mql.library.ast.NullExpression
 import com.craiggwilson.mql.library.ast.NumberExpression
+import com.craiggwilson.mql.library.ast.ObjectIdExpression
 import com.craiggwilson.mql.library.ast.OrExpression
 import com.craiggwilson.mql.library.ast.PowerExpression
 import com.craiggwilson.mql.library.ast.ProjectStage
@@ -65,6 +66,8 @@ import org.antlr.v4.runtime.DefaultErrorStrategy
 import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
 import org.antlr.v4.runtime.atn.PredictionMode
+import org.bson.types.ObjectId
+import java.util.UUID
 
 fun lexMQL(mql: String): MQLLexer {
     val input = CharStreams.fromString(mql)
@@ -342,6 +345,7 @@ object MQLTreeParser {
             }
             is MQLParser.NullExpressionContext -> NullExpression
             is MQLParser.NumberExpressionContext -> parseNumber(ctx.number())
+            is MQLParser.OidExpressionContext -> ObjectIdExpression(ObjectId(ctx.text.substring(4, ctx.text.length - 1)))
             is MQLParser.OrExpressionContext -> {
                 val left = parseExpression(ctx.expression(0))
                 val right = parseExpression(ctx.expression(1))

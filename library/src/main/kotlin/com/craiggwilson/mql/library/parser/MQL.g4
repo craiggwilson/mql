@@ -75,6 +75,7 @@ expression:
 | STRING                                                                #stringExpression
 | (TRUE | FALSE)                                                        #booleanExpression
 | NULL                                                                  #nullExpression
+| OID                                                                   #oidExpression
 | regex                                                                 #regexExpression
 ;
 
@@ -217,6 +218,10 @@ LONG: INT L;
 BIN: '0' B BIN_DIGIT BIN_DIGIT_OR_SEPARATOR* L?;
 HEX: '0' X HEX_DIGIT HEX_DIGIT_OR_SEPARATOR* L?;
 
+OID:
+  O I D '"' HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 '"'
+| O I D '\'' HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 HEX_DIGIT_4 '\'';
+
 ID: UNQUOTED_ID | QUOTED_ID;
 STRING: DQ_STRING | SQ_STRING;
 VARIABLE_ID: '$' [a-z][_a-zA-Z0-9]*;
@@ -234,6 +239,7 @@ fragment EXPONENT_NUM_PART:     E ('+'|'-')? DEC_DIGIT DEC_DIGIT_OR_SEPARATOR*;
 fragment HEX_DIGIT:             [0-9a-fA-F];
 fragment HEX_DIGIT_OR_SEPARATOR: HEX_DIGIT | UNDERSCORE;
 fragment DEC_DIGIT_OR_SEPARATOR: DEC_DIGIT | UNDERSCORE;
+fragment HEX_DIGIT_4: HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT;
 
 // CASE-INSENSITIVE LETTERS
 fragment A:('a'|'A');

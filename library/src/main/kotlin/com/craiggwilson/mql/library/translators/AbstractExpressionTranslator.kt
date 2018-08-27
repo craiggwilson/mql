@@ -8,6 +8,7 @@ import com.craiggwilson.mql.library.ast.Int64Expression
 import com.craiggwilson.mql.library.ast.NewArrayExpression
 import com.craiggwilson.mql.library.ast.NewDocumentExpression
 import com.craiggwilson.mql.library.ast.NullExpression
+import com.craiggwilson.mql.library.ast.ObjectIdExpression
 import com.craiggwilson.mql.library.ast.RegexExpression
 import com.craiggwilson.mql.library.ast.StringExpression
 import org.bson.BsonArray
@@ -19,6 +20,7 @@ import org.bson.BsonElement
 import org.bson.BsonInt32
 import org.bson.BsonInt64
 import org.bson.BsonNull
+import org.bson.BsonObjectId
 import org.bson.BsonRegularExpression
 import org.bson.BsonString
 import org.bson.BsonValue
@@ -63,6 +65,10 @@ internal abstract class AbstractExpressionTranslator : AbstractTranslator() {
 
     override fun visit(n: NullExpression): BsonValue {
         return BsonNull.VALUE
+    }
+
+    override fun visit(n: ObjectIdExpression): BsonValue {
+        return BsonObjectId(n.value)
     }
 
     override fun visit(n: RegexExpression): BsonValue {

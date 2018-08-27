@@ -41,6 +41,7 @@ abstract class Visitor<T> {
     open fun visit(n: NotExpression): T = throw NotImplementedError()
     open fun visit(n: NullCoalesceExpression): T = throw NotImplementedError()
     open fun visit(n: NullExpression): T = throw NotImplementedError()
+    open fun visit(n: ObjectIdExpression): T = throw NotImplementedError()
     open fun visit(n: OrExpression): T = throw NotImplementedError()
     open fun visit(n: PowerExpression): T = throw NotImplementedError()
     open fun visit(n: RangeExpression): T = throw NotImplementedError()
@@ -242,6 +243,8 @@ abstract class NodeVisitor : Visitor<Node>() {
         visit(n.left) as Expression,
         visit(n.right) as Expression
     )
+
+    override fun visit(n: ObjectIdExpression): Node = n
 
     override fun visit(n: OrExpression): Node = n.update(
         visit(n.left) as Expression,

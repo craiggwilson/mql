@@ -1,6 +1,8 @@
 package com.craiggwilson.mql.library.ast
 
+import org.bson.types.ObjectId
 import java.math.BigDecimal
+import java.util.UUID
 
 sealed class Expression : Node()
 sealed class LiteralExpression : Expression()
@@ -414,6 +416,16 @@ data class NullCoalesceExpression(override val left: Expression, override val ri
     fun update(left: Expression, right: Expression): NullCoalesceExpression {
         return if (left !== this.left || right !== this.right) {
             NullCoalesceExpression(left, right)
+        } else this
+    }
+}
+
+data class ObjectIdExpression(val value: ObjectId) : LiteralExpression() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(value: ObjectId): ObjectIdExpression {
+        return if (value != this.value) {
+            ObjectIdExpression(value)
         } else this
     }
 }
