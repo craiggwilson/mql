@@ -96,12 +96,14 @@ class StatementTranslatorTest {
                 test("-1000000000000000000", "{ \"\$literal\": NumberLong(\"-1000000000000000000\") }"),
                 test("null", "null"),
                 test("\"one\"", "\"one\""),
+                test("'one'", "\"one\""),
                 test("\"\$one\"", "{ \"\$literal\": \"\$one\" }"),
                 test("/foo/i", "/foo/i"),
                 test("/fo\\/o/i", "{ \"\$regex\": \"fo/o\", \"\$options\": \"i\" }"),
 
                 // field references
                 test("a", "\"\$a\""),
+                test("`a`", "\"\$a\""),
                 test("a[0].b", "{ \"\$let\": { \"vars\": { \"parent\": { \"\$arrayElemAt\": [ \"\$a\", { \"\$literal\": NumberInt(\"0\") } ] } }, \"in\": \"\$\$parent.b\" } }"),
                 test("{a: false}.a", "{ \"\$let\": { \"vars\": { \"parent\": { \"a\": { \"\$literal\": false } } }, \"in\": \"\$\$parent.a\" } }"),
 

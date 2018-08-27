@@ -72,7 +72,7 @@ expression:
 | variable_name                                                         #variableReferenceExpression
 | field_name                                                            #fieldExpression
 | number                                                                #numberExpression
-| DQ_STRING                                                             #stringExpression
+| STRING                                                                #stringExpression
 | (TRUE | FALSE)                                                        #booleanExpression
 | NULL                                                                  #nullExpression
 | regex                                                                 #regexExpression
@@ -117,21 +117,21 @@ variable_assignment:
 
 // NAMING
 collection_name:
-  UNQUOTED_ID
-| database_name DOT UNQUOTED_ID
+  ID
+| database_name DOT ID
 ;
 
-database_name: UNQUOTED_ID;
+database_name: ID;
 
-field_declaration: DQ_STRING | field_name;
+field_declaration: STRING | field_name;
 
 multipart_field_declaration: field_declaration (DOT field_declaration)*;
 
-field_name: UNQUOTED_ID;
+field_name: ID;
 
-function_name: UNQUOTED_ID;
+function_name: ID;
 
-function_argument_name: DQ_STRING | UNQUOTED_ID;
+function_argument_name: ID;
 
 multipart_field_name: field_name (DOT field_name)*;
 
@@ -217,10 +217,15 @@ LONG: INT L;
 BIN: '0' B BIN_DIGIT BIN_DIGIT_OR_SEPARATOR* L?;
 HEX: '0' X HEX_DIGIT HEX_DIGIT_OR_SEPARATOR* L?;
 
-DQ_STRING: '"' ('\\'. | '""' | ~('"' | '\\'))* '"';
-UNQUOTED_ID: [_a-zA-Z] [_a-zA-Z0-9]*;
+ID: UNQUOTED_ID | QUOTED_ID;
+STRING: DQ_STRING | SQ_STRING;
 VARIABLE_ID: '$' [a-z][_a-zA-Z0-9]*;
 WS: ( ' ' | '\t' | '\r' | '\n' )+ -> skip;
+
+fragment DQ_STRING: '"' ('\\'. | '""' | ~('"' | '\\'))* '"';
+fragment SQ_STRING: '\'' ('\\'. | '\'\'' | ~('\'' | '\\'))* '\'';
+fragment QUOTED_ID: '`' ('\\'. | '``' | ~('`' | '\\'))* '`';
+fragment UNQUOTED_ID: [_a-zA-Z] [_a-zA-Z0-9]*;
 
 fragment BIN_DIGIT:             [01];
 fragment BIN_DIGIT_OR_SEPARATOR: BIN_DIGIT | UNDERSCORE;

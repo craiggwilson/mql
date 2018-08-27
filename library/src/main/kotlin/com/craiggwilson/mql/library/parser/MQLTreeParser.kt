@@ -480,11 +480,11 @@ object MQLTreeParser {
             databaseName = getDatabaseName(ctx.database_name())
         }
 
-        return CollectionName(databaseName, ctx.text)
+        return CollectionName(databaseName, maybeUnquote(ctx.text))
     }
 
     private fun getDatabaseName(ctx: MQLParser.Database_nameContext): DatabaseName {
-        return DatabaseName(ctx.text)
+        return DatabaseName(maybeUnquote(ctx.text))
     }
 
     private fun getFieldDeclaration(ctx: MQLParser.Multipart_field_declarationContext): FieldDeclaration {
@@ -500,15 +500,11 @@ object MQLTreeParser {
     }
 
     private fun getFieldName(ctx: MQLParser.Field_declarationContext): FieldName {
-        if (ctx.DQ_STRING() != null) {
-            return FieldName(unquote(ctx.text))
-        }
-
-        return FieldName(ctx.text)
+        return FieldName(maybeUnquote(ctx.text))
     }
 
     private fun getFieldName(ctx: MQLParser.Field_nameContext): FieldName {
-        return FieldName(ctx.text)
+        return FieldName(maybeUnquote(ctx.text))
     }
 
     private fun getFieldReferenceExpression(ctx: MQLParser.Multipart_field_nameContext): FieldReferenceExpression {
@@ -520,17 +516,21 @@ object MQLTreeParser {
     }
 
     private fun getFunctionName(ctx: MQLParser.Function_nameContext): FunctionName {
-        return FunctionName(ctx.text)
+        return FunctionName(maybeUnquote(ctx.text))
     }
 
     private fun getFunctionArgumentName(ctx: MQLParser.Function_argument_nameContext): FunctionArgumentName {
-        return if (ctx.DQ_STRING() != null) {
-            FunctionArgumentName(unquote(ctx.text))
-        } else FunctionArgumentName(ctx.text)
+        return FunctionArgumentName(maybeUnquote(ctx.text))
     }
 
     private fun getVariableName(ctx: MQLParser.Variable_nameContext): VariableName {
         return VariableName(ctx.text.substring(1))
+    }
+
+    private fun maybeUnquote(text: String): String {
+        return if (text[0] == '`' || text[0] == '\'' || text[0] == '"') {
+            unquote(text)
+        } else text
     }
 
     private fun unquote(text: String): String {
