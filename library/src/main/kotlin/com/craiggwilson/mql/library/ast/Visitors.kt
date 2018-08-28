@@ -71,6 +71,7 @@ abstract class Visitor<T> {
     open fun visit(n: DeleteStatement): T = throw NotImplementedError()
     open fun visit(n: InsertStatement): T = throw NotImplementedError()
     open fun visit(n: QueryStatement): T = throw NotImplementedError()
+    open fun visit(n: UpdateStatement): T = throw NotImplementedError()
 
     protected fun <T> visit(items: List<T>, visit: (T) -> T): List<T> {
         var newItems: MutableList<T>? = null
@@ -340,7 +341,7 @@ abstract class NodeVisitor : Visitor<Node>() {
 
     override fun visit(n: DeleteStatement): Node = n.update(
         n.collectionName,
-        visit(n.expression) as Expression,
+        visit(n.predicate) as Expression,
         n.many
     )
 
@@ -352,5 +353,12 @@ abstract class NodeVisitor : Visitor<Node>() {
     override fun visit(n: QueryStatement): Node = n.update(
         n.collectionName,
         visit(n.stages)
+    )
+
+    override fun visit(n: UpdateStatement): Node = n.update(
+        n.collectionName,
+        visit(n.predicate) as Expression,
+        visit(n.set) as NewDocumentExpression,
+        n.many
     )
 }

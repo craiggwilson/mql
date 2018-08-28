@@ -34,7 +34,14 @@ class ShellStatementTranslatorTests {
                 test("insert into bar [{a: 1},{a: 2}]", "db.bar.insert([{ \"a\" : 1 }, { \"a\" : 2 }] )"),
 
                 // QUERY
-                test("from bar project {a}", "db.bar.aggregate([{ \"\$project\" : { \"a\" : \"\$a\" } }] )")
+                test("from bar project {a}", "db.bar.aggregate([{ \"\$project\" : { \"a\" : \"\$a\" } }] )"),
+
+                // UPDATE
+                test("update from bar match a = 1 set {a: a + 1}", "db.bar.updateOne({ \"a\" : { \"\$eq\" : 1 } }, { \"\$inc\" : { \"a\" : 1 } })"),
+                test("update from bar match a = 1 set {a: a + 1, b: b + 4}", "db.bar.updateOne({ \"a\" : { \"\$eq\" : 1 } }, { \"\$inc\" : { \"a\" : 1, \"b\" : 4 } })"),
+                test("update from bar match a = 1 set {a: a + 1, b: b - 4}", "db.bar.updateOne({ \"a\" : { \"\$eq\" : 1 } }, { \"\$inc\" : { \"a\" : 1, \"b\" : -4 } })"),
+                test("update one from bar match a = 1 set {a: 1, b: 4}", "db.bar.updateOne({ \"a\" : { \"\$eq\" : 1 } }, { \"\$set\" : { \"a\" : 1, \"b\" : 4 } })"),
+                test("update many from bar match a = 1 set {a: a + 1, b: 4}", "db.bar.updateMany({ \"a\" : { \"\$eq\" : 1 } }, { \"\$inc\" : { \"a\" : 1 }, \"\$set\" : { \"b\" : 4 } })")
             )
         }
     }

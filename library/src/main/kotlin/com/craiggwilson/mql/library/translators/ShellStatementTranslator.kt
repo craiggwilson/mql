@@ -5,6 +5,7 @@ import com.craiggwilson.mql.library.ast.DeleteStatement
 import com.craiggwilson.mql.library.ast.InsertStatement
 import com.craiggwilson.mql.library.ast.QueryStatement
 import com.craiggwilson.mql.library.ast.Statement
+import com.craiggwilson.mql.library.ast.UpdateStatement
 import com.craiggwilson.mql.library.ast.Visitor
 import com.craiggwilson.mql.library.parser.ParseException
 import org.bson.BsonArray
@@ -22,12 +23,11 @@ private class ShellStatementTranslator(private val pretty: Boolean) : Visitor<St
 
     override fun visit(n: DeleteStatement): String {
         val db = getDb(n.collectionName)
-        val predicate = translateToQueryLanguage(n.expression)
+        val predicate = getJson(translateToQueryLanguage(n.predicate))
         val methodName = if(n.many) "deleteMany" else "deleteOne"
 
-        val jsonDocument = getJson(predicate)
 
-        return "$db.${n.collectionName.name}.$methodName($jsonDocument)"
+        return "$db.${n.collectionName.name}.$methodName($predicate)"
     }
 
     override fun visit(n: InsertStatement): String {
@@ -43,6 +43,15 @@ private class ShellStatementTranslator(private val pretty: Boolean) : Visitor<St
         val db = getDb(n.collectionName)
         val jsonStages = getJsonArray(pipeline)
         return "$db.${n.collectionName.name}.aggregate($jsonStages)"
+    }
+
+    override fun visit(n: UpdateStatement): String {
+        val db = getDb(n.collectionName)
+        val predicate = getJson(translateToQueryLanguage(n.predicate))
+        val set = getJson(translateToUpdateLanguage(n.set))
+        val methodName = if(n.many) "updateMany" else "updateOne"
+
+        return "$db.${n.collectionName.name}.$methodName($predicate, $set)"
     }
 
     private fun getDb(collectionName: CollectionName): String {

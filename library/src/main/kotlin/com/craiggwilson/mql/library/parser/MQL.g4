@@ -8,6 +8,9 @@ statement:
 | INSERT INTO collection_name
     (document | LBRACK document (COMMA document)* RBRACK)                                           #insertStatement
 | DELETE (ONE | MANY)? FROM collection_name MATCH expression                                        #deleteStatement
+| UPDATE (ONE | MANY)? FROM collection_name
+    (MATCH expression)?
+    SET multipart_document                                                                          #updateStatement
 ;
 
 query_statement: FROM collection_name query_stage*;
@@ -64,19 +67,13 @@ expression:
 | SWITCH switch_case+ (ELSE expression)?                                                   #switchExpression
 | IF expression THEN expression ELSE expression                                            #conditionalExpression
 | LBRACE variable_assignment (COMMA variable_assignment)* RBRACE ARROW expression          #letExpression
-| document                                                                                 #newDocumentExpression
-| LBRACK (expression (COMMA expression)*)? RBRACK                                          #newArrayExpression
 | LPAREN expression RPAREN                                                                 #parenthesisExpression
 | function                                                                                 #functionCallExpression
-| variable_name                                                                            #variableReferenceExpression
 | field_name                                                                               #fieldExpression
-| number                                                                                   #numberExpression
-| STRING                                                                                   #stringExpression
-| (TRUE | FALSE)                                                                           #booleanExpression
-| NULL                                                                                     #nullExpression
-| OID                                                                                      #oidExpression
-| DATE_TIME                                                                                #dateTimeExpression
-| regex                                                                                    #regexExpression
+| variable_name                                                                            #variableReferenceExpression
+| document                                                                                 #newDocumentExpression
+| LBRACK (expression (COMMA expression)*)? RBRACK                                          #newArrayExpression
+| value                                                                                    #valueExpression
 ;
 
 document:
@@ -85,6 +82,14 @@ document:
 
 field_assignment:
   field_declaration COLON expression
+;
+
+multipart_document:
+  LBRACE (multipart_field_assignment (COMMA multipart_field_assignment)*)? RBRACE
+;
+
+multipart_field_assignment:
+  multipart_field_declaration COLON expression
 ;
 
 function:
@@ -106,12 +111,6 @@ lambda_expression:
 | LPAREN lambda_argument (COMMA lambda_argument)* RPAREN ARROW expression
 ;
 
-number:
-  (INT | LONG | DECIMAL | BIN | HEX)
-;
-
-regex: REGEX;
-
 switch_case:
   CASE expression THEN expression
 ;
@@ -119,6 +118,24 @@ switch_case:
 variable_assignment:
   variable_name COLON expression
 ;
+
+// VALUES
+
+value:
+  number                                                                                   #numberValue
+| STRING                                                                                   #stringValue
+| (TRUE | FALSE)                                                                           #booleanValue
+| NULL                                                                                     #nullValue
+| OID                                                                                      #oidValue
+| DATE_TIME                                                                                #dateTimeValue
+| regex                                                                                    #regexValue
+;
+
+number:
+  (INT | LONG | DECIMAL | BIN | HEX)
+;
+
+regex: REGEX;
 
 // NAMING
 collection_name:
@@ -199,6 +216,7 @@ NULL:     N U L L;
 ONE:      O N E;
 OR:       O R;
 PROJECT:  P R O J E C T;
+SET:      S E T;
 SKIP_:    S K I P;
 SORT:     S O R T;
 STEP:     S T E P;
@@ -206,6 +224,7 @@ SWITCH:   S W I T C H;
 THEN:     T H E N;
 TRUE:     T R U E;
 UNWIND:   U N W I N D;
+UPDATE:   U P D A T E;
 WITH:     W I T H;
 
 PRESERVE_NULL_AND_EMPTY: P R E S E R V E '_' N U L L '_' A N D '_' E M P T Y;

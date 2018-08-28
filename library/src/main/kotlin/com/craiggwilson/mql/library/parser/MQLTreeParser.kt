@@ -60,6 +60,7 @@ import com.craiggwilson.mql.library.ast.Statement
 import com.craiggwilson.mql.library.ast.StringExpression
 import com.craiggwilson.mql.library.ast.SubtractExpression
 import com.craiggwilson.mql.library.ast.UnwindStage
+import com.craiggwilson.mql.library.ast.UpdateStatement
 import com.craiggwilson.mql.library.ast.VariableName
 import com.craiggwilson.mql.library.ast.VariableReferenceExpression
 import org.antlr.v4.runtime.BailErrorStrategy
@@ -125,7 +126,7 @@ object MQLTreeParser {
             is MQLParser.DeleteStatementContext -> {
                 val collectionName = getCollectionName(ctx.collection_name())
                 val predicate = parseExpression(ctx.expression())
-                val many = if(ctx.MANY() != null) true else false
+                val many = ctx.MANY() != null
 
                 DeleteStatement(collectionName, predicate, many)
             }
@@ -135,6 +136,14 @@ object MQLTreeParser {
                 InsertStatement(collectionName, documents)
             }
             is MQLParser.QueryStatementContext -> parseQueryStatement(ctx.query_statement())
+            is MQLParser.UpdateStatementContext -> {
+                val collectionName = getCollectionName(ctx.collection_name())
+                val predicate = parseExpression(ctx.expression())
+                val document = parseDocument(ctx.multipart_document())
+                val many = ctx.MANY() != null
+
+                UpdateStatement(collectionName, predicate, document, many)
+            }
             else -> throw UnsupportedOperationException()
         }
     }
@@ -257,7 +266,6 @@ object MQLTreeParser {
                     ArrayAccessExpression(array, range)
                 }
             }
-            is MQLParser.BooleanExpressionContext -> BooleanExpression(ctx.TRUE() != null)
             is MQLParser.ComparisonExpressionContext -> {
                 val left = parseExpression(ctx.expression(0))
                 val right = parseExpression(ctx.expression(1))
@@ -284,12 +292,6 @@ object MQLTreeParser {
                 val fallback = parseExpression(ctx.expression(2))
 
                 ConditionalExpression(condition, then, fallback)
-            }
-            is MQLParser.DateTimeExpressionContext -> {
-                val txt = ctx.text.substring(3, ctx.text.length - 1)
-                val fmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-                val dt = OffsetDateTime.parse(txt, fmt)
-                DateTimeExpression(dt.toInstant())
             }
             is MQLParser.FieldExpressionContext -> FieldReferenceExpression(null, getFieldName(ctx.field_name()))
             is MQLParser.FunctionCallExpressionContext -> {
@@ -364,9 +366,6 @@ object MQLTreeParser {
 
                 NullCoalesceExpression(left, right)
             }
-            is MQLParser.NullExpressionContext -> NullExpression
-            is MQLParser.NumberExpressionContext -> parseNumber(ctx.number())
-            is MQLParser.OidExpressionContext -> ObjectIdExpression(ObjectId(ctx.text.substring(4, ctx.text.length - 1)))
             is MQLParser.OrExpressionContext -> {
                 val left = parseExpression(ctx.expression(0))
                 val right = parseExpression(ctx.expression(1))
@@ -389,8 +388,6 @@ object MQLTreeParser {
 
                 RangeExpression(start, end, step)
             }
-            is MQLParser.RegexExpressionContext -> parseRegex(ctx.regex())
-            is MQLParser.StringExpressionContext -> StringExpression(unquote(ctx.text))
             is MQLParser.SwitchExpressionContext -> {
                 val cases = ctx.switch_case().map { case ->
                     val condition = parseExpression(case.expression(0))
@@ -413,6 +410,7 @@ object MQLTreeParser {
                     throw ParseException("minus operator not supported: ${ctx.text}")
                 }
             }
+            is MQLParser.ValueExpressionContext -> parseValue(ctx.value())
             is MQLParser.VariableReferenceExpressionContext -> {
                 VariableReferenceExpression(getVariableName(ctx.variable_name()))
             }
@@ -423,6 +421,17 @@ object MQLTreeParser {
     private fun parseDocument(ctx: MQLParser.DocumentContext): NewDocumentExpression {
         val elements = ctx.field_assignment().map { fa ->
             val field = getFieldDeclaration(fa.field_declaration())
+            val expression = parseExpression(fa.expression())
+
+            NewDocumentExpression.Element(field, expression)
+        }
+
+        return NewDocumentExpression(elements)
+    }
+
+    private fun parseDocument(ctx: MQLParser.Multipart_documentContext): NewDocumentExpression {
+        val elements = ctx.multipart_field_assignment().map { fa ->
+            val field = getFieldDeclaration(fa.multipart_field_declaration())
             val expression = parseExpression(fa.expression())
 
             NewDocumentExpression.Element(field, expression)
@@ -454,6 +463,24 @@ object MQLTreeParser {
         }
 
         return FunctionCallExpression(name, arguments)
+    }
+
+    private fun parseValue(ctx: MQLParser.ValueContext): Expression {
+        return when(ctx) {
+            is MQLParser.BooleanValueContext -> BooleanExpression(ctx.TRUE() != null)
+            is MQLParser.DateTimeValueContext -> {
+                val txt = ctx.text.substring(3, ctx.text.length - 1)
+                val fmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+                val dt = OffsetDateTime.parse(txt, fmt)
+                DateTimeExpression(dt.toInstant())
+            }
+            is MQLParser.NullValueContext -> NullExpression
+            is MQLParser.NumberValueContext -> parseNumber(ctx.number())
+            is MQLParser.OidValueContext -> ObjectIdExpression(ObjectId(ctx.text.substring(4, ctx.text.length - 1)))
+            is MQLParser.RegexValueContext -> parseRegex(ctx.regex())
+            is MQLParser.StringValueContext -> StringExpression(unquote(ctx.text))
+            else -> throw ParseException("unsupported value ${ctx.text}")
+        }
     }
 
     private fun parseNumber(ctx: MQLParser.NumberContext): NumberExpression {
