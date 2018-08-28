@@ -22,26 +22,28 @@ public class MQLParser extends Parser {
 		MOD=17, POWER=18, MULT=19, NEQ=20, EXCLUDE=21, PLUS=22, RANGE=23, RBRACE=24, 
 		RBRACK=25, RPAREN=26, SEMI=27, UNDERSCORE=28, AND=29, ASC=30, BY=31, CASE=32, 
 		DESC=33, ELSE=34, FALSE=35, FROM=36, GROUP=37, IF=38, IN=39, INDEX=40, 
-		LET=41, LIKE=42, LIMIT=43, LOOKUP=44, MATCH=45, NOT=46, NULL=47, OR=48, 
-		PROJECT=49, SKIP_=50, SORT=51, STEP=52, SWITCH=53, THEN=54, TRUE=55, UNWIND=56, 
-		WITH=57, PRESERVE_NULL_AND_EMPTY=58, REGEX=59, INT=60, DECIMAL=61, LONG=62, 
-		BIN=63, HEX=64, OID=65, ID=66, STRING=67, VARIABLE_ID=68, WS=69, DATE_TIME=70;
+		INSERT=41, INTO=42, LET=43, LIKE=44, LIMIT=45, LOOKUP=46, MATCH=47, NOT=48, 
+		NULL=49, OR=50, PROJECT=51, SKIP_=52, SORT=53, STEP=54, SWITCH=55, THEN=56, 
+		TRUE=57, UNWIND=58, WITH=59, PRESERVE_NULL_AND_EMPTY=60, REGEX=61, INT=62, 
+		DECIMAL=63, LONG=64, BIN=65, HEX=66, OID=67, ID=68, STRING=69, VARIABLE_ID=70, 
+		WS=71, DATE_TIME=72;
 	public static final int
-		RULE_parse = 0, RULE_statement = 1, RULE_pipeline = 2, RULE_stage = 3, 
-		RULE_project_item = 4, RULE_sort_field = 5, RULE_unwind_option = 6, RULE_expression = 7, 
-		RULE_field_assignment = 8, RULE_function = 9, RULE_function_argument = 10, 
-		RULE_lambda_argument = 11, RULE_lambda_expression = 12, RULE_number = 13, 
-		RULE_regex = 14, RULE_switch_case = 15, RULE_variable_assignment = 16, 
-		RULE_collection_name = 17, RULE_database_name = 18, RULE_field_declaration = 19, 
-		RULE_multipart_field_declaration = 20, RULE_field_name = 21, RULE_function_name = 22, 
-		RULE_function_argument_name = 23, RULE_multipart_field_name = 24, RULE_variable_name = 25;
+		RULE_parse = 0, RULE_statement = 1, RULE_query_statement = 2, RULE_insert_statement = 3, 
+		RULE_query_stage = 4, RULE_project_item = 5, RULE_sort_field = 6, RULE_unwind_option = 7, 
+		RULE_expression = 8, RULE_document = 9, RULE_field_assignment = 10, RULE_function = 11, 
+		RULE_function_argument = 12, RULE_lambda_argument = 13, RULE_lambda_expression = 14, 
+		RULE_number = 15, RULE_regex = 16, RULE_switch_case = 17, RULE_variable_assignment = 18, 
+		RULE_collection_name = 19, RULE_database_name = 20, RULE_field_declaration = 21, 
+		RULE_multipart_field_declaration = 22, RULE_field_name = 23, RULE_function_name = 24, 
+		RULE_function_argument_name = 25, RULE_multipart_field_name = 26, RULE_variable_name = 27;
 	public static final String[] ruleNames = {
-		"parse", "statement", "pipeline", "stage", "project_item", "sort_field", 
-		"unwind_option", "expression", "field_assignment", "function", "function_argument", 
-		"lambda_argument", "lambda_expression", "number", "regex", "switch_case", 
-		"variable_assignment", "collection_name", "database_name", "field_declaration", 
-		"multipart_field_declaration", "field_name", "function_name", "function_argument_name", 
-		"multipart_field_name", "variable_name"
+		"parse", "statement", "query_statement", "insert_statement", "query_stage", 
+		"project_item", "sort_field", "unwind_option", "expression", "document", 
+		"field_assignment", "function", "function_argument", "lambda_argument", 
+		"lambda_expression", "number", "regex", "switch_case", "variable_assignment", 
+		"collection_name", "database_name", "field_declaration", "multipart_field_declaration", 
+		"field_name", "function_name", "function_argument_name", "multipart_field_name", 
+		"variable_name"
 	};
 
 	private static final String[] _LITERAL_NAMES = {
@@ -54,9 +56,9 @@ public class MQLParser extends Parser {
 		"EQ", "GT", "GTE", "LBRACE", "LBRACK", "LPAREN", "LT", "LTE", "MINUS", 
 		"MOD", "POWER", "MULT", "NEQ", "EXCLUDE", "PLUS", "RANGE", "RBRACE", "RBRACK", 
 		"RPAREN", "SEMI", "UNDERSCORE", "AND", "ASC", "BY", "CASE", "DESC", "ELSE", 
-		"FALSE", "FROM", "GROUP", "IF", "IN", "INDEX", "LET", "LIKE", "LIMIT", 
-		"LOOKUP", "MATCH", "NOT", "NULL", "OR", "PROJECT", "SKIP_", "SORT", "STEP", 
-		"SWITCH", "THEN", "TRUE", "UNWIND", "WITH", "PRESERVE_NULL_AND_EMPTY", 
+		"FALSE", "FROM", "GROUP", "IF", "IN", "INDEX", "INSERT", "INTO", "LET", 
+		"LIKE", "LIMIT", "LOOKUP", "MATCH", "NOT", "NULL", "OR", "PROJECT", "SKIP_", 
+		"SORT", "STEP", "SWITCH", "THEN", "TRUE", "UNWIND", "WITH", "PRESERVE_NULL_AND_EMPTY", 
 		"REGEX", "INT", "DECIMAL", "LONG", "BIN", "HEX", "OID", "ID", "STRING", 
 		"VARIABLE_ID", "WS", "DATE_TIME"
 	};
@@ -135,37 +137,37 @@ public class MQLParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(52);
+			setState(56);
 			statement();
-			setState(57);
+			setState(61);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,0,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					{
 					{
-					setState(53);
+					setState(57);
 					match(SEMI);
-					setState(54);
+					setState(58);
 					statement();
 					}
 					} 
 				}
-				setState(59);
+				setState(63);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,0,_ctx);
 			}
-			setState(61);
+			setState(65);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==SEMI) {
 				{
-				setState(60);
+				setState(64);
 				match(SEMI);
 				}
 			}
 
-			setState(63);
+			setState(67);
 			match(EOF);
 			}
 		}
@@ -181,23 +183,54 @@ public class MQLParser extends Parser {
 	}
 
 	public static class StatementContext extends ParserRuleContext {
-		public PipelineContext pipeline() {
-			return getRuleContext(PipelineContext.class,0);
-		}
 		public StatementContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_statement; }
+	 
+		public StatementContext() { }
+		public void copyFrom(StatementContext ctx) {
+			super.copyFrom(ctx);
+		}
+	}
+	public static class QueryStatementContext extends StatementContext {
+		public Query_statementContext query_statement() {
+			return getRuleContext(Query_statementContext.class,0);
+		}
+		public QueryStatementContext(StatementContext ctx) { copyFrom(ctx); }
+	}
+	public static class InsertStatementContext extends StatementContext {
+		public Insert_statementContext insert_statement() {
+			return getRuleContext(Insert_statementContext.class,0);
+		}
+		public InsertStatementContext(StatementContext ctx) { copyFrom(ctx); }
 	}
 
 	public final StatementContext statement() throws RecognitionException {
 		StatementContext _localctx = new StatementContext(_ctx, getState());
 		enterRule(_localctx, 2, RULE_statement);
 		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(65);
-			pipeline();
+			setState(71);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case FROM:
+				_localctx = new QueryStatementContext(_localctx);
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(69);
+				query_statement();
+				}
+				break;
+			case INSERT:
+				_localctx = new InsertStatementContext(_localctx);
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(70);
+				insert_statement();
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
 			}
 		}
 		catch (RecognitionException re) {
@@ -211,45 +244,45 @@ public class MQLParser extends Parser {
 		return _localctx;
 	}
 
-	public static class PipelineContext extends ParserRuleContext {
+	public static class Query_statementContext extends ParserRuleContext {
 		public TerminalNode FROM() { return getToken(MQLParser.FROM, 0); }
 		public Collection_nameContext collection_name() {
 			return getRuleContext(Collection_nameContext.class,0);
 		}
-		public List<StageContext> stage() {
-			return getRuleContexts(StageContext.class);
+		public List<Query_stageContext> query_stage() {
+			return getRuleContexts(Query_stageContext.class);
 		}
-		public StageContext stage(int i) {
-			return getRuleContext(StageContext.class,i);
+		public Query_stageContext query_stage(int i) {
+			return getRuleContext(Query_stageContext.class,i);
 		}
-		public PipelineContext(ParserRuleContext parent, int invokingState) {
+		public Query_statementContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_pipeline; }
+		@Override public int getRuleIndex() { return RULE_query_statement; }
 	}
 
-	public final PipelineContext pipeline() throws RecognitionException {
-		PipelineContext _localctx = new PipelineContext(_ctx, getState());
-		enterRule(_localctx, 4, RULE_pipeline);
+	public final Query_statementContext query_statement() throws RecognitionException {
+		Query_statementContext _localctx = new Query_statementContext(_ctx, getState());
+		enterRule(_localctx, 4, RULE_query_statement);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(67);
+			setState(73);
 			match(FROM);
-			setState(68);
+			setState(74);
 			collection_name();
-			setState(72);
+			setState(78);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << GROUP) | (1L << LIMIT) | (1L << LOOKUP) | (1L << MATCH) | (1L << PROJECT) | (1L << SKIP_) | (1L << SORT) | (1L << UNWIND))) != 0)) {
 				{
 				{
-				setState(69);
-				stage();
+				setState(75);
+				query_stage();
 				}
 				}
-				setState(74);
+				setState(80);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -266,18 +299,84 @@ public class MQLParser extends Parser {
 		return _localctx;
 	}
 
-	public static class StageContext extends ParserRuleContext {
-		public StageContext(ParserRuleContext parent, int invokingState) {
+	public static class Insert_statementContext extends ParserRuleContext {
+		public TerminalNode INSERT() { return getToken(MQLParser.INSERT, 0); }
+		public TerminalNode INTO() { return getToken(MQLParser.INTO, 0); }
+		public Collection_nameContext collection_name() {
+			return getRuleContext(Collection_nameContext.class,0);
+		}
+		public List<DocumentContext> document() {
+			return getRuleContexts(DocumentContext.class);
+		}
+		public DocumentContext document(int i) {
+			return getRuleContext(DocumentContext.class,i);
+		}
+		public List<TerminalNode> COMMA() { return getTokens(MQLParser.COMMA); }
+		public TerminalNode COMMA(int i) {
+			return getToken(MQLParser.COMMA, i);
+		}
+		public Insert_statementContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_stage; }
+		@Override public int getRuleIndex() { return RULE_insert_statement; }
+	}
+
+	public final Insert_statementContext insert_statement() throws RecognitionException {
+		Insert_statementContext _localctx = new Insert_statementContext(_ctx, getState());
+		enterRule(_localctx, 6, RULE_insert_statement);
+		int _la;
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(81);
+			match(INSERT);
+			setState(82);
+			match(INTO);
+			setState(83);
+			collection_name();
+			setState(84);
+			document();
+			setState(89);
+			_errHandler.sync(this);
+			_la = _input.LA(1);
+			while (_la==COMMA) {
+				{
+				{
+				setState(85);
+				match(COMMA);
+				setState(86);
+				document();
+				}
+				}
+				setState(91);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+			}
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Query_stageContext extends ParserRuleContext {
+		public Query_stageContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_query_stage; }
 	 
-		public StageContext() { }
-		public void copyFrom(StageContext ctx) {
+		public Query_stageContext() { }
+		public void copyFrom(Query_stageContext ctx) {
 			super.copyFrom(ctx);
 		}
 	}
-	public static class SortStageContext extends StageContext {
+	public static class SortStageContext extends Query_stageContext {
 		public TerminalNode SORT() { return getToken(MQLParser.SORT, 0); }
 		public List<Sort_fieldContext> sort_field() {
 			return getRuleContexts(Sort_fieldContext.class);
@@ -289,9 +388,9 @@ public class MQLParser extends Parser {
 		public TerminalNode COMMA(int i) {
 			return getToken(MQLParser.COMMA, i);
 		}
-		public SortStageContext(StageContext ctx) { copyFrom(ctx); }
+		public SortStageContext(Query_stageContext ctx) { copyFrom(ctx); }
 	}
-	public static class ProjectStageContext extends StageContext {
+	public static class ProjectStageContext extends Query_stageContext {
 		public TerminalNode PROJECT() { return getToken(MQLParser.PROJECT, 0); }
 		public TerminalNode LBRACE() { return getToken(MQLParser.LBRACE, 0); }
 		public List<Project_itemContext> project_item() {
@@ -305,9 +404,9 @@ public class MQLParser extends Parser {
 		public TerminalNode COMMA(int i) {
 			return getToken(MQLParser.COMMA, i);
 		}
-		public ProjectStageContext(StageContext ctx) { copyFrom(ctx); }
+		public ProjectStageContext(Query_stageContext ctx) { copyFrom(ctx); }
 	}
-	public static class UnwindStageContext extends StageContext {
+	public static class UnwindStageContext extends Query_stageContext {
 		public TerminalNode UNWIND() { return getToken(MQLParser.UNWIND, 0); }
 		public Multipart_field_nameContext multipart_field_name() {
 			return getRuleContext(Multipart_field_nameContext.class,0);
@@ -319,14 +418,14 @@ public class MQLParser extends Parser {
 		public Unwind_optionContext unwind_option(int i) {
 			return getRuleContext(Unwind_optionContext.class,i);
 		}
-		public UnwindStageContext(StageContext ctx) { copyFrom(ctx); }
+		public UnwindStageContext(Query_stageContext ctx) { copyFrom(ctx); }
 	}
-	public static class LimitStageContext extends StageContext {
+	public static class LimitStageContext extends Query_stageContext {
 		public TerminalNode LIMIT() { return getToken(MQLParser.LIMIT, 0); }
 		public TerminalNode INT() { return getToken(MQLParser.INT, 0); }
-		public LimitStageContext(StageContext ctx) { copyFrom(ctx); }
+		public LimitStageContext(Query_stageContext ctx) { copyFrom(ctx); }
 	}
-	public static class GroupStageContext extends StageContext {
+	public static class GroupStageContext extends Query_stageContext {
 		public TerminalNode GROUP() { return getToken(MQLParser.GROUP, 0); }
 		public TerminalNode LBRACE() { return getToken(MQLParser.LBRACE, 0); }
 		public List<Field_assignmentContext> field_assignment() {
@@ -344,9 +443,9 @@ public class MQLParser extends Parser {
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
-		public GroupStageContext(StageContext ctx) { copyFrom(ctx); }
+		public GroupStageContext(Query_stageContext ctx) { copyFrom(ctx); }
 	}
-	public static class LookupStageContext extends StageContext {
+	public static class LookupStageContext extends Query_stageContext {
 		public TerminalNode LOOKUP() { return getToken(MQLParser.LOOKUP, 0); }
 		public List<TerminalNode> LBRACE() { return getTokens(MQLParser.LBRACE); }
 		public TerminalNode LBRACE(int i) {
@@ -356,8 +455,8 @@ public class MQLParser extends Parser {
 			return getRuleContext(Multipart_field_declarationContext.class,0);
 		}
 		public TerminalNode COLON() { return getToken(MQLParser.COLON, 0); }
-		public StatementContext statement() {
-			return getRuleContext(StatementContext.class,0);
+		public Query_statementContext query_statement() {
+			return getRuleContext(Query_statementContext.class,0);
 		}
 		public List<TerminalNode> RBRACE() { return getTokens(MQLParser.RBRACE); }
 		public TerminalNode RBRACE(int i) {
@@ -374,65 +473,65 @@ public class MQLParser extends Parser {
 		public TerminalNode COMMA(int i) {
 			return getToken(MQLParser.COMMA, i);
 		}
-		public LookupStageContext(StageContext ctx) { copyFrom(ctx); }
+		public LookupStageContext(Query_stageContext ctx) { copyFrom(ctx); }
 	}
-	public static class MatchStageContext extends StageContext {
+	public static class MatchStageContext extends Query_stageContext {
 		public TerminalNode MATCH() { return getToken(MQLParser.MATCH, 0); }
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
-		public MatchStageContext(StageContext ctx) { copyFrom(ctx); }
+		public MatchStageContext(Query_stageContext ctx) { copyFrom(ctx); }
 	}
-	public static class SkipStageContext extends StageContext {
+	public static class SkipStageContext extends Query_stageContext {
 		public TerminalNode SKIP_() { return getToken(MQLParser.SKIP_, 0); }
 		public TerminalNode INT() { return getToken(MQLParser.INT, 0); }
-		public SkipStageContext(StageContext ctx) { copyFrom(ctx); }
+		public SkipStageContext(Query_stageContext ctx) { copyFrom(ctx); }
 	}
 
-	public final StageContext stage() throws RecognitionException {
-		StageContext _localctx = new StageContext(_ctx, getState());
-		enterRule(_localctx, 6, RULE_stage);
+	public final Query_stageContext query_stage() throws RecognitionException {
+		Query_stageContext _localctx = new Query_stageContext(_ctx, getState());
+		enterRule(_localctx, 8, RULE_query_stage);
 		int _la;
 		try {
-			setState(148);
+			setState(165);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case GROUP:
 				_localctx = new GroupStageContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(75);
+				setState(92);
 				match(GROUP);
-				setState(76);
+				setState(93);
 				match(LBRACE);
-				setState(77);
+				setState(94);
 				field_assignment();
-				setState(82);
+				setState(99);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==COMMA) {
 					{
 					{
-					setState(78);
+					setState(95);
 					match(COMMA);
-					setState(79);
+					setState(96);
 					field_assignment();
 					}
 					}
-					setState(84);
+					setState(101);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(85);
+				setState(102);
 				match(RBRACE);
-				setState(88);
+				setState(105);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==BY) {
 					{
-					setState(86);
+					setState(103);
 					match(BY);
-					setState(87);
+					setState(104);
 					expression(0);
 					}
 				}
@@ -443,9 +542,9 @@ public class MQLParser extends Parser {
 				_localctx = new LimitStageContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(90);
+				setState(107);
 				match(LIMIT);
-				setState(91);
+				setState(108);
 				match(INT);
 				}
 				break;
@@ -453,49 +552,49 @@ public class MQLParser extends Parser {
 				_localctx = new LookupStageContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(92);
+				setState(109);
 				match(LOOKUP);
-				setState(93);
+				setState(110);
 				match(LBRACE);
-				setState(94);
+				setState(111);
 				multipart_field_declaration();
-				setState(95);
+				setState(112);
 				match(COLON);
-				setState(108);
+				setState(125);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==LBRACE) {
 					{
-					setState(96);
+					setState(113);
 					match(LBRACE);
-					setState(97);
+					setState(114);
 					variable_assignment();
-					setState(102);
+					setState(119);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 					while (_la==COMMA) {
 						{
 						{
-						setState(98);
+						setState(115);
 						match(COMMA);
-						setState(99);
+						setState(116);
 						variable_assignment();
 						}
 						}
-						setState(104);
+						setState(121);
 						_errHandler.sync(this);
 						_la = _input.LA(1);
 					}
-					setState(105);
+					setState(122);
 					match(RBRACE);
-					setState(106);
+					setState(123);
 					match(ARROW);
 					}
 				}
 
-				setState(110);
-				statement();
-				setState(111);
+				setState(127);
+				query_statement();
+				setState(128);
 				match(RBRACE);
 				}
 				break;
@@ -503,9 +602,9 @@ public class MQLParser extends Parser {
 				_localctx = new MatchStageContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(113);
+				setState(130);
 				match(MATCH);
-				setState(114);
+				setState(131);
 				expression(0);
 				}
 				break;
@@ -513,29 +612,29 @@ public class MQLParser extends Parser {
 				_localctx = new ProjectStageContext(_localctx);
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(115);
+				setState(132);
 				match(PROJECT);
-				setState(116);
+				setState(133);
 				match(LBRACE);
-				setState(117);
+				setState(134);
 				project_item();
-				setState(122);
+				setState(139);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==COMMA) {
 					{
 					{
-					setState(118);
+					setState(135);
 					match(COMMA);
-					setState(119);
+					setState(136);
 					project_item();
 					}
 					}
-					setState(124);
+					setState(141);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(125);
+				setState(142);
 				match(RBRACE);
 				}
 				break;
@@ -543,9 +642,9 @@ public class MQLParser extends Parser {
 				_localctx = new SkipStageContext(_localctx);
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(127);
+				setState(144);
 				match(SKIP_);
-				setState(128);
+				setState(145);
 				match(INT);
 				}
 				break;
@@ -553,23 +652,23 @@ public class MQLParser extends Parser {
 				_localctx = new SortStageContext(_localctx);
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(129);
+				setState(146);
 				match(SORT);
-				setState(130);
+				setState(147);
 				sort_field();
-				setState(135);
+				setState(152);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==COMMA) {
 					{
 					{
-					setState(131);
+					setState(148);
 					match(COMMA);
-					setState(132);
+					setState(149);
 					sort_field();
 					}
 					}
-					setState(137);
+					setState(154);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
@@ -579,28 +678,28 @@ public class MQLParser extends Parser {
 				_localctx = new UnwindStageContext(_localctx);
 				enterOuterAlt(_localctx, 8);
 				{
-				setState(138);
+				setState(155);
 				match(UNWIND);
-				setState(139);
+				setState(156);
 				multipart_field_name();
-				setState(146);
+				setState(163);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==WITH) {
 					{
-					setState(140);
+					setState(157);
 					match(WITH);
-					setState(142); 
+					setState(159); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 					do {
 						{
 						{
-						setState(141);
+						setState(158);
 						unwind_option();
 						}
 						}
-						setState(144); 
+						setState(161); 
 						_errHandler.sync(this);
 						_la = _input.LA(1);
 					} while ( _la==INDEX || _la==PRESERVE_NULL_AND_EMPTY );
@@ -641,37 +740,37 @@ public class MQLParser extends Parser {
 
 	public final Project_itemContext project_item() throws RecognitionException {
 		Project_itemContext _localctx = new Project_itemContext(_ctx, getState());
-		enterRule(_localctx, 8, RULE_project_item);
+		enterRule(_localctx, 10, RULE_project_item);
 		int _la;
 		try {
-			setState(158);
+			setState(175);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,13,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,15,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(151);
+				setState(168);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==EXCLUDE) {
 					{
-					setState(150);
+					setState(167);
 					match(EXCLUDE);
 					}
 				}
 
-				setState(153);
+				setState(170);
 				multipart_field_declaration();
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(154);
+				setState(171);
 				multipart_field_declaration();
-				setState(155);
+				setState(172);
 				match(COLON);
-				setState(156);
+				setState(173);
 				expression(0);
 				}
 				break;
@@ -702,19 +801,19 @@ public class MQLParser extends Parser {
 
 	public final Sort_fieldContext sort_field() throws RecognitionException {
 		Sort_fieldContext _localctx = new Sort_fieldContext(_ctx, getState());
-		enterRule(_localctx, 10, RULE_sort_field);
+		enterRule(_localctx, 12, RULE_sort_field);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(160);
+			setState(177);
 			multipart_field_name();
-			setState(162);
+			setState(179);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==ASC || _la==DESC) {
 				{
-				setState(161);
+				setState(178);
 				_la = _input.LA(1);
 				if ( !(_la==ASC || _la==DESC) ) {
 				_errHandler.recoverInline(this);
@@ -754,24 +853,24 @@ public class MQLParser extends Parser {
 
 	public final Unwind_optionContext unwind_option() throws RecognitionException {
 		Unwind_optionContext _localctx = new Unwind_optionContext(_ctx, getState());
-		enterRule(_localctx, 12, RULE_unwind_option);
+		enterRule(_localctx, 14, RULE_unwind_option);
 		try {
-			setState(167);
+			setState(184);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case INDEX:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(164);
+				setState(181);
 				match(INDEX);
-				setState(165);
+				setState(182);
 				multipart_field_declaration();
 				}
 				break;
 			case PRESERVE_NULL_AND_EMPTY:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(166);
+				setState(183);
 				match(PRESERVE_NULL_AND_EMPTY);
 				}
 				break;
@@ -867,17 +966,8 @@ public class MQLParser extends Parser {
 		public NullCoalesceExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
 	}
 	public static class NewDocumentExpressionContext extends ExpressionContext {
-		public TerminalNode LBRACE() { return getToken(MQLParser.LBRACE, 0); }
-		public TerminalNode RBRACE() { return getToken(MQLParser.RBRACE, 0); }
-		public List<Field_assignmentContext> field_assignment() {
-			return getRuleContexts(Field_assignmentContext.class);
-		}
-		public Field_assignmentContext field_assignment(int i) {
-			return getRuleContext(Field_assignmentContext.class,i);
-		}
-		public List<TerminalNode> COMMA() { return getTokens(MQLParser.COMMA); }
-		public TerminalNode COMMA(int i) {
-			return getToken(MQLParser.COMMA, i);
+		public DocumentContext document() {
+			return getRuleContext(DocumentContext.class,0);
 		}
 		public NewDocumentExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
 	}
@@ -1111,14 +1201,14 @@ public class MQLParser extends Parser {
 		int _parentState = getState();
 		ExpressionContext _localctx = new ExpressionContext(_ctx, _parentState);
 		ExpressionContext _prevctx = _localctx;
-		int _startState = 14;
-		enterRecursionRule(_localctx, 14, RULE_expression, _p);
+		int _startState = 16;
+		enterRecursionRule(_localctx, 16, RULE_expression, _p);
 		int _la;
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(242);
+			setState(248);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,23,_ctx) ) {
 			case 1:
@@ -1127,9 +1217,9 @@ public class MQLParser extends Parser {
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
-				setState(170);
+				setState(187);
 				match(MINUS);
-				setState(171);
+				setState(188);
 				expression(30);
 				}
 				break;
@@ -1138,9 +1228,9 @@ public class MQLParser extends Parser {
 				_localctx = new NotExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(172);
+				setState(189);
 				match(NOT);
-				setState(173);
+				setState(190);
 				expression(29);
 				}
 				break;
@@ -1149,9 +1239,9 @@ public class MQLParser extends Parser {
 				_localctx = new SwitchExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(174);
+				setState(191);
 				match(SWITCH);
-				setState(176); 
+				setState(193); 
 				_errHandler.sync(this);
 				_alt = 1;
 				do {
@@ -1159,7 +1249,7 @@ public class MQLParser extends Parser {
 					case 1:
 						{
 						{
-						setState(175);
+						setState(192);
 						switch_case();
 						}
 						}
@@ -1167,18 +1257,18 @@ public class MQLParser extends Parser {
 					default:
 						throw new NoViableAltException(this);
 					}
-					setState(178); 
+					setState(195); 
 					_errHandler.sync(this);
-					_alt = getInterpreter().adaptivePredict(_input,16,_ctx);
+					_alt = getInterpreter().adaptivePredict(_input,18,_ctx);
 				} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
-				setState(182);
+				setState(199);
 				_errHandler.sync(this);
-				switch ( getInterpreter().adaptivePredict(_input,17,_ctx) ) {
+				switch ( getInterpreter().adaptivePredict(_input,19,_ctx) ) {
 				case 1:
 					{
-					setState(180);
+					setState(197);
 					match(ELSE);
-					setState(181);
+					setState(198);
 					expression(0);
 					}
 					break;
@@ -1190,17 +1280,17 @@ public class MQLParser extends Parser {
 				_localctx = new ConditionalExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(184);
+				setState(201);
 				match(IF);
-				setState(185);
+				setState(202);
 				expression(0);
-				setState(186);
+				setState(203);
 				match(THEN);
-				setState(187);
+				setState(204);
 				expression(0);
-				setState(188);
+				setState(205);
 				match(ELSE);
-				setState(189);
+				setState(206);
 				expression(15);
 				}
 				break;
@@ -1209,31 +1299,31 @@ public class MQLParser extends Parser {
 				_localctx = new LetExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(191);
+				setState(208);
 				match(LBRACE);
-				setState(192);
+				setState(209);
 				variable_assignment();
-				setState(197);
+				setState(214);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==COMMA) {
 					{
 					{
-					setState(193);
+					setState(210);
 					match(COMMA);
-					setState(194);
+					setState(211);
 					variable_assignment();
 					}
 					}
-					setState(199);
+					setState(216);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(200);
+				setState(217);
 				match(RBRACE);
-				setState(201);
+				setState(218);
 				match(ARROW);
-				setState(202);
+				setState(219);
 				expression(14);
 				}
 				break;
@@ -1242,36 +1332,8 @@ public class MQLParser extends Parser {
 				_localctx = new NewDocumentExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(204);
-				match(LBRACE);
-				setState(213);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-				if (_la==ID || _la==STRING) {
-					{
-					setState(205);
-					field_assignment();
-					setState(210);
-					_errHandler.sync(this);
-					_la = _input.LA(1);
-					while (_la==COMMA) {
-						{
-						{
-						setState(206);
-						match(COMMA);
-						setState(207);
-						field_assignment();
-						}
-						}
-						setState(212);
-						_errHandler.sync(this);
-						_la = _input.LA(1);
-					}
-					}
-				}
-
-				setState(215);
-				match(RBRACE);
+				setState(221);
+				document();
 				}
 				break;
 			case 7:
@@ -1279,35 +1341,35 @@ public class MQLParser extends Parser {
 				_localctx = new NewArrayExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(216);
+				setState(222);
 				match(LBRACK);
-				setState(225);
+				setState(231);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (((((_la - 11)) & ~0x3f) == 0 && ((1L << (_la - 11)) & ((1L << (LBRACE - 11)) | (1L << (LBRACK - 11)) | (1L << (LPAREN - 11)) | (1L << (MINUS - 11)) | (1L << (FALSE - 11)) | (1L << (IF - 11)) | (1L << (NOT - 11)) | (1L << (NULL - 11)) | (1L << (SWITCH - 11)) | (1L << (TRUE - 11)) | (1L << (REGEX - 11)) | (1L << (INT - 11)) | (1L << (DECIMAL - 11)) | (1L << (LONG - 11)) | (1L << (BIN - 11)) | (1L << (HEX - 11)) | (1L << (OID - 11)) | (1L << (ID - 11)) | (1L << (STRING - 11)) | (1L << (VARIABLE_ID - 11)) | (1L << (DATE_TIME - 11)))) != 0)) {
 					{
-					setState(217);
+					setState(223);
 					expression(0);
-					setState(222);
+					setState(228);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 					while (_la==COMMA) {
 						{
 						{
-						setState(218);
+						setState(224);
 						match(COMMA);
-						setState(219);
+						setState(225);
 						expression(0);
 						}
 						}
-						setState(224);
+						setState(230);
 						_errHandler.sync(this);
 						_la = _input.LA(1);
 					}
 					}
 				}
 
-				setState(227);
+				setState(233);
 				match(RBRACK);
 				}
 				break;
@@ -1316,11 +1378,11 @@ public class MQLParser extends Parser {
 				_localctx = new ParenthesisExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(228);
+				setState(234);
 				match(LPAREN);
-				setState(229);
+				setState(235);
 				expression(0);
-				setState(230);
+				setState(236);
 				match(RPAREN);
 				}
 				break;
@@ -1329,7 +1391,7 @@ public class MQLParser extends Parser {
 				_localctx = new FunctionCallExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(232);
+				setState(238);
 				function();
 				}
 				break;
@@ -1338,7 +1400,7 @@ public class MQLParser extends Parser {
 				_localctx = new VariableReferenceExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(233);
+				setState(239);
 				variable_name();
 				}
 				break;
@@ -1347,7 +1409,7 @@ public class MQLParser extends Parser {
 				_localctx = new FieldExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(234);
+				setState(240);
 				field_name();
 				}
 				break;
@@ -1356,7 +1418,7 @@ public class MQLParser extends Parser {
 				_localctx = new NumberExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(235);
+				setState(241);
 				number();
 				}
 				break;
@@ -1365,7 +1427,7 @@ public class MQLParser extends Parser {
 				_localctx = new StringExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(236);
+				setState(242);
 				match(STRING);
 				}
 				break;
@@ -1374,7 +1436,7 @@ public class MQLParser extends Parser {
 				_localctx = new BooleanExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(237);
+				setState(243);
 				_la = _input.LA(1);
 				if ( !(_la==FALSE || _la==TRUE) ) {
 				_errHandler.recoverInline(this);
@@ -1391,7 +1453,7 @@ public class MQLParser extends Parser {
 				_localctx = new NullExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(238);
+				setState(244);
 				match(NULL);
 				}
 				break;
@@ -1400,7 +1462,7 @@ public class MQLParser extends Parser {
 				_localctx = new OidExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(239);
+				setState(245);
 				match(OID);
 				}
 				break;
@@ -1409,7 +1471,7 @@ public class MQLParser extends Parser {
 				_localctx = new DateTimeExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(240);
+				setState(246);
 				match(DATE_TIME);
 				}
 				break;
@@ -1418,13 +1480,13 @@ public class MQLParser extends Parser {
 				_localctx = new RegexExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(241);
+				setState(247);
 				regex();
 				}
 				break;
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(309);
+			setState(315);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,32,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
@@ -1432,18 +1494,18 @@ public class MQLParser extends Parser {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(307);
+					setState(313);
 					_errHandler.sync(this);
 					switch ( getInterpreter().adaptivePredict(_input,31,_ctx) ) {
 					case 1:
 						{
 						_localctx = new PowerExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(244);
+						setState(250);
 						if (!(precpred(_ctx, 31))) throw new FailedPredicateException(this, "precpred(_ctx, 31)");
-						setState(245);
+						setState(251);
 						match(POWER);
-						setState(246);
+						setState(252);
 						expression(31);
 						}
 						break;
@@ -1451,9 +1513,9 @@ public class MQLParser extends Parser {
 						{
 						_localctx = new MultiplicationExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(247);
+						setState(253);
 						if (!(precpred(_ctx, 24))) throw new FailedPredicateException(this, "precpred(_ctx, 24)");
-						setState(248);
+						setState(254);
 						((MultiplicationExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << DIV) | (1L << MOD) | (1L << MULT))) != 0)) ) {
@@ -1464,7 +1526,7 @@ public class MQLParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(249);
+						setState(255);
 						expression(25);
 						}
 						break;
@@ -1472,9 +1534,9 @@ public class MQLParser extends Parser {
 						{
 						_localctx = new AdditionExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(250);
+						setState(256);
 						if (!(precpred(_ctx, 23))) throw new FailedPredicateException(this, "precpred(_ctx, 23)");
-						setState(251);
+						setState(257);
 						((AdditionExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !(_la==MINUS || _la==PLUS) ) {
@@ -1485,7 +1547,7 @@ public class MQLParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(252);
+						setState(258);
 						expression(24);
 						}
 						break;
@@ -1493,9 +1555,9 @@ public class MQLParser extends Parser {
 						{
 						_localctx = new ComparisonExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(253);
+						setState(259);
 						if (!(precpred(_ctx, 22))) throw new FailedPredicateException(this, "precpred(_ctx, 22)");
-						setState(254);
+						setState(260);
 						((ComparisonExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << EQ) | (1L << GT) | (1L << GTE) | (1L << LT) | (1L << LTE) | (1L << NEQ))) != 0)) ) {
@@ -1506,7 +1568,7 @@ public class MQLParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(255);
+						setState(261);
 						expression(23);
 						}
 						break;
@@ -1514,11 +1576,11 @@ public class MQLParser extends Parser {
 						{
 						_localctx = new AndExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(256);
+						setState(262);
 						if (!(precpred(_ctx, 21))) throw new FailedPredicateException(this, "precpred(_ctx, 21)");
-						setState(257);
+						setState(263);
 						match(AND);
-						setState(258);
+						setState(264);
 						expression(22);
 						}
 						break;
@@ -1526,11 +1588,11 @@ public class MQLParser extends Parser {
 						{
 						_localctx = new OrExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(259);
+						setState(265);
 						if (!(precpred(_ctx, 20))) throw new FailedPredicateException(this, "precpred(_ctx, 20)");
-						setState(260);
+						setState(266);
 						match(OR);
-						setState(261);
+						setState(267);
 						expression(21);
 						}
 						break;
@@ -1538,11 +1600,11 @@ public class MQLParser extends Parser {
 						{
 						_localctx = new ConcatExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(262);
+						setState(268);
 						if (!(precpred(_ctx, 19))) throw new FailedPredicateException(this, "precpred(_ctx, 19)");
-						setState(263);
+						setState(269);
 						match(CONCAT);
-						setState(264);
+						setState(270);
 						expression(20);
 						}
 						break;
@@ -1550,11 +1612,11 @@ public class MQLParser extends Parser {
 						{
 						_localctx = new NullCoalesceExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(265);
+						setState(271);
 						if (!(precpred(_ctx, 18))) throw new FailedPredicateException(this, "precpred(_ctx, 18)");
-						setState(266);
+						setState(272);
 						match(DQUESTION);
-						setState(267);
+						setState(273);
 						expression(19);
 						}
 						break;
@@ -1562,21 +1624,21 @@ public class MQLParser extends Parser {
 						{
 						_localctx = new InExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(268);
+						setState(274);
 						if (!(precpred(_ctx, 17))) throw new FailedPredicateException(this, "precpred(_ctx, 17)");
-						setState(270);
+						setState(276);
 						_errHandler.sync(this);
 						_la = _input.LA(1);
 						if (_la==NOT) {
 							{
-							setState(269);
+							setState(275);
 							match(NOT);
 							}
 						}
 
-						setState(272);
+						setState(278);
 						match(IN);
-						setState(273);
+						setState(279);
 						expression(18);
 						}
 						break;
@@ -1584,22 +1646,22 @@ public class MQLParser extends Parser {
 						{
 						_localctx = new MemberExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(274);
+						setState(280);
 						if (!(precpred(_ctx, 28))) throw new FailedPredicateException(this, "precpred(_ctx, 28)");
-						setState(275);
+						setState(281);
 						match(DOT);
-						setState(278);
+						setState(284);
 						_errHandler.sync(this);
 						switch ( getInterpreter().adaptivePredict(_input,25,_ctx) ) {
 						case 1:
 							{
-							setState(276);
+							setState(282);
 							field_name();
 							}
 							break;
 						case 2:
 							{
-							setState(277);
+							setState(283);
 							function();
 							}
 							break;
@@ -1610,51 +1672,51 @@ public class MQLParser extends Parser {
 						{
 						_localctx = new ArrayAccessExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(280);
+						setState(286);
 						if (!(precpred(_ctx, 27))) throw new FailedPredicateException(this, "precpred(_ctx, 27)");
-						setState(281);
+						setState(287);
 						match(LBRACK);
-						setState(294);
+						setState(300);
 						_errHandler.sync(this);
 						switch ( getInterpreter().adaptivePredict(_input,29,_ctx) ) {
 						case 1:
 							{
-							setState(282);
+							setState(288);
 							((ArrayAccessExpressionContext)_localctx).start = expression(0);
 							}
 							break;
 						case 2:
 							{
-							setState(284);
+							setState(290);
 							_errHandler.sync(this);
 							_la = _input.LA(1);
 							if (((((_la - 11)) & ~0x3f) == 0 && ((1L << (_la - 11)) & ((1L << (LBRACE - 11)) | (1L << (LBRACK - 11)) | (1L << (LPAREN - 11)) | (1L << (MINUS - 11)) | (1L << (FALSE - 11)) | (1L << (IF - 11)) | (1L << (NOT - 11)) | (1L << (NULL - 11)) | (1L << (SWITCH - 11)) | (1L << (TRUE - 11)) | (1L << (REGEX - 11)) | (1L << (INT - 11)) | (1L << (DECIMAL - 11)) | (1L << (LONG - 11)) | (1L << (BIN - 11)) | (1L << (HEX - 11)) | (1L << (OID - 11)) | (1L << (ID - 11)) | (1L << (STRING - 11)) | (1L << (VARIABLE_ID - 11)) | (1L << (DATE_TIME - 11)))) != 0)) {
 								{
-								setState(283);
+								setState(289);
 								((ArrayAccessExpressionContext)_localctx).start = expression(0);
 								}
 							}
 
-							setState(286);
+							setState(292);
 							match(RANGE);
-							setState(288);
+							setState(294);
 							_errHandler.sync(this);
 							_la = _input.LA(1);
 							if (((((_la - 11)) & ~0x3f) == 0 && ((1L << (_la - 11)) & ((1L << (LBRACE - 11)) | (1L << (LBRACK - 11)) | (1L << (LPAREN - 11)) | (1L << (MINUS - 11)) | (1L << (FALSE - 11)) | (1L << (IF - 11)) | (1L << (NOT - 11)) | (1L << (NULL - 11)) | (1L << (SWITCH - 11)) | (1L << (TRUE - 11)) | (1L << (REGEX - 11)) | (1L << (INT - 11)) | (1L << (DECIMAL - 11)) | (1L << (LONG - 11)) | (1L << (BIN - 11)) | (1L << (HEX - 11)) | (1L << (OID - 11)) | (1L << (ID - 11)) | (1L << (STRING - 11)) | (1L << (VARIABLE_ID - 11)) | (1L << (DATE_TIME - 11)))) != 0)) {
 								{
-								setState(287);
+								setState(293);
 								((ArrayAccessExpressionContext)_localctx).end = expression(0);
 								}
 							}
 
-							setState(292);
+							setState(298);
 							_errHandler.sync(this);
 							_la = _input.LA(1);
 							if (_la==COLON) {
 								{
-								setState(290);
+								setState(296);
 								match(COLON);
-								setState(291);
+								setState(297);
 								((ArrayAccessExpressionContext)_localctx).step = expression(0);
 								}
 							}
@@ -1662,7 +1724,7 @@ public class MQLParser extends Parser {
 							}
 							break;
 						}
-						setState(296);
+						setState(302);
 						match(RBRACK);
 						}
 						break;
@@ -1670,20 +1732,20 @@ public class MQLParser extends Parser {
 						{
 						_localctx = new RangeExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(297);
+						setState(303);
 						if (!(precpred(_ctx, 26))) throw new FailedPredicateException(this, "precpred(_ctx, 26)");
-						setState(298);
+						setState(304);
 						match(RANGE);
-						setState(299);
+						setState(305);
 						expression(0);
-						setState(302);
+						setState(308);
 						_errHandler.sync(this);
 						switch ( getInterpreter().adaptivePredict(_input,30,_ctx) ) {
 						case 1:
 							{
-							setState(300);
+							setState(306);
 							match(COLON);
-							setState(301);
+							setState(307);
 							expression(0);
 							}
 							break;
@@ -1694,18 +1756,18 @@ public class MQLParser extends Parser {
 						{
 						_localctx = new LikeExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(304);
+						setState(310);
 						if (!(precpred(_ctx, 25))) throw new FailedPredicateException(this, "precpred(_ctx, 25)");
-						setState(305);
+						setState(311);
 						match(LIKE);
-						setState(306);
+						setState(312);
 						regex();
 						}
 						break;
 					}
 					} 
 				}
-				setState(311);
+				setState(317);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,32,_ctx);
 			}
@@ -1718,6 +1780,75 @@ public class MQLParser extends Parser {
 		}
 		finally {
 			unrollRecursionContexts(_parentctx);
+		}
+		return _localctx;
+	}
+
+	public static class DocumentContext extends ParserRuleContext {
+		public TerminalNode LBRACE() { return getToken(MQLParser.LBRACE, 0); }
+		public TerminalNode RBRACE() { return getToken(MQLParser.RBRACE, 0); }
+		public List<Field_assignmentContext> field_assignment() {
+			return getRuleContexts(Field_assignmentContext.class);
+		}
+		public Field_assignmentContext field_assignment(int i) {
+			return getRuleContext(Field_assignmentContext.class,i);
+		}
+		public List<TerminalNode> COMMA() { return getTokens(MQLParser.COMMA); }
+		public TerminalNode COMMA(int i) {
+			return getToken(MQLParser.COMMA, i);
+		}
+		public DocumentContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_document; }
+	}
+
+	public final DocumentContext document() throws RecognitionException {
+		DocumentContext _localctx = new DocumentContext(_ctx, getState());
+		enterRule(_localctx, 18, RULE_document);
+		int _la;
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(318);
+			match(LBRACE);
+			setState(327);
+			_errHandler.sync(this);
+			_la = _input.LA(1);
+			if (_la==ID || _la==STRING) {
+				{
+				setState(319);
+				field_assignment();
+				setState(324);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la==COMMA) {
+					{
+					{
+					setState(320);
+					match(COMMA);
+					setState(321);
+					field_assignment();
+					}
+					}
+					setState(326);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				}
+			}
+
+			setState(329);
+			match(RBRACE);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
 		}
 		return _localctx;
 	}
@@ -1738,15 +1869,15 @@ public class MQLParser extends Parser {
 
 	public final Field_assignmentContext field_assignment() throws RecognitionException {
 		Field_assignmentContext _localctx = new Field_assignmentContext(_ctx, getState());
-		enterRule(_localctx, 16, RULE_field_assignment);
+		enterRule(_localctx, 20, RULE_field_assignment);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(312);
+			setState(331);
 			field_declaration();
-			setState(313);
+			setState(332);
 			match(COLON);
-			setState(314);
+			setState(333);
 			expression(0);
 			}
 		}
@@ -1785,42 +1916,42 @@ public class MQLParser extends Parser {
 
 	public final FunctionContext function() throws RecognitionException {
 		FunctionContext _localctx = new FunctionContext(_ctx, getState());
-		enterRule(_localctx, 18, RULE_function);
+		enterRule(_localctx, 22, RULE_function);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(316);
+			setState(335);
 			function_name();
-			setState(317);
+			setState(336);
 			match(LPAREN);
-			setState(326);
+			setState(345);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (((((_la - 11)) & ~0x3f) == 0 && ((1L << (_la - 11)) & ((1L << (LBRACE - 11)) | (1L << (LBRACK - 11)) | (1L << (LPAREN - 11)) | (1L << (MINUS - 11)) | (1L << (UNDERSCORE - 11)) | (1L << (FALSE - 11)) | (1L << (IF - 11)) | (1L << (NOT - 11)) | (1L << (NULL - 11)) | (1L << (SWITCH - 11)) | (1L << (TRUE - 11)) | (1L << (REGEX - 11)) | (1L << (INT - 11)) | (1L << (DECIMAL - 11)) | (1L << (LONG - 11)) | (1L << (BIN - 11)) | (1L << (HEX - 11)) | (1L << (OID - 11)) | (1L << (ID - 11)) | (1L << (STRING - 11)) | (1L << (VARIABLE_ID - 11)) | (1L << (DATE_TIME - 11)))) != 0)) {
 				{
-				setState(318);
+				setState(337);
 				function_argument();
-				setState(323);
+				setState(342);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==COMMA) {
 					{
 					{
-					setState(319);
+					setState(338);
 					match(COMMA);
-					setState(320);
+					setState(339);
 					function_argument();
 					}
 					}
-					setState(325);
+					setState(344);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
 				}
 			}
 
-			setState(328);
+			setState(347);
 			match(RPAREN);
 			}
 		}
@@ -1854,33 +1985,33 @@ public class MQLParser extends Parser {
 
 	public final Function_argumentContext function_argument() throws RecognitionException {
 		Function_argumentContext _localctx = new Function_argumentContext(_ctx, getState());
-		enterRule(_localctx, 20, RULE_function_argument);
+		enterRule(_localctx, 24, RULE_function_argument);
 		try {
-			setState(336);
+			setState(355);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,35,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,37,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(330);
+				setState(349);
 				expression(0);
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(331);
+				setState(350);
 				function_argument_name();
-				setState(332);
+				setState(351);
 				match(COLON);
-				setState(333);
+				setState(352);
 				expression(0);
 				}
 				break;
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(335);
+				setState(354);
 				lambda_expression();
 				}
 				break;
@@ -1910,22 +2041,22 @@ public class MQLParser extends Parser {
 
 	public final Lambda_argumentContext lambda_argument() throws RecognitionException {
 		Lambda_argumentContext _localctx = new Lambda_argumentContext(_ctx, getState());
-		enterRule(_localctx, 22, RULE_lambda_argument);
+		enterRule(_localctx, 26, RULE_lambda_argument);
 		try {
-			setState(340);
+			setState(359);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case VARIABLE_ID:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(338);
+				setState(357);
 				variable_name();
 				}
 				break;
 			case UNDERSCORE:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(339);
+				setState(358);
 				match(UNDERSCORE);
 				}
 				break;
@@ -1969,52 +2100,52 @@ public class MQLParser extends Parser {
 
 	public final Lambda_expressionContext lambda_expression() throws RecognitionException {
 		Lambda_expressionContext _localctx = new Lambda_expressionContext(_ctx, getState());
-		enterRule(_localctx, 24, RULE_lambda_expression);
+		enterRule(_localctx, 28, RULE_lambda_expression);
 		int _la;
 		try {
-			setState(359);
+			setState(378);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case UNDERSCORE:
 			case VARIABLE_ID:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(342);
+				setState(361);
 				lambda_argument();
-				setState(343);
+				setState(362);
 				match(ARROW);
-				setState(344);
+				setState(363);
 				expression(0);
 				}
 				break;
 			case LPAREN:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(346);
+				setState(365);
 				match(LPAREN);
-				setState(347);
+				setState(366);
 				lambda_argument();
-				setState(352);
+				setState(371);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==COMMA) {
 					{
 					{
-					setState(348);
+					setState(367);
 					match(COMMA);
-					setState(349);
+					setState(368);
 					lambda_argument();
 					}
 					}
-					setState(354);
+					setState(373);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(355);
+				setState(374);
 				match(RPAREN);
-				setState(356);
+				setState(375);
 				match(ARROW);
-				setState(357);
+				setState(376);
 				expression(0);
 				}
 				break;
@@ -2047,14 +2178,14 @@ public class MQLParser extends Parser {
 
 	public final NumberContext number() throws RecognitionException {
 		NumberContext _localctx = new NumberContext(_ctx, getState());
-		enterRule(_localctx, 26, RULE_number);
+		enterRule(_localctx, 30, RULE_number);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(361);
+			setState(380);
 			_la = _input.LA(1);
-			if ( !(((((_la - 60)) & ~0x3f) == 0 && ((1L << (_la - 60)) & ((1L << (INT - 60)) | (1L << (DECIMAL - 60)) | (1L << (LONG - 60)) | (1L << (BIN - 60)) | (1L << (HEX - 60)))) != 0)) ) {
+			if ( !(((((_la - 62)) & ~0x3f) == 0 && ((1L << (_la - 62)) & ((1L << (INT - 62)) | (1L << (DECIMAL - 62)) | (1L << (LONG - 62)) | (1L << (BIN - 62)) | (1L << (HEX - 62)))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -2085,11 +2216,11 @@ public class MQLParser extends Parser {
 
 	public final RegexContext regex() throws RecognitionException {
 		RegexContext _localctx = new RegexContext(_ctx, getState());
-		enterRule(_localctx, 28, RULE_regex);
+		enterRule(_localctx, 32, RULE_regex);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(363);
+			setState(382);
 			match(REGEX);
 			}
 		}
@@ -2121,17 +2252,17 @@ public class MQLParser extends Parser {
 
 	public final Switch_caseContext switch_case() throws RecognitionException {
 		Switch_caseContext _localctx = new Switch_caseContext(_ctx, getState());
-		enterRule(_localctx, 30, RULE_switch_case);
+		enterRule(_localctx, 34, RULE_switch_case);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(365);
+			setState(384);
 			match(CASE);
-			setState(366);
+			setState(385);
 			expression(0);
-			setState(367);
+			setState(386);
 			match(THEN);
-			setState(368);
+			setState(387);
 			expression(0);
 			}
 		}
@@ -2162,15 +2293,15 @@ public class MQLParser extends Parser {
 
 	public final Variable_assignmentContext variable_assignment() throws RecognitionException {
 		Variable_assignmentContext _localctx = new Variable_assignmentContext(_ctx, getState());
-		enterRule(_localctx, 32, RULE_variable_assignment);
+		enterRule(_localctx, 36, RULE_variable_assignment);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(370);
+			setState(389);
 			variable_name();
-			setState(371);
+			setState(390);
 			match(COLON);
-			setState(372);
+			setState(391);
 			expression(0);
 			}
 		}
@@ -2199,26 +2330,26 @@ public class MQLParser extends Parser {
 
 	public final Collection_nameContext collection_name() throws RecognitionException {
 		Collection_nameContext _localctx = new Collection_nameContext(_ctx, getState());
-		enterRule(_localctx, 34, RULE_collection_name);
+		enterRule(_localctx, 38, RULE_collection_name);
 		try {
-			setState(379);
+			setState(398);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,39,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,41,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(374);
+				setState(393);
 				match(ID);
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(375);
+				setState(394);
 				database_name();
-				setState(376);
+				setState(395);
 				match(DOT);
-				setState(377);
+				setState(396);
 				match(ID);
 				}
 				break;
@@ -2245,11 +2376,11 @@ public class MQLParser extends Parser {
 
 	public final Database_nameContext database_name() throws RecognitionException {
 		Database_nameContext _localctx = new Database_nameContext(_ctx, getState());
-		enterRule(_localctx, 36, RULE_database_name);
+		enterRule(_localctx, 40, RULE_database_name);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(381);
+			setState(400);
 			match(ID);
 			}
 		}
@@ -2277,22 +2408,22 @@ public class MQLParser extends Parser {
 
 	public final Field_declarationContext field_declaration() throws RecognitionException {
 		Field_declarationContext _localctx = new Field_declarationContext(_ctx, getState());
-		enterRule(_localctx, 38, RULE_field_declaration);
+		enterRule(_localctx, 42, RULE_field_declaration);
 		try {
-			setState(385);
+			setState(404);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case STRING:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(383);
+				setState(402);
 				match(STRING);
 				}
 				break;
 			case ID:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(384);
+				setState(403);
 				field_name();
 				}
 				break;
@@ -2330,26 +2461,26 @@ public class MQLParser extends Parser {
 
 	public final Multipart_field_declarationContext multipart_field_declaration() throws RecognitionException {
 		Multipart_field_declarationContext _localctx = new Multipart_field_declarationContext(_ctx, getState());
-		enterRule(_localctx, 40, RULE_multipart_field_declaration);
+		enterRule(_localctx, 44, RULE_multipart_field_declaration);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(387);
+			setState(406);
 			field_declaration();
-			setState(392);
+			setState(411);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==DOT) {
 				{
 				{
-				setState(388);
+				setState(407);
 				match(DOT);
-				setState(389);
+				setState(408);
 				field_declaration();
 				}
 				}
-				setState(394);
+				setState(413);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -2376,11 +2507,11 @@ public class MQLParser extends Parser {
 
 	public final Field_nameContext field_name() throws RecognitionException {
 		Field_nameContext _localctx = new Field_nameContext(_ctx, getState());
-		enterRule(_localctx, 42, RULE_field_name);
+		enterRule(_localctx, 46, RULE_field_name);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(395);
+			setState(414);
 			match(ID);
 			}
 		}
@@ -2405,11 +2536,11 @@ public class MQLParser extends Parser {
 
 	public final Function_nameContext function_name() throws RecognitionException {
 		Function_nameContext _localctx = new Function_nameContext(_ctx, getState());
-		enterRule(_localctx, 44, RULE_function_name);
+		enterRule(_localctx, 48, RULE_function_name);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(397);
+			setState(416);
 			match(ID);
 			}
 		}
@@ -2434,11 +2565,11 @@ public class MQLParser extends Parser {
 
 	public final Function_argument_nameContext function_argument_name() throws RecognitionException {
 		Function_argument_nameContext _localctx = new Function_argument_nameContext(_ctx, getState());
-		enterRule(_localctx, 46, RULE_function_argument_name);
+		enterRule(_localctx, 50, RULE_function_argument_name);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(399);
+			setState(418);
 			match(ID);
 			}
 		}
@@ -2472,26 +2603,26 @@ public class MQLParser extends Parser {
 
 	public final Multipart_field_nameContext multipart_field_name() throws RecognitionException {
 		Multipart_field_nameContext _localctx = new Multipart_field_nameContext(_ctx, getState());
-		enterRule(_localctx, 48, RULE_multipart_field_name);
+		enterRule(_localctx, 52, RULE_multipart_field_name);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(401);
+			setState(420);
 			field_name();
-			setState(406);
+			setState(425);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==DOT) {
 				{
 				{
-				setState(402);
+				setState(421);
 				match(DOT);
-				setState(403);
+				setState(422);
 				field_name();
 				}
 				}
-				setState(408);
+				setState(427);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -2518,11 +2649,11 @@ public class MQLParser extends Parser {
 
 	public final Variable_nameContext variable_name() throws RecognitionException {
 		Variable_nameContext _localctx = new Variable_nameContext(_ctx, getState());
-		enterRule(_localctx, 50, RULE_variable_name);
+		enterRule(_localctx, 54, RULE_variable_name);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(409);
+			setState(428);
 			match(VARIABLE_ID);
 			}
 		}
@@ -2539,7 +2670,7 @@ public class MQLParser extends Parser {
 
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
-		case 7:
+		case 8:
 			return expression_sempred((ExpressionContext)_localctx, predIndex);
 		}
 		return true;
@@ -2577,160 +2708,168 @@ public class MQLParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3H\u019e\4\2\t\2\4"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3J\u01b1\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
-		"\4\32\t\32\4\33\t\33\3\2\3\2\3\2\7\2:\n\2\f\2\16\2=\13\2\3\2\5\2@\n\2"+
-		"\3\2\3\2\3\3\3\3\3\4\3\4\3\4\7\4I\n\4\f\4\16\4L\13\4\3\5\3\5\3\5\3\5\3"+
-		"\5\7\5S\n\5\f\5\16\5V\13\5\3\5\3\5\3\5\5\5[\n\5\3\5\3\5\3\5\3\5\3\5\3"+
-		"\5\3\5\3\5\3\5\3\5\7\5g\n\5\f\5\16\5j\13\5\3\5\3\5\3\5\5\5o\n\5\3\5\3"+
-		"\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\7\5{\n\5\f\5\16\5~\13\5\3\5\3\5\3\5"+
-		"\3\5\3\5\3\5\3\5\3\5\7\5\u0088\n\5\f\5\16\5\u008b\13\5\3\5\3\5\3\5\3\5"+
-		"\6\5\u0091\n\5\r\5\16\5\u0092\5\5\u0095\n\5\5\5\u0097\n\5\3\6\5\6\u009a"+
-		"\n\6\3\6\3\6\3\6\3\6\3\6\5\6\u00a1\n\6\3\7\3\7\5\7\u00a5\n\7\3\b\3\b\3"+
-		"\b\5\b\u00aa\n\b\3\t\3\t\3\t\3\t\3\t\3\t\3\t\6\t\u00b3\n\t\r\t\16\t\u00b4"+
-		"\3\t\3\t\5\t\u00b9\n\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\7\t"+
-		"\u00c6\n\t\f\t\16\t\u00c9\13\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\7\t\u00d3"+
-		"\n\t\f\t\16\t\u00d6\13\t\5\t\u00d8\n\t\3\t\3\t\3\t\3\t\3\t\7\t\u00df\n"+
-		"\t\f\t\16\t\u00e2\13\t\5\t\u00e4\n\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3"+
-		"\t\3\t\3\t\3\t\3\t\3\t\3\t\5\t\u00f5\n\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3"+
-		"\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t"+
-		"\3\t\5\t\u0111\n\t\3\t\3\t\3\t\3\t\3\t\3\t\5\t\u0119\n\t\3\t\3\t\3\t\3"+
-		"\t\5\t\u011f\n\t\3\t\3\t\5\t\u0123\n\t\3\t\3\t\5\t\u0127\n\t\5\t\u0129"+
-		"\n\t\3\t\3\t\3\t\3\t\3\t\3\t\5\t\u0131\n\t\3\t\3\t\3\t\7\t\u0136\n\t\f"+
-		"\t\16\t\u0139\13\t\3\n\3\n\3\n\3\n\3\13\3\13\3\13\3\13\3\13\7\13\u0144"+
-		"\n\13\f\13\16\13\u0147\13\13\5\13\u0149\n\13\3\13\3\13\3\f\3\f\3\f\3\f"+
-		"\3\f\3\f\5\f\u0153\n\f\3\r\3\r\5\r\u0157\n\r\3\16\3\16\3\16\3\16\3\16"+
-		"\3\16\3\16\3\16\7\16\u0161\n\16\f\16\16\16\u0164\13\16\3\16\3\16\3\16"+
-		"\3\16\5\16\u016a\n\16\3\17\3\17\3\20\3\20\3\21\3\21\3\21\3\21\3\21\3\22"+
-		"\3\22\3\22\3\22\3\23\3\23\3\23\3\23\3\23\5\23\u017e\n\23\3\24\3\24\3\25"+
-		"\3\25\5\25\u0184\n\25\3\26\3\26\3\26\7\26\u0189\n\26\f\26\16\26\u018c"+
-		"\13\26\3\27\3\27\3\30\3\30\3\31\3\31\3\32\3\32\3\32\7\32\u0197\n\32\f"+
-		"\32\16\32\u019a\13\32\3\33\3\33\3\33\2\3\20\34\2\4\6\b\n\f\16\20\22\24"+
-		"\26\30\32\34\36 \"$&(*,.\60\62\64\2\b\4\2  ##\4\2%%99\5\2\7\7\23\23\25"+
-		"\25\4\2\22\22\30\30\5\2\n\f\20\21\26\26\3\2>B\2\u01d0\2\66\3\2\2\2\4C"+
-		"\3\2\2\2\6E\3\2\2\2\b\u0096\3\2\2\2\n\u00a0\3\2\2\2\f\u00a2\3\2\2\2\16"+
-		"\u00a9\3\2\2\2\20\u00f4\3\2\2\2\22\u013a\3\2\2\2\24\u013e\3\2\2\2\26\u0152"+
-		"\3\2\2\2\30\u0156\3\2\2\2\32\u0169\3\2\2\2\34\u016b\3\2\2\2\36\u016d\3"+
-		"\2\2\2 \u016f\3\2\2\2\"\u0174\3\2\2\2$\u017d\3\2\2\2&\u017f\3\2\2\2(\u0183"+
-		"\3\2\2\2*\u0185\3\2\2\2,\u018d\3\2\2\2.\u018f\3\2\2\2\60\u0191\3\2\2\2"+
-		"\62\u0193\3\2\2\2\64\u019b\3\2\2\2\66;\5\4\3\2\678\7\35\2\28:\5\4\3\2"+
-		"9\67\3\2\2\2:=\3\2\2\2;9\3\2\2\2;<\3\2\2\2<?\3\2\2\2=;\3\2\2\2>@\7\35"+
-		"\2\2?>\3\2\2\2?@\3\2\2\2@A\3\2\2\2AB\7\2\2\3B\3\3\2\2\2CD\5\6\4\2D\5\3"+
-		"\2\2\2EF\7&\2\2FJ\5$\23\2GI\5\b\5\2HG\3\2\2\2IL\3\2\2\2JH\3\2\2\2JK\3"+
-		"\2\2\2K\7\3\2\2\2LJ\3\2\2\2MN\7\'\2\2NO\7\r\2\2OT\5\22\n\2PQ\7\5\2\2Q"+
-		"S\5\22\n\2RP\3\2\2\2SV\3\2\2\2TR\3\2\2\2TU\3\2\2\2UW\3\2\2\2VT\3\2\2\2"+
-		"WZ\7\32\2\2XY\7!\2\2Y[\5\20\t\2ZX\3\2\2\2Z[\3\2\2\2[\u0097\3\2\2\2\\]"+
-		"\7-\2\2]\u0097\7>\2\2^_\7.\2\2_`\7\r\2\2`a\5*\26\2an\7\4\2\2bc\7\r\2\2"+
-		"ch\5\"\22\2de\7\5\2\2eg\5\"\22\2fd\3\2\2\2gj\3\2\2\2hf\3\2\2\2hi\3\2\2"+
-		"\2ik\3\2\2\2jh\3\2\2\2kl\7\32\2\2lm\7\3\2\2mo\3\2\2\2nb\3\2\2\2no\3\2"+
-		"\2\2op\3\2\2\2pq\5\4\3\2qr\7\32\2\2r\u0097\3\2\2\2st\7/\2\2t\u0097\5\20"+
-		"\t\2uv\7\63\2\2vw\7\r\2\2w|\5\n\6\2xy\7\5\2\2y{\5\n\6\2zx\3\2\2\2{~\3"+
-		"\2\2\2|z\3\2\2\2|}\3\2\2\2}\177\3\2\2\2~|\3\2\2\2\177\u0080\7\32\2\2\u0080"+
-		"\u0097\3\2\2\2\u0081\u0082\7\64\2\2\u0082\u0097\7>\2\2\u0083\u0084\7\65"+
-		"\2\2\u0084\u0089\5\f\7\2\u0085\u0086\7\5\2\2\u0086\u0088\5\f\7\2\u0087"+
-		"\u0085\3\2\2\2\u0088\u008b\3\2\2\2\u0089\u0087\3\2\2\2\u0089\u008a\3\2"+
-		"\2\2\u008a\u0097\3\2\2\2\u008b\u0089\3\2\2\2\u008c\u008d\7:\2\2\u008d"+
-		"\u0094\5\62\32\2\u008e\u0090\7;\2\2\u008f\u0091\5\16\b\2\u0090\u008f\3"+
-		"\2\2\2\u0091\u0092\3\2\2\2\u0092\u0090\3\2\2\2\u0092\u0093\3\2\2\2\u0093"+
-		"\u0095\3\2\2\2\u0094\u008e\3\2\2\2\u0094\u0095\3\2\2\2\u0095\u0097\3\2"+
-		"\2\2\u0096M\3\2\2\2\u0096\\\3\2\2\2\u0096^\3\2\2\2\u0096s\3\2\2\2\u0096"+
-		"u\3\2\2\2\u0096\u0081\3\2\2\2\u0096\u0083\3\2\2\2\u0096\u008c\3\2\2\2"+
-		"\u0097\t\3\2\2\2\u0098\u009a\7\27\2\2\u0099\u0098\3\2\2\2\u0099\u009a"+
-		"\3\2\2\2\u009a\u009b\3\2\2\2\u009b\u00a1\5*\26\2\u009c\u009d\5*\26\2\u009d"+
-		"\u009e\7\4\2\2\u009e\u009f\5\20\t\2\u009f\u00a1\3\2\2\2\u00a0\u0099\3"+
-		"\2\2\2\u00a0\u009c\3\2\2\2\u00a1\13\3\2\2\2\u00a2\u00a4\5\62\32\2\u00a3"+
-		"\u00a5\t\2\2\2\u00a4\u00a3\3\2\2\2\u00a4\u00a5\3\2\2\2\u00a5\r\3\2\2\2"+
-		"\u00a6\u00a7\7*\2\2\u00a7\u00aa\5*\26\2\u00a8\u00aa\7<\2\2\u00a9\u00a6"+
-		"\3\2\2\2\u00a9\u00a8\3\2\2\2\u00aa\17\3\2\2\2\u00ab\u00ac\b\t\1\2\u00ac"+
-		"\u00ad\7\22\2\2\u00ad\u00f5\5\20\t \u00ae\u00af\7\60\2\2\u00af\u00f5\5"+
-		"\20\t\37\u00b0\u00b2\7\67\2\2\u00b1\u00b3\5 \21\2\u00b2\u00b1\3\2\2\2"+
-		"\u00b3\u00b4\3\2\2\2\u00b4\u00b2\3\2\2\2\u00b4\u00b5\3\2\2\2\u00b5\u00b8"+
-		"\3\2\2\2\u00b6\u00b7\7$\2\2\u00b7\u00b9\5\20\t\2\u00b8\u00b6\3\2\2\2\u00b8"+
-		"\u00b9\3\2\2\2\u00b9\u00f5\3\2\2\2\u00ba\u00bb\7(\2\2\u00bb\u00bc\5\20"+
-		"\t\2\u00bc\u00bd\78\2\2\u00bd\u00be\5\20\t\2\u00be\u00bf\7$\2\2\u00bf"+
-		"\u00c0\5\20\t\21\u00c0\u00f5\3\2\2\2\u00c1\u00c2\7\r\2\2\u00c2\u00c7\5"+
-		"\"\22\2\u00c3\u00c4\7\5\2\2\u00c4\u00c6\5\"\22\2\u00c5\u00c3\3\2\2\2\u00c6"+
-		"\u00c9\3\2\2\2\u00c7\u00c5\3\2\2\2\u00c7\u00c8\3\2\2\2\u00c8\u00ca\3\2"+
-		"\2\2\u00c9\u00c7\3\2\2\2\u00ca\u00cb\7\32\2\2\u00cb\u00cc\7\3\2\2\u00cc"+
-		"\u00cd\5\20\t\20\u00cd\u00f5\3\2\2\2\u00ce\u00d7\7\r\2\2\u00cf\u00d4\5"+
-		"\22\n\2\u00d0\u00d1\7\5\2\2\u00d1\u00d3\5\22\n\2\u00d2\u00d0\3\2\2\2\u00d3"+
-		"\u00d6\3\2\2\2\u00d4\u00d2\3\2\2\2\u00d4\u00d5\3\2\2\2\u00d5\u00d8\3\2"+
-		"\2\2\u00d6\u00d4\3\2\2\2\u00d7\u00cf\3\2\2\2\u00d7\u00d8\3\2\2\2\u00d8"+
-		"\u00d9\3\2\2\2\u00d9\u00f5\7\32\2\2\u00da\u00e3\7\16\2\2\u00db\u00e0\5"+
-		"\20\t\2\u00dc\u00dd\7\5\2\2\u00dd\u00df\5\20\t\2\u00de\u00dc\3\2\2\2\u00df"+
-		"\u00e2\3\2\2\2\u00e0\u00de\3\2\2\2\u00e0\u00e1\3\2\2\2\u00e1\u00e4\3\2"+
-		"\2\2\u00e2\u00e0\3\2\2\2\u00e3\u00db\3\2\2\2\u00e3\u00e4\3\2\2\2\u00e4"+
-		"\u00e5\3\2\2\2\u00e5\u00f5\7\33\2\2\u00e6\u00e7\7\17\2\2\u00e7\u00e8\5"+
-		"\20\t\2\u00e8\u00e9\7\34\2\2\u00e9\u00f5\3\2\2\2\u00ea\u00f5\5\24\13\2"+
-		"\u00eb\u00f5\5\64\33\2\u00ec\u00f5\5,\27\2\u00ed\u00f5\5\34\17\2\u00ee"+
-		"\u00f5\7E\2\2\u00ef\u00f5\t\3\2\2\u00f0\u00f5\7\61\2\2\u00f1\u00f5\7C"+
-		"\2\2\u00f2\u00f5\7H\2\2\u00f3\u00f5\5\36\20\2\u00f4\u00ab\3\2\2\2\u00f4"+
-		"\u00ae\3\2\2\2\u00f4\u00b0\3\2\2\2\u00f4\u00ba\3\2\2\2\u00f4\u00c1\3\2"+
-		"\2\2\u00f4\u00ce\3\2\2\2\u00f4\u00da\3\2\2\2\u00f4\u00e6\3\2\2\2\u00f4"+
-		"\u00ea\3\2\2\2\u00f4\u00eb\3\2\2\2\u00f4\u00ec\3\2\2\2\u00f4\u00ed\3\2"+
-		"\2\2\u00f4\u00ee\3\2\2\2\u00f4\u00ef\3\2\2\2\u00f4\u00f0\3\2\2\2\u00f4"+
-		"\u00f1\3\2\2\2\u00f4\u00f2\3\2\2\2\u00f4\u00f3\3\2\2\2\u00f5\u0137\3\2"+
-		"\2\2\u00f6\u00f7\f!\2\2\u00f7\u00f8\7\24\2\2\u00f8\u0136\5\20\t!\u00f9"+
-		"\u00fa\f\32\2\2\u00fa\u00fb\t\4\2\2\u00fb\u0136\5\20\t\33\u00fc\u00fd"+
-		"\f\31\2\2\u00fd\u00fe\t\5\2\2\u00fe\u0136\5\20\t\32\u00ff\u0100\f\30\2"+
-		"\2\u0100\u0101\t\6\2\2\u0101\u0136\5\20\t\31\u0102\u0103\f\27\2\2\u0103"+
-		"\u0104\7\37\2\2\u0104\u0136\5\20\t\30\u0105\u0106\f\26\2\2\u0106\u0107"+
-		"\7\62\2\2\u0107\u0136\5\20\t\27\u0108\u0109\f\25\2\2\u0109\u010a\7\6\2"+
-		"\2\u010a\u0136\5\20\t\26\u010b\u010c\f\24\2\2\u010c\u010d\7\t\2\2\u010d"+
-		"\u0136\5\20\t\25\u010e\u0110\f\23\2\2\u010f\u0111\7\60\2\2\u0110\u010f"+
-		"\3\2\2\2\u0110\u0111\3\2\2\2\u0111\u0112\3\2\2\2\u0112\u0113\7)\2\2\u0113"+
-		"\u0136\5\20\t\24\u0114\u0115\f\36\2\2\u0115\u0118\7\b\2\2\u0116\u0119"+
-		"\5,\27\2\u0117\u0119\5\24\13\2\u0118\u0116\3\2\2\2\u0118\u0117\3\2\2\2"+
-		"\u0119\u0136\3\2\2\2\u011a\u011b\f\35\2\2\u011b\u0128\7\16\2\2\u011c\u0129"+
-		"\5\20\t\2\u011d\u011f\5\20\t\2\u011e\u011d\3\2\2\2\u011e\u011f\3\2\2\2"+
-		"\u011f\u0120\3\2\2\2\u0120\u0122\7\31\2\2\u0121\u0123\5\20\t\2\u0122\u0121"+
-		"\3\2\2\2\u0122\u0123\3\2\2\2\u0123\u0126\3\2\2\2\u0124\u0125\7\4\2\2\u0125"+
-		"\u0127\5\20\t\2\u0126\u0124\3\2\2\2\u0126\u0127\3\2\2\2\u0127\u0129\3"+
-		"\2\2\2\u0128\u011c\3\2\2\2\u0128\u011e\3\2\2\2\u0129\u012a\3\2\2\2\u012a"+
-		"\u0136\7\33\2\2\u012b\u012c\f\34\2\2\u012c\u012d\7\31\2\2\u012d\u0130"+
-		"\5\20\t\2\u012e\u012f\7\4\2\2\u012f\u0131\5\20\t\2\u0130\u012e\3\2\2\2"+
-		"\u0130\u0131\3\2\2\2\u0131\u0136\3\2\2\2\u0132\u0133\f\33\2\2\u0133\u0134"+
-		"\7,\2\2\u0134\u0136\5\36\20\2\u0135\u00f6\3\2\2\2\u0135\u00f9\3\2\2\2"+
-		"\u0135\u00fc\3\2\2\2\u0135\u00ff\3\2\2\2\u0135\u0102\3\2\2\2\u0135\u0105"+
-		"\3\2\2\2\u0135\u0108\3\2\2\2\u0135\u010b\3\2\2\2\u0135\u010e\3\2\2\2\u0135"+
-		"\u0114\3\2\2\2\u0135\u011a\3\2\2\2\u0135\u012b\3\2\2\2\u0135\u0132\3\2"+
-		"\2\2\u0136\u0139\3\2\2\2\u0137\u0135\3\2\2\2\u0137\u0138\3\2\2\2\u0138"+
-		"\21\3\2\2\2\u0139\u0137\3\2\2\2\u013a\u013b\5(\25\2\u013b\u013c\7\4\2"+
-		"\2\u013c\u013d\5\20\t\2\u013d\23\3\2\2\2\u013e\u013f\5.\30\2\u013f\u0148"+
-		"\7\17\2\2\u0140\u0145\5\26\f\2\u0141\u0142\7\5\2\2\u0142\u0144\5\26\f"+
-		"\2\u0143\u0141\3\2\2\2\u0144\u0147\3\2\2\2\u0145\u0143\3\2\2\2\u0145\u0146"+
-		"\3\2\2\2\u0146\u0149\3\2\2\2\u0147\u0145\3\2\2\2\u0148\u0140\3\2\2\2\u0148"+
-		"\u0149\3\2\2\2\u0149\u014a\3\2\2\2\u014a\u014b\7\34\2\2\u014b\25\3\2\2"+
-		"\2\u014c\u0153\5\20\t\2\u014d\u014e\5\60\31\2\u014e\u014f\7\4\2\2\u014f"+
-		"\u0150\5\20\t\2\u0150\u0153\3\2\2\2\u0151\u0153\5\32\16\2\u0152\u014c"+
-		"\3\2\2\2\u0152\u014d\3\2\2\2\u0152\u0151\3\2\2\2\u0153\27\3\2\2\2\u0154"+
-		"\u0157\5\64\33\2\u0155\u0157\7\36\2\2\u0156\u0154\3\2\2\2\u0156\u0155"+
-		"\3\2\2\2\u0157\31\3\2\2\2\u0158\u0159\5\30\r\2\u0159\u015a\7\3\2\2\u015a"+
-		"\u015b\5\20\t\2\u015b\u016a\3\2\2\2\u015c\u015d\7\17\2\2\u015d\u0162\5"+
-		"\30\r\2\u015e\u015f\7\5\2\2\u015f\u0161\5\30\r\2\u0160\u015e\3\2\2\2\u0161"+
-		"\u0164\3\2\2\2\u0162\u0160\3\2\2\2\u0162\u0163\3\2\2\2\u0163\u0165\3\2"+
-		"\2\2\u0164\u0162\3\2\2\2\u0165\u0166\7\34\2\2\u0166\u0167\7\3\2\2\u0167"+
-		"\u0168\5\20\t\2\u0168\u016a\3\2\2\2\u0169\u0158\3\2\2\2\u0169\u015c\3"+
-		"\2\2\2\u016a\33\3\2\2\2\u016b\u016c\t\7\2\2\u016c\35\3\2\2\2\u016d\u016e"+
-		"\7=\2\2\u016e\37\3\2\2\2\u016f\u0170\7\"\2\2\u0170\u0171\5\20\t\2\u0171"+
-		"\u0172\78\2\2\u0172\u0173\5\20\t\2\u0173!\3\2\2\2\u0174\u0175\5\64\33"+
-		"\2\u0175\u0176\7\4\2\2\u0176\u0177\5\20\t\2\u0177#\3\2\2\2\u0178\u017e"+
-		"\7D\2\2\u0179\u017a\5&\24\2\u017a\u017b\7\b\2\2\u017b\u017c\7D\2\2\u017c"+
-		"\u017e\3\2\2\2\u017d\u0178\3\2\2\2\u017d\u0179\3\2\2\2\u017e%\3\2\2\2"+
-		"\u017f\u0180\7D\2\2\u0180\'\3\2\2\2\u0181\u0184\7E\2\2\u0182\u0184\5,"+
-		"\27\2\u0183\u0181\3\2\2\2\u0183\u0182\3\2\2\2\u0184)\3\2\2\2\u0185\u018a"+
-		"\5(\25\2\u0186\u0187\7\b\2\2\u0187\u0189\5(\25\2\u0188\u0186\3\2\2\2\u0189"+
-		"\u018c\3\2\2\2\u018a\u0188\3\2\2\2\u018a\u018b\3\2\2\2\u018b+\3\2\2\2"+
-		"\u018c\u018a\3\2\2\2\u018d\u018e\7D\2\2\u018e-\3\2\2\2\u018f\u0190\7D"+
-		"\2\2\u0190/\3\2\2\2\u0191\u0192\7D\2\2\u0192\61\3\2\2\2\u0193\u0198\5"+
-		",\27\2\u0194\u0195\7\b\2\2\u0195\u0197\5,\27\2\u0196\u0194\3\2\2\2\u0197"+
-		"\u019a\3\2\2\2\u0198\u0196\3\2\2\2\u0198\u0199\3\2\2\2\u0199\63\3\2\2"+
-		"\2\u019a\u0198\3\2\2\2\u019b\u019c\7F\2\2\u019c\65\3\2\2\2-;?JTZhn|\u0089"+
-		"\u0092\u0094\u0096\u0099\u00a0\u00a4\u00a9\u00b4\u00b8\u00c7\u00d4\u00d7"+
-		"\u00e0\u00e3\u00f4\u0110\u0118\u011e\u0122\u0126\u0128\u0130\u0135\u0137"+
-		"\u0145\u0148\u0152\u0156\u0162\u0169\u017d\u0183\u018a\u0198";
+		"\4\32\t\32\4\33\t\33\4\34\t\34\4\35\t\35\3\2\3\2\3\2\7\2>\n\2\f\2\16\2"+
+		"A\13\2\3\2\5\2D\n\2\3\2\3\2\3\3\3\3\5\3J\n\3\3\4\3\4\3\4\7\4O\n\4\f\4"+
+		"\16\4R\13\4\3\5\3\5\3\5\3\5\3\5\3\5\7\5Z\n\5\f\5\16\5]\13\5\3\6\3\6\3"+
+		"\6\3\6\3\6\7\6d\n\6\f\6\16\6g\13\6\3\6\3\6\3\6\5\6l\n\6\3\6\3\6\3\6\3"+
+		"\6\3\6\3\6\3\6\3\6\3\6\3\6\7\6x\n\6\f\6\16\6{\13\6\3\6\3\6\3\6\5\6\u0080"+
+		"\n\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\7\6\u008c\n\6\f\6\16\6\u008f"+
+		"\13\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\7\6\u0099\n\6\f\6\16\6\u009c\13"+
+		"\6\3\6\3\6\3\6\3\6\6\6\u00a2\n\6\r\6\16\6\u00a3\5\6\u00a6\n\6\5\6\u00a8"+
+		"\n\6\3\7\5\7\u00ab\n\7\3\7\3\7\3\7\3\7\3\7\5\7\u00b2\n\7\3\b\3\b\5\b\u00b6"+
+		"\n\b\3\t\3\t\3\t\5\t\u00bb\n\t\3\n\3\n\3\n\3\n\3\n\3\n\3\n\6\n\u00c4\n"+
+		"\n\r\n\16\n\u00c5\3\n\3\n\5\n\u00ca\n\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3"+
+		"\n\3\n\3\n\3\n\7\n\u00d7\n\n\f\n\16\n\u00da\13\n\3\n\3\n\3\n\3\n\3\n\3"+
+		"\n\3\n\3\n\3\n\7\n\u00e5\n\n\f\n\16\n\u00e8\13\n\5\n\u00ea\n\n\3\n\3\n"+
+		"\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\5\n\u00fb\n\n\3\n"+
+		"\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3"+
+		"\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\5\n\u0117\n\n\3\n\3\n\3\n\3\n\3\n\3\n\5"+
+		"\n\u011f\n\n\3\n\3\n\3\n\3\n\5\n\u0125\n\n\3\n\3\n\5\n\u0129\n\n\3\n\3"+
+		"\n\5\n\u012d\n\n\5\n\u012f\n\n\3\n\3\n\3\n\3\n\3\n\3\n\5\n\u0137\n\n\3"+
+		"\n\3\n\3\n\7\n\u013c\n\n\f\n\16\n\u013f\13\n\3\13\3\13\3\13\3\13\7\13"+
+		"\u0145\n\13\f\13\16\13\u0148\13\13\5\13\u014a\n\13\3\13\3\13\3\f\3\f\3"+
+		"\f\3\f\3\r\3\r\3\r\3\r\3\r\7\r\u0157\n\r\f\r\16\r\u015a\13\r\5\r\u015c"+
+		"\n\r\3\r\3\r\3\16\3\16\3\16\3\16\3\16\3\16\5\16\u0166\n\16\3\17\3\17\5"+
+		"\17\u016a\n\17\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\7\20\u0174\n\20"+
+		"\f\20\16\20\u0177\13\20\3\20\3\20\3\20\3\20\5\20\u017d\n\20\3\21\3\21"+
+		"\3\22\3\22\3\23\3\23\3\23\3\23\3\23\3\24\3\24\3\24\3\24\3\25\3\25\3\25"+
+		"\3\25\3\25\5\25\u0191\n\25\3\26\3\26\3\27\3\27\5\27\u0197\n\27\3\30\3"+
+		"\30\3\30\7\30\u019c\n\30\f\30\16\30\u019f\13\30\3\31\3\31\3\32\3\32\3"+
+		"\33\3\33\3\34\3\34\3\34\7\34\u01aa\n\34\f\34\16\34\u01ad\13\34\3\35\3"+
+		"\35\3\35\2\3\22\36\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,.\60"+
+		"\62\64\668\2\b\4\2  ##\4\2%%;;\5\2\7\7\23\23\25\25\4\2\22\22\30\30\5\2"+
+		"\n\f\20\21\26\26\3\2@D\2\u01e3\2:\3\2\2\2\4I\3\2\2\2\6K\3\2\2\2\bS\3\2"+
+		"\2\2\n\u00a7\3\2\2\2\f\u00b1\3\2\2\2\16\u00b3\3\2\2\2\20\u00ba\3\2\2\2"+
+		"\22\u00fa\3\2\2\2\24\u0140\3\2\2\2\26\u014d\3\2\2\2\30\u0151\3\2\2\2\32"+
+		"\u0165\3\2\2\2\34\u0169\3\2\2\2\36\u017c\3\2\2\2 \u017e\3\2\2\2\"\u0180"+
+		"\3\2\2\2$\u0182\3\2\2\2&\u0187\3\2\2\2(\u0190\3\2\2\2*\u0192\3\2\2\2,"+
+		"\u0196\3\2\2\2.\u0198\3\2\2\2\60\u01a0\3\2\2\2\62\u01a2\3\2\2\2\64\u01a4"+
+		"\3\2\2\2\66\u01a6\3\2\2\28\u01ae\3\2\2\2:?\5\4\3\2;<\7\35\2\2<>\5\4\3"+
+		"\2=;\3\2\2\2>A\3\2\2\2?=\3\2\2\2?@\3\2\2\2@C\3\2\2\2A?\3\2\2\2BD\7\35"+
+		"\2\2CB\3\2\2\2CD\3\2\2\2DE\3\2\2\2EF\7\2\2\3F\3\3\2\2\2GJ\5\6\4\2HJ\5"+
+		"\b\5\2IG\3\2\2\2IH\3\2\2\2J\5\3\2\2\2KL\7&\2\2LP\5(\25\2MO\5\n\6\2NM\3"+
+		"\2\2\2OR\3\2\2\2PN\3\2\2\2PQ\3\2\2\2Q\7\3\2\2\2RP\3\2\2\2ST\7+\2\2TU\7"+
+		",\2\2UV\5(\25\2V[\5\24\13\2WX\7\5\2\2XZ\5\24\13\2YW\3\2\2\2Z]\3\2\2\2"+
+		"[Y\3\2\2\2[\\\3\2\2\2\\\t\3\2\2\2][\3\2\2\2^_\7\'\2\2_`\7\r\2\2`e\5\26"+
+		"\f\2ab\7\5\2\2bd\5\26\f\2ca\3\2\2\2dg\3\2\2\2ec\3\2\2\2ef\3\2\2\2fh\3"+
+		"\2\2\2ge\3\2\2\2hk\7\32\2\2ij\7!\2\2jl\5\22\n\2ki\3\2\2\2kl\3\2\2\2l\u00a8"+
+		"\3\2\2\2mn\7/\2\2n\u00a8\7@\2\2op\7\60\2\2pq\7\r\2\2qr\5.\30\2r\177\7"+
+		"\4\2\2st\7\r\2\2ty\5&\24\2uv\7\5\2\2vx\5&\24\2wu\3\2\2\2x{\3\2\2\2yw\3"+
+		"\2\2\2yz\3\2\2\2z|\3\2\2\2{y\3\2\2\2|}\7\32\2\2}~\7\3\2\2~\u0080\3\2\2"+
+		"\2\177s\3\2\2\2\177\u0080\3\2\2\2\u0080\u0081\3\2\2\2\u0081\u0082\5\6"+
+		"\4\2\u0082\u0083\7\32\2\2\u0083\u00a8\3\2\2\2\u0084\u0085\7\61\2\2\u0085"+
+		"\u00a8\5\22\n\2\u0086\u0087\7\65\2\2\u0087\u0088\7\r\2\2\u0088\u008d\5"+
+		"\f\7\2\u0089\u008a\7\5\2\2\u008a\u008c\5\f\7\2\u008b\u0089\3\2\2\2\u008c"+
+		"\u008f\3\2\2\2\u008d\u008b\3\2\2\2\u008d\u008e\3\2\2\2\u008e\u0090\3\2"+
+		"\2\2\u008f\u008d\3\2\2\2\u0090\u0091\7\32\2\2\u0091\u00a8\3\2\2\2\u0092"+
+		"\u0093\7\66\2\2\u0093\u00a8\7@\2\2\u0094\u0095\7\67\2\2\u0095\u009a\5"+
+		"\16\b\2\u0096\u0097\7\5\2\2\u0097\u0099\5\16\b\2\u0098\u0096\3\2\2\2\u0099"+
+		"\u009c\3\2\2\2\u009a\u0098\3\2\2\2\u009a\u009b\3\2\2\2\u009b\u00a8\3\2"+
+		"\2\2\u009c\u009a\3\2\2\2\u009d\u009e\7<\2\2\u009e\u00a5\5\66\34\2\u009f"+
+		"\u00a1\7=\2\2\u00a0\u00a2\5\20\t\2\u00a1\u00a0\3\2\2\2\u00a2\u00a3\3\2"+
+		"\2\2\u00a3\u00a1\3\2\2\2\u00a3\u00a4\3\2\2\2\u00a4\u00a6\3\2\2\2\u00a5"+
+		"\u009f\3\2\2\2\u00a5\u00a6\3\2\2\2\u00a6\u00a8\3\2\2\2\u00a7^\3\2\2\2"+
+		"\u00a7m\3\2\2\2\u00a7o\3\2\2\2\u00a7\u0084\3\2\2\2\u00a7\u0086\3\2\2\2"+
+		"\u00a7\u0092\3\2\2\2\u00a7\u0094\3\2\2\2\u00a7\u009d\3\2\2\2\u00a8\13"+
+		"\3\2\2\2\u00a9\u00ab\7\27\2\2\u00aa\u00a9\3\2\2\2\u00aa\u00ab\3\2\2\2"+
+		"\u00ab\u00ac\3\2\2\2\u00ac\u00b2\5.\30\2\u00ad\u00ae\5.\30\2\u00ae\u00af"+
+		"\7\4\2\2\u00af\u00b0\5\22\n\2\u00b0\u00b2\3\2\2\2\u00b1\u00aa\3\2\2\2"+
+		"\u00b1\u00ad\3\2\2\2\u00b2\r\3\2\2\2\u00b3\u00b5\5\66\34\2\u00b4\u00b6"+
+		"\t\2\2\2\u00b5\u00b4\3\2\2\2\u00b5\u00b6\3\2\2\2\u00b6\17\3\2\2\2\u00b7"+
+		"\u00b8\7*\2\2\u00b8\u00bb\5.\30\2\u00b9\u00bb\7>\2\2\u00ba\u00b7\3\2\2"+
+		"\2\u00ba\u00b9\3\2\2\2\u00bb\21\3\2\2\2\u00bc\u00bd\b\n\1\2\u00bd\u00be"+
+		"\7\22\2\2\u00be\u00fb\5\22\n \u00bf\u00c0\7\62\2\2\u00c0\u00fb\5\22\n"+
+		"\37\u00c1\u00c3\79\2\2\u00c2\u00c4\5$\23\2\u00c3\u00c2\3\2\2\2\u00c4\u00c5"+
+		"\3\2\2\2\u00c5\u00c3\3\2\2\2\u00c5\u00c6\3\2\2\2\u00c6\u00c9\3\2\2\2\u00c7"+
+		"\u00c8\7$\2\2\u00c8\u00ca\5\22\n\2\u00c9\u00c7\3\2\2\2\u00c9\u00ca\3\2"+
+		"\2\2\u00ca\u00fb\3\2\2\2\u00cb\u00cc\7(\2\2\u00cc\u00cd\5\22\n\2\u00cd"+
+		"\u00ce\7:\2\2\u00ce\u00cf\5\22\n\2\u00cf\u00d0\7$\2\2\u00d0\u00d1\5\22"+
+		"\n\21\u00d1\u00fb\3\2\2\2\u00d2\u00d3\7\r\2\2\u00d3\u00d8\5&\24\2\u00d4"+
+		"\u00d5\7\5\2\2\u00d5\u00d7\5&\24\2\u00d6\u00d4\3\2\2\2\u00d7\u00da\3\2"+
+		"\2\2\u00d8\u00d6\3\2\2\2\u00d8\u00d9\3\2\2\2\u00d9\u00db\3\2\2\2\u00da"+
+		"\u00d8\3\2\2\2\u00db\u00dc\7\32\2\2\u00dc\u00dd\7\3\2\2\u00dd\u00de\5"+
+		"\22\n\20\u00de\u00fb\3\2\2\2\u00df\u00fb\5\24\13\2\u00e0\u00e9\7\16\2"+
+		"\2\u00e1\u00e6\5\22\n\2\u00e2\u00e3\7\5\2\2\u00e3\u00e5\5\22\n\2\u00e4"+
+		"\u00e2\3\2\2\2\u00e5\u00e8\3\2\2\2\u00e6\u00e4\3\2\2\2\u00e6\u00e7\3\2"+
+		"\2\2\u00e7\u00ea\3\2\2\2\u00e8\u00e6\3\2\2\2\u00e9\u00e1\3\2\2\2\u00e9"+
+		"\u00ea\3\2\2\2\u00ea\u00eb\3\2\2\2\u00eb\u00fb\7\33\2\2\u00ec\u00ed\7"+
+		"\17\2\2\u00ed\u00ee\5\22\n\2\u00ee\u00ef\7\34\2\2\u00ef\u00fb\3\2\2\2"+
+		"\u00f0\u00fb\5\30\r\2\u00f1\u00fb\58\35\2\u00f2\u00fb\5\60\31\2\u00f3"+
+		"\u00fb\5 \21\2\u00f4\u00fb\7G\2\2\u00f5\u00fb\t\3\2\2\u00f6\u00fb\7\63"+
+		"\2\2\u00f7\u00fb\7E\2\2\u00f8\u00fb\7J\2\2\u00f9\u00fb\5\"\22\2\u00fa"+
+		"\u00bc\3\2\2\2\u00fa\u00bf\3\2\2\2\u00fa\u00c1\3\2\2\2\u00fa\u00cb\3\2"+
+		"\2\2\u00fa\u00d2\3\2\2\2\u00fa\u00df\3\2\2\2\u00fa\u00e0\3\2\2\2\u00fa"+
+		"\u00ec\3\2\2\2\u00fa\u00f0\3\2\2\2\u00fa\u00f1\3\2\2\2\u00fa\u00f2\3\2"+
+		"\2\2\u00fa\u00f3\3\2\2\2\u00fa\u00f4\3\2\2\2\u00fa\u00f5\3\2\2\2\u00fa"+
+		"\u00f6\3\2\2\2\u00fa\u00f7\3\2\2\2\u00fa\u00f8\3\2\2\2\u00fa\u00f9\3\2"+
+		"\2\2\u00fb\u013d\3\2\2\2\u00fc\u00fd\f!\2\2\u00fd\u00fe\7\24\2\2\u00fe"+
+		"\u013c\5\22\n!\u00ff\u0100\f\32\2\2\u0100\u0101\t\4\2\2\u0101\u013c\5"+
+		"\22\n\33\u0102\u0103\f\31\2\2\u0103\u0104\t\5\2\2\u0104\u013c\5\22\n\32"+
+		"\u0105\u0106\f\30\2\2\u0106\u0107\t\6\2\2\u0107\u013c\5\22\n\31\u0108"+
+		"\u0109\f\27\2\2\u0109\u010a\7\37\2\2\u010a\u013c\5\22\n\30\u010b\u010c"+
+		"\f\26\2\2\u010c\u010d\7\64\2\2\u010d\u013c\5\22\n\27\u010e\u010f\f\25"+
+		"\2\2\u010f\u0110\7\6\2\2\u0110\u013c\5\22\n\26\u0111\u0112\f\24\2\2\u0112"+
+		"\u0113\7\t\2\2\u0113\u013c\5\22\n\25\u0114\u0116\f\23\2\2\u0115\u0117"+
+		"\7\62\2\2\u0116\u0115\3\2\2\2\u0116\u0117\3\2\2\2\u0117\u0118\3\2\2\2"+
+		"\u0118\u0119\7)\2\2\u0119\u013c\5\22\n\24\u011a\u011b\f\36\2\2\u011b\u011e"+
+		"\7\b\2\2\u011c\u011f\5\60\31\2\u011d\u011f\5\30\r\2\u011e\u011c\3\2\2"+
+		"\2\u011e\u011d\3\2\2\2\u011f\u013c\3\2\2\2\u0120\u0121\f\35\2\2\u0121"+
+		"\u012e\7\16\2\2\u0122\u012f\5\22\n\2\u0123\u0125\5\22\n\2\u0124\u0123"+
+		"\3\2\2\2\u0124\u0125\3\2\2\2\u0125\u0126\3\2\2\2\u0126\u0128\7\31\2\2"+
+		"\u0127\u0129\5\22\n\2\u0128\u0127\3\2\2\2\u0128\u0129\3\2\2\2\u0129\u012c"+
+		"\3\2\2\2\u012a\u012b\7\4\2\2\u012b\u012d\5\22\n\2\u012c\u012a\3\2\2\2"+
+		"\u012c\u012d\3\2\2\2\u012d\u012f\3\2\2\2\u012e\u0122\3\2\2\2\u012e\u0124"+
+		"\3\2\2\2\u012f\u0130\3\2\2\2\u0130\u013c\7\33\2\2\u0131\u0132\f\34\2\2"+
+		"\u0132\u0133\7\31\2\2\u0133\u0136\5\22\n\2\u0134\u0135\7\4\2\2\u0135\u0137"+
+		"\5\22\n\2\u0136\u0134\3\2\2\2\u0136\u0137\3\2\2\2\u0137\u013c\3\2\2\2"+
+		"\u0138\u0139\f\33\2\2\u0139\u013a\7.\2\2\u013a\u013c\5\"\22\2\u013b\u00fc"+
+		"\3\2\2\2\u013b\u00ff\3\2\2\2\u013b\u0102\3\2\2\2\u013b\u0105\3\2\2\2\u013b"+
+		"\u0108\3\2\2\2\u013b\u010b\3\2\2\2\u013b\u010e\3\2\2\2\u013b\u0111\3\2"+
+		"\2\2\u013b\u0114\3\2\2\2\u013b\u011a\3\2\2\2\u013b\u0120\3\2\2\2\u013b"+
+		"\u0131\3\2\2\2\u013b\u0138\3\2\2\2\u013c\u013f\3\2\2\2\u013d\u013b\3\2"+
+		"\2\2\u013d\u013e\3\2\2\2\u013e\23\3\2\2\2\u013f\u013d\3\2\2\2\u0140\u0149"+
+		"\7\r\2\2\u0141\u0146\5\26\f\2\u0142\u0143\7\5\2\2\u0143\u0145\5\26\f\2"+
+		"\u0144\u0142\3\2\2\2\u0145\u0148\3\2\2\2\u0146\u0144\3\2\2\2\u0146\u0147"+
+		"\3\2\2\2\u0147\u014a\3\2\2\2\u0148\u0146\3\2\2\2\u0149\u0141\3\2\2\2\u0149"+
+		"\u014a\3\2\2\2\u014a\u014b\3\2\2\2\u014b\u014c\7\32\2\2\u014c\25\3\2\2"+
+		"\2\u014d\u014e\5,\27\2\u014e\u014f\7\4\2\2\u014f\u0150\5\22\n\2\u0150"+
+		"\27\3\2\2\2\u0151\u0152\5\62\32\2\u0152\u015b\7\17\2\2\u0153\u0158\5\32"+
+		"\16\2\u0154\u0155\7\5\2\2\u0155\u0157\5\32\16\2\u0156\u0154\3\2\2\2\u0157"+
+		"\u015a\3\2\2\2\u0158\u0156\3\2\2\2\u0158\u0159\3\2\2\2\u0159\u015c\3\2"+
+		"\2\2\u015a\u0158\3\2\2\2\u015b\u0153\3\2\2\2\u015b\u015c\3\2\2\2\u015c"+
+		"\u015d\3\2\2\2\u015d\u015e\7\34\2\2\u015e\31\3\2\2\2\u015f\u0166\5\22"+
+		"\n\2\u0160\u0161\5\64\33\2\u0161\u0162\7\4\2\2\u0162\u0163\5\22\n\2\u0163"+
+		"\u0166\3\2\2\2\u0164\u0166\5\36\20\2\u0165\u015f\3\2\2\2\u0165\u0160\3"+
+		"\2\2\2\u0165\u0164\3\2\2\2\u0166\33\3\2\2\2\u0167\u016a\58\35\2\u0168"+
+		"\u016a\7\36\2\2\u0169\u0167\3\2\2\2\u0169\u0168\3\2\2\2\u016a\35\3\2\2"+
+		"\2\u016b\u016c\5\34\17\2\u016c\u016d\7\3\2\2\u016d\u016e\5\22\n\2\u016e"+
+		"\u017d\3\2\2\2\u016f\u0170\7\17\2\2\u0170\u0175\5\34\17\2\u0171\u0172"+
+		"\7\5\2\2\u0172\u0174\5\34\17\2\u0173\u0171\3\2\2\2\u0174\u0177\3\2\2\2"+
+		"\u0175\u0173\3\2\2\2\u0175\u0176\3\2\2\2\u0176\u0178\3\2\2\2\u0177\u0175"+
+		"\3\2\2\2\u0178\u0179\7\34\2\2\u0179\u017a\7\3\2\2\u017a\u017b\5\22\n\2"+
+		"\u017b\u017d\3\2\2\2\u017c\u016b\3\2\2\2\u017c\u016f\3\2\2\2\u017d\37"+
+		"\3\2\2\2\u017e\u017f\t\7\2\2\u017f!\3\2\2\2\u0180\u0181\7?\2\2\u0181#"+
+		"\3\2\2\2\u0182\u0183\7\"\2\2\u0183\u0184\5\22\n\2\u0184\u0185\7:\2\2\u0185"+
+		"\u0186\5\22\n\2\u0186%\3\2\2\2\u0187\u0188\58\35\2\u0188\u0189\7\4\2\2"+
+		"\u0189\u018a\5\22\n\2\u018a\'\3\2\2\2\u018b\u0191\7F\2\2\u018c\u018d\5"+
+		"*\26\2\u018d\u018e\7\b\2\2\u018e\u018f\7F\2\2\u018f\u0191\3\2\2\2\u0190"+
+		"\u018b\3\2\2\2\u0190\u018c\3\2\2\2\u0191)\3\2\2\2\u0192\u0193\7F\2\2\u0193"+
+		"+\3\2\2\2\u0194\u0197\7G\2\2\u0195\u0197\5\60\31\2\u0196\u0194\3\2\2\2"+
+		"\u0196\u0195\3\2\2\2\u0197-\3\2\2\2\u0198\u019d\5,\27\2\u0199\u019a\7"+
+		"\b\2\2\u019a\u019c\5,\27\2\u019b\u0199\3\2\2\2\u019c\u019f\3\2\2\2\u019d"+
+		"\u019b\3\2\2\2\u019d\u019e\3\2\2\2\u019e/\3\2\2\2\u019f\u019d\3\2\2\2"+
+		"\u01a0\u01a1\7F\2\2\u01a1\61\3\2\2\2\u01a2\u01a3\7F\2\2\u01a3\63\3\2\2"+
+		"\2\u01a4\u01a5\7F\2\2\u01a5\65\3\2\2\2\u01a6\u01ab\5\60\31\2\u01a7\u01a8"+
+		"\7\b\2\2\u01a8\u01aa\5\60\31\2\u01a9\u01a7\3\2\2\2\u01aa\u01ad\3\2\2\2"+
+		"\u01ab\u01a9\3\2\2\2\u01ab\u01ac\3\2\2\2\u01ac\67\3\2\2\2\u01ad\u01ab"+
+		"\3\2\2\2\u01ae\u01af\7H\2\2\u01af9\3\2\2\2/?CIP[eky\177\u008d\u009a\u00a3"+
+		"\u00a5\u00a7\u00aa\u00b1\u00b5\u00ba\u00c5\u00c9\u00d8\u00e6\u00e9\u00fa"+
+		"\u0116\u011e\u0124\u0128\u012c\u012e\u0136\u013b\u013d\u0146\u0149\u0158"+
+		"\u015b\u0165\u0169\u0175\u017c\u0190\u0196\u019d\u01ab";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

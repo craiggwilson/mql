@@ -2,19 +2,25 @@ grammar MQL;
 
 parse: statement (SEMI statement)* SEMI? EOF;
 
+// STATEMENTS
 statement:
-  pipeline
+  query_statement                                             #queryStatement
+| insert_statement                                            #insertStatement
 ;
 
-pipeline: FROM collection_name stage*;
+query_statement: FROM collection_name query_stage*;
 
-// STAGES
-stage:
+insert_statement:
+  INSERT INTO collection_name document (COMMA document)*
+;
+
+// QUERY STAGES
+query_stage:
   GROUP LBRACE field_assignment (COMMA field_assignment)* RBRACE (BY expression)?      #groupStage
 | LIMIT INT                                                                            #limitStage
 | LOOKUP LBRACE multipart_field_declaration COLON
     (LBRACE variable_assignment (COMMA variable_assignment)* RBRACE ARROW)?
-    statement
+    query_statement
   RBRACE                                                                               #lookupStage
 | MATCH expression                                                                     #matchStage
 | PROJECT LBRACE project_item (COMMA project_item)* RBRACE                             #projectStage
@@ -37,44 +43,46 @@ unwind_option:
 | PRESERVE_NULL_AND_EMPTY
 ;
 
-
 // EXPRESSIONS
 expression:
-  <assoc=right>expression POWER expression                              #powerExpression
-| MINUS expression                                                      #unaryMinusExpression
-| NOT expression                                                        #notExpression
-| expression DOT (field_name | function)                                #memberExpression
+  <assoc=right>expression POWER expression                                                 #powerExpression
+| MINUS expression                                                                         #unaryMinusExpression
+| NOT expression                                                                           #notExpression
+| expression DOT (field_name | function)                                                   #memberExpression
 | expression LBRACK (
         start=expression
       | (start=expression)? RANGE (end=expression)? (COLON step=expression)?
-    ) RBRACK                                                            #arrayAccessExpression
-| expression RANGE expression (COLON expression)?                       #rangeExpression
-| expression LIKE regex                                                 #likeExpression
-| expression op=(MULT | DIV | MOD) expression                           #multiplicationExpression
-| expression op=(PLUS | MINUS) expression                               #additionExpression
-| expression op=(EQ | GT | GTE | LT | LTE | NEQ) expression             #comparisonExpression
-| expression AND expression                                             #andExpression
-| expression OR expression                                              #orExpression
-| expression CONCAT expression                                          #concatExpression
-| expression DQUESTION expression                                       #nullCoalesceExpression
-| expression NOT? IN expression                                         #inExpression
-| SWITCH switch_case+ (ELSE expression)?                                #switchExpression
-| IF expression THEN expression ELSE expression                         #conditionalExpression
-| LBRACE variable_assignment (COMMA variable_assignment)*
-      RBRACE ARROW expression                                           #letExpression
-| LBRACE (field_assignment (COMMA field_assignment)*)? RBRACE           #newDocumentExpression
-| LBRACK (expression (COMMA expression)*)? RBRACK                       #newArrayExpression
-| LPAREN expression RPAREN                                              #parenthesisExpression
-| function                                                              #functionCallExpression
-| variable_name                                                         #variableReferenceExpression
-| field_name                                                            #fieldExpression
-| number                                                                #numberExpression
-| STRING                                                                #stringExpression
-| (TRUE | FALSE)                                                        #booleanExpression
-| NULL                                                                  #nullExpression
-| OID                                                                   #oidExpression
-| DATE_TIME                                                             #dateTimeExpression
-| regex                                                                 #regexExpression
+    ) RBRACK                                                                               #arrayAccessExpression
+| expression RANGE expression (COLON expression)?                                          #rangeExpression
+| expression LIKE regex                                                                    #likeExpression
+| expression op=(MULT | DIV | MOD) expression                                              #multiplicationExpression
+| expression op=(PLUS | MINUS) expression                                                  #additionExpression
+| expression op=(EQ | GT | GTE | LT | LTE | NEQ) expression                                #comparisonExpression
+| expression AND expression                                                                #andExpression
+| expression OR expression                                                                 #orExpression
+| expression CONCAT expression                                                             #concatExpression
+| expression DQUESTION expression                                                          #nullCoalesceExpression
+| expression NOT? IN expression                                                            #inExpression
+| SWITCH switch_case+ (ELSE expression)?                                                   #switchExpression
+| IF expression THEN expression ELSE expression                                            #conditionalExpression
+| LBRACE variable_assignment (COMMA variable_assignment)* RBRACE ARROW expression          #letExpression
+| document                                                                                 #newDocumentExpression
+| LBRACK (expression (COMMA expression)*)? RBRACK                                          #newArrayExpression
+| LPAREN expression RPAREN                                                                 #parenthesisExpression
+| function                                                                                 #functionCallExpression
+| variable_name                                                                            #variableReferenceExpression
+| field_name                                                                               #fieldExpression
+| number                                                                                   #numberExpression
+| STRING                                                                                   #stringExpression
+| (TRUE | FALSE)                                                                           #booleanExpression
+| NULL                                                                                     #nullExpression
+| OID                                                                                      #oidExpression
+| DATE_TIME                                                                                #dateTimeExpression
+| regex                                                                                    #regexExpression
+;
+
+document:
+  LBRACE (field_assignment (COMMA field_assignment)*)? RBRACE
 ;
 
 field_assignment:
@@ -179,6 +187,8 @@ GROUP:    G R O U P;
 IF:       I F;
 IN:       I N;
 INDEX:    I N D E X;
+INSERT:   I N S E R T;
+INTO:     I N T O;
 LET:      L E T;
 LIKE:     L I K E;
 LIMIT:    L I M I T;

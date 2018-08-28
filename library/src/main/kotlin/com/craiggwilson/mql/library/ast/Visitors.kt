@@ -54,9 +54,8 @@ abstract class Visitor<T> {
     // Nodes
 
     open fun visit(n: FieldDeclaration): T = throw NotImplementedError()
-    open fun visit(n: Statement): T = throw NotImplementedError()
 
-    // Stages
+    // Query Stages
 
     open fun visit(n: GroupStage): T = throw NotImplementedError()
     open fun visit(n: LimitStage): T = throw NotImplementedError()
@@ -66,6 +65,10 @@ abstract class Visitor<T> {
     open fun visit(n: SkipStage): T = throw NotImplementedError()
     open fun visit(n: SortStage): T = throw NotImplementedError()
     open fun visit(n: UnwindStage): T = throw NotImplementedError()
+
+    // Statements
+
+    open fun visit(n: QueryStatement): T = throw NotImplementedError()
 
     protected fun <T> visit(items: List<T>, visit: (T) -> T): List<T> {
         var newItems: MutableList<T>? = null
@@ -282,10 +285,6 @@ abstract class NodeVisitor : Visitor<Node>() {
         visit(n.parent) as FieldDeclaration?,
         n.name)
 
-    override fun visit(n: Statement): Node = n.update(
-        n.collectionName,
-        visit(n.stages))
-
     // Stages
 
     override fun visit(n: GroupStage): Node = n.update(
@@ -303,7 +302,7 @@ abstract class NodeVisitor : Visitor<Node>() {
                 visit(variable.expression) as Expression
             )
         },
-        visit(n.statement) as Statement
+        visit(n.statement) as QueryStatement
     )
 
     override fun visit(n: MatchStage): Node = n.update(visit(n.expression) as Expression)
@@ -336,4 +335,10 @@ abstract class NodeVisitor : Visitor<Node>() {
     )
 
     override fun visit(n: UnwindStage): Node = n.update(n.field, n.indexField, n.preserveNullAndEmpty)
+
+    // Statements
+
+    override fun visit(n: QueryStatement): Node = n.update(
+        n.collectionName,
+        visit(n.stages))
 }

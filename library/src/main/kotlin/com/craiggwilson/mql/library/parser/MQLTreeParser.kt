@@ -48,6 +48,7 @@ import com.craiggwilson.mql.library.ast.ObjectIdExpression
 import com.craiggwilson.mql.library.ast.OrExpression
 import com.craiggwilson.mql.library.ast.PowerExpression
 import com.craiggwilson.mql.library.ast.ProjectStage
+import com.craiggwilson.mql.library.ast.QueryStatement
 import com.craiggwilson.mql.library.ast.RangeExpression
 import com.craiggwilson.mql.library.ast.RegexExpression
 import com.craiggwilson.mql.library.ast.SkipStage
@@ -118,13 +119,20 @@ object MQLTreeParser {
     }
 
     private fun parseStatement(ctx: MQLParser.StatementContext): Statement {
-        val collectionName = getCollectionName(ctx.pipeline().collection_name())
-        val stages = ctx.pipeline().stage().map { parseStage(it) }
-
-        return Statement(collectionName, stages)
+        return when(ctx) {
+            is MQLParser.QueryStatementContext -> parseQueryStatement(ctx.query_statement())
+            else -> throw UnsupportedOperationException()
+        }
     }
 
-    private fun parseStage(ctx: MQLParser.StageContext): Stage {
+    private fun parseQueryStatement(ctx: MQLParser.Query_statementContext): QueryStatement {
+        val collectionName = getCollectionName(ctx.collection_name())
+        val stages = ctx.query_stage().map { parseQueryStage(it) }
+
+        return QueryStatement(collectionName, stages)
+    }
+
+    private fun parseQueryStage(ctx: MQLParser.Query_stageContext): Stage {
         return when (ctx) {
             is MQLParser.GroupStageContext -> {
                 val by = parseExpression(ctx.expression())
@@ -145,7 +153,7 @@ object MQLTreeParser {
                         parseExpression(variable.expression())
                     )
                 }
-                val statement = parseStatement(ctx.statement())
+                val statement = parseQueryStatement(ctx.query_statement())
 
                 LookupStage(field, variables, statement)
             }
@@ -331,16 +339,7 @@ object MQLTreeParser {
 
                 NewArrayExpression(items)
             }
-            is MQLParser.NewDocumentExpressionContext -> {
-                val elements = ctx.field_assignment().map { fa ->
-                    val field = getFieldDeclaration(fa.field_declaration())
-                    val expression = parseExpression(fa.expression())
-
-                    NewDocumentExpression.Element(field, expression)
-                }
-
-                NewDocumentExpression(elements)
-            }
+            is MQLParser.NewDocumentExpressionContext -> parserDocument(ctx.document())
             is MQLParser.NotExpressionContext -> {
                 val expression = parseExpression(ctx.expression())
                 return NotExpression(expression)
@@ -405,6 +404,17 @@ object MQLTreeParser {
             }
             else -> throw ParseException("expression not supported: ${ctx.text}")
         }
+    }
+
+    private fun parserDocument(ctx: MQLParser.DocumentContext): NewDocumentExpression {
+        val elements = ctx.field_assignment().map { fa ->
+            val field = getFieldDeclaration(fa.field_declaration())
+            val expression = parseExpression(fa.expression())
+
+            NewDocumentExpression.Element(field, expression)
+        }
+
+        return NewDocumentExpression(elements)
     }
 
     private fun parseFunction(ctx: MQLParser.FunctionContext): FunctionCallExpression {

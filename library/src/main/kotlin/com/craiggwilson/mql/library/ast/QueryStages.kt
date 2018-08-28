@@ -26,10 +26,10 @@ data class LimitStage(val limit: Long) : Stage() {
     }
 }
 
-data class LookupStage(val field: FieldDeclaration, val variables: List<Variable>, val statement: Statement) : Stage() {
+data class LookupStage(val field: FieldDeclaration, val variables: List<Variable>, val statement: QueryStatement) : Stage() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 
-    fun update(field: FieldDeclaration, variables: List<Variable>, statement: Statement): LookupStage {
+    fun update(field: FieldDeclaration, variables: List<Variable>, statement: QueryStatement): LookupStage {
         return if (field !== this.field || variables !== this.variables || statement !== this.statement) {
             LookupStage(field, variables, statement)
         } else this

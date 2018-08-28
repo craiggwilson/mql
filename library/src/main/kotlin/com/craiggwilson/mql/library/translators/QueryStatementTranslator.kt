@@ -6,6 +6,7 @@ import com.craiggwilson.mql.library.ast.LimitStage
 import com.craiggwilson.mql.library.ast.LookupStage
 import com.craiggwilson.mql.library.ast.MatchStage
 import com.craiggwilson.mql.library.ast.ProjectStage
+import com.craiggwilson.mql.library.ast.QueryStatement
 import com.craiggwilson.mql.library.ast.SkipStage
 import com.craiggwilson.mql.library.ast.SortStage
 import com.craiggwilson.mql.library.ast.Statement
@@ -25,29 +26,33 @@ import org.bson.json.JsonMode
 import org.bson.json.JsonWriterSettings
 
 fun Statement.toShell(pretty: Boolean = false): String {
-    val pipeline = translatedPipeline()
-    val settings = JsonWriterSettings.builder().outputMode(JsonMode.SHELL).indent(pretty).build()
-    val dummyDoc = BsonDocument("d", pipeline)
-    val json = dummyDoc.toJson(settings)
+    when(this) {
+        is QueryStatement -> {
+            val pipeline = translatedPipeline()
+            val settings = JsonWriterSettings.builder().outputMode(JsonMode.SHELL).indent(pretty).build()
+            val dummyDoc = BsonDocument("d", pipeline)
+            val json = dummyDoc.toJson(settings)
 
-    val db = if (collectionName.databaseName != null) {
-        "db.getSiblingDB(\"${collectionName.databaseName}"
-    } else "db"
+            val db = if (collectionName.databaseName != null) {
+                "db.getSiblingDB(\"${collectionName.databaseName}"
+            } else "db"
 
-    val startIndex = json.indexOf('[')
-    return "$db.${collectionName.name}.aggregate(${json.substring(startIndex until json.length-1)})"
+            val startIndex = json.indexOf('[')
+            return "$db.${collectionName.name}.aggregate(${json.substring(startIndex until json.length-1)})"
+        }
+        else -> throw UnsupportedOperationException("can only translate a QueryStatement")
+    }
 }
 
-fun Statement.translatedPipeline(): BsonArray {
-    return StatementTranslator().visit(this)
+fun QueryStatement.translatedPipeline(): BsonArray {
+    return QueryStatementTranslator().visit(this)
 }
 
-class StatementTranslator(rewriter: NodeRewriter = DefaultNodeRewriter) : AbstractTranslator() {
+class QueryStatementTranslator(rewriter: NodeRewriter = DefaultNodeRewriter) : AbstractTranslator() {
     private val preProcessor = Rewriter(rewriter)
 
-    // Nodes
-    override fun visit(n: Statement): BsonArray {
-        val stmt = preProcessor.visit(n) as Statement
+    override fun visit(n: QueryStatement): BsonArray {
+        val stmt = preProcessor.visit(n) as QueryStatement
         return BsonArray(stmt.stages.map { visit(it) })
     }
 

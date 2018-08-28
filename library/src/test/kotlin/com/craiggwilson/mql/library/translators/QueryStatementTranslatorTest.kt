@@ -1,12 +1,13 @@
 package com.craiggwilson.mql.library.translators
 
+import com.craiggwilson.mql.library.ast.QueryStatement
 import com.craiggwilson.mql.library.parser.parseMQL
 import org.bson.BsonArray
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 
-class StatementTranslatorTest {
+class QueryStatementTranslatorTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("aggExpressions")
@@ -14,7 +15,7 @@ class StatementTranslatorTest {
         val actualExpected = BsonArray.parse("[{ \"\$project\": { \"test\": $expected } }]")
 
         val parsed = parseMQL("FROM bar PROJECT { test: $mql }")[0]
-        val actual = parsed.translatedPipeline()
+        val actual = (parsed as QueryStatement).translatedPipeline()
 
         assertEquals(actualExpected, actual)
     }
@@ -25,7 +26,7 @@ class StatementTranslatorTest {
         val actualExpected = BsonArray.parse("[{ \"\$project\": { \"test\": $expected } }]")
 
         val parsed = parseMQL("FROM bar PROJECT { test: $mql }")[0]
-        val actual = parsed.translatedPipeline()
+        val actual = (parsed as QueryStatement).translatedPipeline()
 
         assertEquals(actualExpected, actual)
     }
@@ -36,7 +37,7 @@ class StatementTranslatorTest {
         val actualExpected = BsonArray.parse("[{ \"\$match\": $expected }]")
 
         val parsed = parseMQL("FROM bar MATCH $mql")[0]
-        val actual = parsed.translatedPipeline()
+        val actual = (parsed as QueryStatement).translatedPipeline()
 
         assertEquals(actualExpected, actual)
     }
@@ -47,7 +48,7 @@ class StatementTranslatorTest {
         val actualExpected = BsonArray.parse(expected)
 
         val parsed = parseMQL(mql)[0]
-        val actual = parsed.translatedPipeline()
+        val actual = (parsed as QueryStatement).translatedPipeline()
 
         assertEquals(actualExpected, actual)
     }
@@ -58,7 +59,7 @@ class StatementTranslatorTest {
         val actualExpected = BsonArray.parse(expected)
 
         val parsed = parseMQL(mql)[0]
-        val actual = parsed.translatedPipeline()
+        val actual = (parsed as QueryStatement).translatedPipeline()
 
         assertEquals(actualExpected, actual)
     }
