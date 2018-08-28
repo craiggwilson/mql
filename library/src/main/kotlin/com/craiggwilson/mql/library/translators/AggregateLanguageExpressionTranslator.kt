@@ -59,7 +59,7 @@ internal fun translateToAggregationLanguage(n: Node?): BsonValue? {
     return AggregateLanguageExpressionTranslator.visit(n)
 }
 
-internal object AggregateLanguageExpressionTranslator : AbstractExpressionTranslator() {
+internal object AggregateLanguageExpressionTranslator : ValueExpressionTranslator() {
     override fun visit(n: AddExpression): BsonValue {
         return visit(function("add", n.left, n.right))
     }

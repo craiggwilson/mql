@@ -2,20 +2,26 @@ package com.craiggwilson.mql.library.translators
 
 import com.craiggwilson.mql.library.ast.QueryStatement
 import com.craiggwilson.mql.library.parser.parseMQL
+import com.craiggwilson.mql.library.visitors.DefaultNodeRewriter
+import com.craiggwilson.mql.library.visitors.Rewriter
 import org.bson.BsonArray
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 
-class QueryStatementTranslatorTest {
+class PipelineTranslatorTests {
+
+    private fun getPipeline(mql: String): BsonArray {
+        val parsed = parseMQL(mql)[0]
+        val statement = Rewriter(DefaultNodeRewriter).visit(parsed) as QueryStatement
+        return BsonArray(statement.translatePipeline())
+    }
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("aggExpressions")
     fun testAggExpressions(mql: String, expected: String) {
         val actualExpected = BsonArray.parse("[{ \"\$project\": { \"test\": $expected } }]")
-
-        val parsed = parseMQL("FROM bar PROJECT { test: $mql }")[0]
-        val actual = (parsed as QueryStatement).translatedPipeline()
+        val actual = getPipeline("FROM bar PROJECT { test: $mql }")
 
         assertEquals(actualExpected, actual)
     }
@@ -24,9 +30,7 @@ class QueryStatementTranslatorTest {
     @MethodSource("functions")
     fun testFunctions(mql: String, expected: String) {
         val actualExpected = BsonArray.parse("[{ \"\$project\": { \"test\": $expected } }]")
-
-        val parsed = parseMQL("FROM bar PROJECT { test: $mql }")[0]
-        val actual = (parsed as QueryStatement).translatedPipeline()
+        val actual= getPipeline("FROM bar PROJECT { test: $mql }")
 
         assertEquals(actualExpected, actual)
     }
@@ -36,8 +40,7 @@ class QueryStatementTranslatorTest {
     fun testMatchExpressions(mql: String, expected: String) {
         val actualExpected = BsonArray.parse("[{ \"\$match\": $expected }]")
 
-        val parsed = parseMQL("FROM bar MATCH $mql")[0]
-        val actual = (parsed as QueryStatement).translatedPipeline()
+        val actual = getPipeline("FROM bar MATCH $mql")
 
         assertEquals(actualExpected, actual)
     }
@@ -46,9 +49,7 @@ class QueryStatementTranslatorTest {
     @MethodSource("stages")
     fun testStages(mql: String, expected: String) {
         val actualExpected = BsonArray.parse(expected)
-
-        val parsed = parseMQL(mql)[0]
-        val actual = (parsed as QueryStatement).translatedPipeline()
+        val actual = getPipeline(mql)
 
         assertEquals(actualExpected, actual)
     }
@@ -57,9 +58,7 @@ class QueryStatementTranslatorTest {
     @MethodSource("full")
     fun testFull(mql: String, expected: String) {
         val actualExpected = BsonArray.parse(expected)
-
-        val parsed = parseMQL(mql)[0]
-        val actual = (parsed as QueryStatement).translatedPipeline()
+        val actual = getPipeline(mql)
 
         assertEquals(actualExpected, actual)
     }

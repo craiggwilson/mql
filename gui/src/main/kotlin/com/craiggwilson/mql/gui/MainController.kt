@@ -1,9 +1,12 @@
 package com.craiggwilson.mql.gui
 
+import com.craiggwilson.mql.library.ast.Statement
 import com.craiggwilson.mql.library.parser.MQLLexer
 import com.craiggwilson.mql.library.parser.lexMQL
 import com.craiggwilson.mql.library.parser.parseMQL
 import com.craiggwilson.mql.library.translators.toShell
+import com.craiggwilson.mql.library.visitors.DefaultNodeRewriter
+import com.craiggwilson.mql.library.visitors.Rewriter
 import org.antlr.v4.runtime.Token
 import org.fxmisc.richtext.model.StyleSpans
 import org.fxmisc.richtext.model.StyleSpansBuilder
@@ -31,7 +34,9 @@ class MainController : Controller() {
 
     fun translate(input: String, prettyPrint: Boolean): String {
         return try {
-            val statement = parseMQL(input)[0]
+            val rewriter = Rewriter(DefaultNodeRewriter)
+            val statement = rewriter.visit(parseMQL(input)[0]) as Statement
+
             statement.toShell(prettyPrint)
         } catch (t: Throwable) {
             t.message ?: "unknown error"

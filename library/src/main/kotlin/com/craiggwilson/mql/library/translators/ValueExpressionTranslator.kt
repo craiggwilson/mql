@@ -28,7 +28,7 @@ import org.bson.BsonString
 import org.bson.BsonValue
 import org.bson.types.Decimal128
 
-internal abstract class AbstractExpressionTranslator : AbstractTranslator() {
+open class ValueExpressionTranslator : AbstractTranslator() {
     // Expressions
 
     override fun visit(n: NewArrayExpression): BsonValue {

@@ -107,7 +107,7 @@ private object QueryLanguageNormalizer : NodeVisitor() {
     }
 }
 
-private object QueryLanguageExpressionTranslator : AbstractExpressionTranslator() {
+private object QueryLanguageExpressionTranslator : ValueExpressionTranslator() {
 
     override fun visit(n: Node?): BsonValue? {
         if (n == null) {

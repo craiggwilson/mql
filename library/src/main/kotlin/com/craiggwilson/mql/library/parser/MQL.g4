@@ -4,15 +4,12 @@ parse: statement (SEMI statement)* SEMI? EOF;
 
 // STATEMENTS
 statement:
-  query_statement                                             #queryStatement
-| insert_statement                                            #insertStatement
+  query_statement                                                                                   #queryStatement
+| INSERT INTO collection_name
+    (document | LBRACK document (COMMA document)* RBRACK)                                           #insertStatement
 ;
 
 query_statement: FROM collection_name query_stage*;
-
-insert_statement:
-  INSERT INTO collection_name document (COMMA document)*
-;
 
 // QUERY STAGES
 query_stage:

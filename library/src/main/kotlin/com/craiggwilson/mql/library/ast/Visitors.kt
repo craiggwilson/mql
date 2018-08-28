@@ -68,6 +68,7 @@ abstract class Visitor<T> {
 
     // Statements
 
+    open fun visit(n: InsertStatement): T = throw NotImplementedError()
     open fun visit(n: QueryStatement): T = throw NotImplementedError()
 
     protected fun <T> visit(items: List<T>, visit: (T) -> T): List<T> {
@@ -338,7 +339,13 @@ abstract class NodeVisitor : Visitor<Node>() {
 
     // Statements
 
+    override fun visit(n: InsertStatement): Node = n.update(
+        n.collectionName,
+        visit(n.documents)
+    )
+
     override fun visit(n: QueryStatement): Node = n.update(
         n.collectionName,
-        visit(n.stages))
+        visit(n.stages)
+    )
 }

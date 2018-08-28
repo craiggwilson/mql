@@ -25,6 +25,7 @@ import com.craiggwilson.mql.library.ast.GreaterThanExpression
 import com.craiggwilson.mql.library.ast.GreaterThanOrEqualsExpression
 import com.craiggwilson.mql.library.ast.GroupStage
 import com.craiggwilson.mql.library.ast.InExpression
+import com.craiggwilson.mql.library.ast.InsertStatement
 import com.craiggwilson.mql.library.ast.Int32Expression
 import com.craiggwilson.mql.library.ast.Int64Expression
 import com.craiggwilson.mql.library.ast.LambdaExpression
@@ -120,6 +121,11 @@ object MQLTreeParser {
 
     private fun parseStatement(ctx: MQLParser.StatementContext): Statement {
         return when(ctx) {
+            is MQLParser.InsertStatementContext -> {
+                val collectionName = getCollectionName(ctx.collection_name())
+                val documents = ctx.document().map { parseDocument(it) }
+                InsertStatement(collectionName, documents)
+            }
             is MQLParser.QueryStatementContext -> parseQueryStatement(ctx.query_statement())
             else -> throw UnsupportedOperationException()
         }
@@ -339,7 +345,7 @@ object MQLTreeParser {
 
                 NewArrayExpression(items)
             }
-            is MQLParser.NewDocumentExpressionContext -> parserDocument(ctx.document())
+            is MQLParser.NewDocumentExpressionContext -> parseDocument(ctx.document())
             is MQLParser.NotExpressionContext -> {
                 val expression = parseExpression(ctx.expression())
                 return NotExpression(expression)
@@ -406,7 +412,7 @@ object MQLTreeParser {
         }
     }
 
-    private fun parserDocument(ctx: MQLParser.DocumentContext): NewDocumentExpression {
+    private fun parseDocument(ctx: MQLParser.DocumentContext): NewDocumentExpression {
         val elements = ctx.field_assignment().map { fa ->
             val field = getFieldDeclaration(fa.field_declaration())
             val expression = parseExpression(fa.expression())
