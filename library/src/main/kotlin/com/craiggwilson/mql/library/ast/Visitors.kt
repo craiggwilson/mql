@@ -68,6 +68,7 @@ abstract class Visitor<T> {
 
     // Statements
 
+    open fun visit(n: DeleteStatement): T = throw NotImplementedError()
     open fun visit(n: InsertStatement): T = throw NotImplementedError()
     open fun visit(n: QueryStatement): T = throw NotImplementedError()
 
@@ -81,12 +82,10 @@ abstract class Visitor<T> {
                 newItems.addAll(items.subList(0, i))
             }
 
-            if (newItems != null) {
-                newItems.add(newItem)
-            }
+            newItems?.add(newItem)
         }
 
-        return if (newItems == null) items else newItems
+        return newItems ?: items
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -338,6 +337,12 @@ abstract class NodeVisitor : Visitor<Node>() {
     override fun visit(n: UnwindStage): Node = n.update(n.field, n.indexField, n.preserveNullAndEmpty)
 
     // Statements
+
+    override fun visit(n: DeleteStatement): Node = n.update(
+        n.collectionName,
+        visit(n.expression) as Expression,
+        n.many
+    )
 
     override fun visit(n: InsertStatement): Node = n.update(
         n.collectionName,

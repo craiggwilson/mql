@@ -2,6 +2,17 @@ package com.craiggwilson.mql.library.ast
 
 sealed class Statement : Node()
 
+data class DeleteStatement(val collectionName: CollectionName, val expression: Expression, val many: Boolean) : Statement() {
+    override fun <T> accept(v: Visitor<T>) = v.visit(this)
+
+    fun update(collectionName: CollectionName, expression: Expression, many: Boolean): DeleteStatement {
+        if (collectionName !== this.collectionName || expression !== this.expression || many != this.many) {
+            return DeleteStatement(collectionName, expression, many)
+        }
+        return this
+    }
+}
+
 data class InsertStatement(val collectionName: CollectionName, val documents: List<NewDocumentExpression>) : Statement() {
     override fun <T> accept(v: Visitor<T>) = v.visit(this)
 

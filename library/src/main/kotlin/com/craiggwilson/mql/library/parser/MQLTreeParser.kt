@@ -10,6 +10,7 @@ import com.craiggwilson.mql.library.ast.ConditionalExpression
 import com.craiggwilson.mql.library.ast.DatabaseName
 import com.craiggwilson.mql.library.ast.DateTimeExpression
 import com.craiggwilson.mql.library.ast.DecimalExpression
+import com.craiggwilson.mql.library.ast.DeleteStatement
 import com.craiggwilson.mql.library.ast.Direction
 import com.craiggwilson.mql.library.ast.DivideExpression
 import com.craiggwilson.mql.library.ast.DoubleExpression
@@ -121,6 +122,13 @@ object MQLTreeParser {
 
     private fun parseStatement(ctx: MQLParser.StatementContext): Statement {
         return when(ctx) {
+            is MQLParser.DeleteStatementContext -> {
+                val collectionName = getCollectionName(ctx.collection_name())
+                val predicate = parseExpression(ctx.expression())
+                val many = if(ctx.MANY() != null) true else false
+
+                DeleteStatement(collectionName, predicate, many)
+            }
             is MQLParser.InsertStatementContext -> {
                 val collectionName = getCollectionName(ctx.collection_name())
                 val documents = ctx.document().map { parseDocument(it) }

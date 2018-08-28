@@ -23,8 +23,14 @@ class ShellStatementTranslatorTests {
         @JvmStatic
         private fun statements(): Collection<Array<String>> {
             return listOf(
+                // DELETE
+                test("delete from bar match a = 1", "db.bar.deleteOne({ \"a\" : { \"\$eq\" : 1 } })"),
+                test("delete one from bar match a = 1", "db.bar.deleteOne({ \"a\" : { \"\$eq\" : 1 } })"),
+                test("delete many from bar match a = 1", "db.bar.deleteMany({ \"a\" : { \"\$eq\" : 1 } })"),
+
                 // INSERT
                 test("insert into bar {a:1}", "db.bar.insert([{ \"a\" : 1 }] )"),
+                test("insert into bar [{a:1}]", "db.bar.insert([{ \"a\" : 1 }] )"),
                 test("insert into bar [{a: 1},{a: 2}]", "db.bar.insert([{ \"a\" : 1 }, { \"a\" : 2 }] )"),
 
                 // QUERY

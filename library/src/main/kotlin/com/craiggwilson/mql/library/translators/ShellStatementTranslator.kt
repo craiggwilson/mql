@@ -1,6 +1,7 @@
 package com.craiggwilson.mql.library.translators
 
 import com.craiggwilson.mql.library.ast.CollectionName
+import com.craiggwilson.mql.library.ast.DeleteStatement
 import com.craiggwilson.mql.library.ast.InsertStatement
 import com.craiggwilson.mql.library.ast.QueryStatement
 import com.craiggwilson.mql.library.ast.Statement
@@ -18,6 +19,16 @@ fun Statement.toShell(pretty: Boolean = false): String {
 }
 
 private class ShellStatementTranslator(private val pretty: Boolean) : Visitor<String>() {
+
+    override fun visit(n: DeleteStatement): String {
+        val db = getDb(n.collectionName)
+        val predicate = translateToQueryLanguage(n.expression)
+        val methodName = if(n.many) "deleteMany" else "deleteOne"
+
+        val jsonDocument = getJson(predicate)
+
+        return "$db.${n.collectionName.name}.$methodName($jsonDocument)"
+    }
 
     override fun visit(n: InsertStatement): String {
         val db = getDb(n.collectionName)
@@ -38,6 +49,15 @@ private class ShellStatementTranslator(private val pretty: Boolean) : Visitor<St
         return if (collectionName.databaseName != null) {
             "db.getSiblingDB(\"${collectionName.databaseName}"
         } else "db"
+    }
+
+    private fun getJson(value: BsonValue?): String {
+        if (value == null) {
+            return "null"
+        }
+
+        val settings = JsonWriterSettings.builder().outputMode(JsonMode.SHELL).indent(pretty).build()
+        return value.asDocument().toJson(settings)
     }
 
     private fun getJsonArray(array: List<BsonValue>): String {

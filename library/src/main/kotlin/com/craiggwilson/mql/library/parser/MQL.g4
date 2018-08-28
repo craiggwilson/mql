@@ -7,6 +7,7 @@ statement:
   query_statement                                                                                   #queryStatement
 | INSERT INTO collection_name
     (document | LBRACK document (COMMA document)* RBRACK)                                           #insertStatement
+| DELETE (ONE | MANY)? FROM collection_name MATCH expression                                        #deleteStatement
 ;
 
 query_statement: FROM collection_name query_stage*;
@@ -176,6 +177,7 @@ AND:      A N D;
 ASC:      A S C;
 BY:       B Y;
 CASE:     C A S E;
+DELETE:   D E L E T E;
 DESC:     D E S C;
 ELSE:     E L S E;
 FALSE:    F A L S E;
@@ -190,9 +192,11 @@ LET:      L E T;
 LIKE:     L I K E;
 LIMIT:    L I M I T;
 LOOKUP:   L O O K U P;
+MANY:     M A N Y;
 MATCH:    M A T C H;
 NOT:      N O T;
 NULL:     N U L L;
+ONE:      O N E;
 OR:       O R;
 PROJECT:  P R O J E C T;
 SKIP_:    S K I P;
