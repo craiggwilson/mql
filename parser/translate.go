@@ -526,6 +526,25 @@ func (t *exprTranslator) VisitStringValue(ctx *grammar.StringValueContext) inter
 	})
 }
 
+func (t *exprTranslator) VisitUnaryMinusExpression(ctx *grammar.UnaryMinusExpressionContext) interface{} {
+	expr, err := t.translate(ctx.Expression())
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing AND rhs")
+		return nil
+	}
+
+	return ast.NewFunction(
+		"multiply",
+		ast.NewArray(
+			expr,
+			ast.NewConstant(bsoncore.Value{
+				Type: bsontype.Int32,
+				Data: bsoncore.AppendInt32(nil, -1),
+			}),
+		),
+	)
+}
+
 func (t *exprTranslator) VisitValueExpression(ctx *grammar.ValueExpressionContext) interface{} {
 	return ctx.Value().Accept(t)
 }
