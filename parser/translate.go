@@ -221,18 +221,18 @@ func (t *exprTranslator) VisitAdditionExpression(ctx *grammar.AdditionExpression
 		return nil
 	}
 
-	var op ast.BinaryOp
+	var op string
 	switch ctx.GetOp().GetTokenType() {
 	case grammar.MQLParserMINUS:
-		op = ast.BinaryOp("$sub")
+		op = "$sub"
 	case grammar.MQLParserPLUS:
-		op = ast.BinaryOp("$add")
+		op = "$add"
 	default:
 		t.err = errors.Errorf("unknown addition operator %q", ctx.GetOp().GetText())
 		return nil
 	}
 
-	return ast.NewBinary(op, left, right)
+	return ast.NewFunction(op, ast.NewArray(left, right))
 }
 
 func (t *exprTranslator) VisitAndExpression(ctx *grammar.AndExpressionContext) interface{} {
@@ -430,33 +430,59 @@ func (t *exprTranslator) VisitLongValue(ctx *grammar.LongValueContext) interface
 	return c
 }
 
+func (t *exprTranslator) VisitMemberExpression(ctx *grammar.MemberExpressionContext) interface{} {
+	parentExpr, err := t.translate(ctx.Expression())
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing not expression")
+		return nil
+	}
+
+	if fn := ctx.FieldName(); fn != nil {
+		name := fn.Accept(t).(string)
+		return ast.NewFieldRef(name, parentExpr)
+	}
+
+	t.err = errors.New("functions are only supported at the top-level")
+	return nil
+}
+
 func (t *exprTranslator) VisitMultiplicationExpression(ctx *grammar.MultiplicationExpressionContext) interface{} {
 	allExpressions := ctx.AllExpression()
 	left, err := t.translate(allExpressions[0])
 	if err != nil {
-		t.err = errors.Wrap(err, "failed parsing comparison lhs")
+		t.err = errors.Wrap(err, "failed parsing comparison lhs expression")
 		return nil
 	}
 	right, err := t.translate(allExpressions[1])
 	if err != nil {
-		t.err = errors.Wrap(err, "failed parsing comparison rhs")
+		t.err = errors.Wrap(err, "failed parsing comparison rhs expression")
 		return nil
 	}
 
-	var op ast.BinaryOp
+	var op string
 	switch ctx.GetOp().GetTokenType() {
 	case grammar.MQLParserDIV:
-		op = ast.BinaryOp("$div")
+		op = "$div"
 	case grammar.MQLParserMOD:
-		op = ast.BinaryOp("$mod")
+		op = "$mod"
 	case grammar.MQLParserMULT:
-		op = ast.BinaryOp("$multiply")
+		op = "$multiply"
 	default:
 		t.err = errors.Errorf("unknown addition operator %q", ctx.GetOp().GetText())
 		return nil
 	}
 
-	return ast.NewBinary(op, left, right)
+	return ast.NewFunction(op, ast.NewArray(left, right))
+}
+
+func (t *exprTranslator) VisitNotExpression(ctx *grammar.NotExpressionContext) interface{} {
+	expr, err := t.translate(ctx.Expression())
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing not expression")
+		return nil
+	}
+
+	return ast.NewFunction("$not", expr)
 }
 
 func (t *exprTranslator) VisitNumberValue(ctx *grammar.NumberValueContext) interface{} {
@@ -486,12 +512,12 @@ func (t *exprTranslator) VisitOrExpression(ctx *grammar.OrExpressionContext) int
 	allExpressions := ctx.AllExpression()
 	left, err := t.translate(allExpressions[0])
 	if err != nil {
-		t.err = errors.Wrap(err, "failed parsing AND lhs")
+		t.err = errors.Wrap(err, "failed parsing AND lhs expression")
 		return nil
 	}
 	right, err := t.translate(allExpressions[1])
 	if err != nil {
-		t.err = errors.Wrap(err, "failed parsing AND rhs")
+		t.err = errors.Wrap(err, "failed parsing AND rhs expression")
 		return nil
 	}
 
@@ -529,7 +555,7 @@ func (t *exprTranslator) VisitStringValue(ctx *grammar.StringValueContext) inter
 func (t *exprTranslator) VisitUnaryMinusExpression(ctx *grammar.UnaryMinusExpressionContext) interface{} {
 	expr, err := t.translate(ctx.Expression())
 	if err != nil {
-		t.err = errors.Wrap(err, "failed parsing AND rhs")
+		t.err = errors.Wrap(err, "failed parsing unary minus expression")
 		return nil
 	}
 
