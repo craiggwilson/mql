@@ -18,8 +18,9 @@ queryStage:
 ;
 
 projectItem:
-  EXCLUDE? multipartFieldDeclaration
-| fieldDeclaration COLON expression
+  EXCLUDE multipartFieldDeclaration #excludeProjectItem
+| multipartFieldDeclaration #includeProjectItem
+| fieldDeclaration COLON expression #assignProjectItem
 ;
 
 sortField:
@@ -137,15 +138,15 @@ collectionName:
 
 databaseName: ID;
 
-fieldDeclaration: STRING | fieldName;
-
-multipartFieldDeclaration: fieldDeclaration (DOT fieldDeclaration)*;
+fieldDeclaration: ID;
 
 fieldName: ID;
 
 functionName: ID;
 
 functionArgumentName: ID;
+
+multipartFieldDeclaration: fieldDeclaration (DOT fieldDeclaration)*;
 
 multipartFieldName: fieldName (DOT fieldName)*;
 

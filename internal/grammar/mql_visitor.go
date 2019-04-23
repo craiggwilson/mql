@@ -34,8 +34,14 @@ type MQLVisitor interface {
 	// Visit a parse tree produced by MQLParser#unwindStage.
 	VisitUnwindStage(ctx *UnwindStageContext) interface{}
 
-	// Visit a parse tree produced by MQLParser#projectItem.
-	VisitProjectItem(ctx *ProjectItemContext) interface{}
+	// Visit a parse tree produced by MQLParser#excludeProjectItem.
+	VisitExcludeProjectItem(ctx *ExcludeProjectItemContext) interface{}
+
+	// Visit a parse tree produced by MQLParser#includeProjectItem.
+	VisitIncludeProjectItem(ctx *IncludeProjectItemContext) interface{}
+
+	// Visit a parse tree produced by MQLParser#assignProjectItem.
+	VisitAssignProjectItem(ctx *AssignProjectItemContext) interface{}
 
 	// Visit a parse tree produced by MQLParser#sortField.
 	VisitSortField(ctx *SortFieldContext) interface{}
@@ -202,9 +208,6 @@ type MQLVisitor interface {
 	// Visit a parse tree produced by MQLParser#fieldDeclaration.
 	VisitFieldDeclaration(ctx *FieldDeclarationContext) interface{}
 
-	// Visit a parse tree produced by MQLParser#multipartFieldDeclaration.
-	VisitMultipartFieldDeclaration(ctx *MultipartFieldDeclarationContext) interface{}
-
 	// Visit a parse tree produced by MQLParser#fieldName.
 	VisitFieldName(ctx *FieldNameContext) interface{}
 
@@ -213,6 +216,9 @@ type MQLVisitor interface {
 
 	// Visit a parse tree produced by MQLParser#functionArgumentName.
 	VisitFunctionArgumentName(ctx *FunctionArgumentNameContext) interface{}
+
+	// Visit a parse tree produced by MQLParser#multipartFieldDeclaration.
+	VisitMultipartFieldDeclaration(ctx *MultipartFieldDeclarationContext) interface{}
 
 	// Visit a parse tree produced by MQLParser#multipartFieldName.
 	VisitMultipartFieldName(ctx *MultipartFieldNameContext) interface{}

@@ -9,6 +9,7 @@ import (
 	"bitbucket.org/craiggwilson/mql/internal/grammar"
 
 	"github.com/10gen/mongoast/ast"
+	astparser "github.com/10gen/mongoast/parser"
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson/bsontype"
@@ -73,7 +74,7 @@ func (t *queryStageTranslator) translate(ctx grammar.IQueryStageContext) (ast.St
 func (t *queryStageTranslator) VisitLimitStage(ctx *grammar.LimitStageContext) interface{} {
 	n, err := strconv.ParseInt(ctx.INT().GetText(), 10, 64)
 	if err != nil {
-		t.err = errors.Wrapf(err, "failed to parse limit stage count")
+		t.err = errors.Wrapf(err, "failed parsing limit stage count")
 		return nil
 	}
 
@@ -83,25 +84,113 @@ func (t *queryStageTranslator) VisitLimitStage(ctx *grammar.LimitStageContext) i
 func (t *queryStageTranslator) VisitMatchStage(ctx *grammar.MatchStageContext) interface{} {
 	expr, err := translateExpr(ctx.Expression())
 	if err != nil {
-		t.err = errors.Wrapf(err, "failed to parse match expression")
+		t.err = errors.Wrapf(err, "failed parsing match expression")
 		return nil
 	}
 
 	return ast.NewMatchStage(expr)
 }
 
+func (t *queryStageTranslator) VisitProjectStage(ctx *grammar.ProjectStageContext) interface{} {
+	s, err := translateProjectStage(ctx)
+	if err != nil {
+		t.err = errors.Wrap(err, "failed translating project stage")
+		return nil
+	}
+
+	return s
+}
+
 func (t *queryStageTranslator) VisitSkipStage(ctx *grammar.SkipStageContext) interface{} {
 	n, err := strconv.ParseInt(ctx.INT().GetText(), 10, 64)
 	if err != nil {
-		t.err = errors.Wrapf(err, "failed to parse limit stage count")
+		t.err = errors.Wrapf(err, "failed parsing limit stage count")
 		return nil
 	}
 
 	return ast.NewSkipStage(n)
 }
 
+func translateProjectStage(ctx *grammar.ProjectStageContext) (*ast.ProjectStage, error) {
+	t := &projectItemTranslator{}
+	pis := ctx.AllProjectItem()
+	items := make([]ast.ProjectItem, len(pis))
+	for i, pi := range pis {
+		item := pi.Accept(t)
+		if t.err != nil {
+			return nil, errors.Wrapf(t.err, "failed translating project item %d", i)
+		}
+
+		items[i] = item.(ast.ProjectItem)
+	}
+
+	return ast.NewProjectStage(items...), nil
+}
+
+type projectItemTranslator struct {
+	*grammar.BaseMQLVisitor
+	err error
+}
+
+func (t *projectItemTranslator) translate(ctx grammar.IProjectItemContext) (ast.ProjectItem, error) {
+	result := ctx.Accept(t)
+	if t.err != nil {
+		return nil, t.err
+	}
+
+	return result.(ast.ProjectItem), nil
+}
+
+func (t *projectItemTranslator) VisitAssignProjectItem(ctx *grammar.AssignProjectItemContext) interface{} {
+	s, err := translateFieldDeclaration(ctx.FieldDeclaration())
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing include project item")
+		return nil
+	}
+
+	expr, err := translateExpr(ctx.Expression())
+	if err != nil {
+		t.err = errors.Wrapf(err, "failed parsing assign project item")
+		return nil
+	}
+
+	return ast.NewAssignProjectItem(s, expr)
+}
+
+func (t *projectItemTranslator) VisitExcludeProjectItem(ctx *grammar.ExcludeProjectItemContext) interface{} {
+	s, err := translateMultipartFieldDeclaration(ctx.MultipartFieldDeclaration())
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing include project item")
+		return nil
+	}
+
+	fr, err := astparser.ParseFieldRef(s)
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing field ref")
+		return nil
+	}
+
+	return ast.NewExcludeProjectItem(fr.(*ast.FieldRef))
+}
+
+func (t *projectItemTranslator) VisitIncludeProjectItem(ctx *grammar.IncludeProjectItemContext) interface{} {
+	s, err := translateMultipartFieldDeclaration(ctx.MultipartFieldDeclaration())
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing include project item")
+		return nil
+	}
+
+	fr, err := astparser.ParseFieldRef(s)
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing field ref")
+		return nil
+	}
+
+	return ast.NewIncludeProjectItem(fr.(*ast.FieldRef))
+}
+
 func translateExpr(ctx grammar.IExpressionContext) (ast.Expr, error) {
-	t := &exprTranslator{BaseMQLVisitor: &grammar.BaseMQLVisitor{BaseParseTreeVisitor: &antlr.BaseParseTreeVisitor{}}}
+	t := &exprTranslator{}
 	return t.translate(ctx)
 }
 
@@ -439,6 +528,57 @@ func (t *exprTranslator) VisitStringValue(ctx *grammar.StringValueContext) inter
 
 func (t *exprTranslator) VisitValueExpression(ctx *grammar.ValueExpressionContext) interface{} {
 	return ctx.Value().Accept(t)
+}
+
+func translateMultipartFieldDeclaration(ctx grammar.IMultipartFieldDeclarationContext) (string, error) {
+	t := &fieldDeclarationTranslator{}
+	return t.translateMultipartFieldDeclaration(ctx)
+}
+
+func translateFieldDeclaration(ctx grammar.IFieldDeclarationContext) (string, error) {
+	t := &fieldDeclarationTranslator{}
+	return t.translateFieldDeclaration(ctx)
+}
+
+type fieldDeclarationTranslator struct {
+	*grammar.BaseMQLVisitor
+	err error
+}
+
+func (t *fieldDeclarationTranslator) translateMultipartFieldDeclaration(ctx grammar.IMultipartFieldDeclarationContext) (string, error) {
+	result := ctx.Accept(t)
+	if t.err != nil {
+		return "", t.err
+	}
+
+	return result.(string), nil
+}
+
+func (t *fieldDeclarationTranslator) translateFieldDeclaration(ctx grammar.IFieldDeclarationContext) (string, error) {
+	result := ctx.Accept(t)
+	if t.err != nil {
+		return "", t.err
+	}
+
+	return result.(string), nil
+}
+
+func (t *fieldDeclarationTranslator) VisitMultipartFieldDeclaration(ctx *grammar.MultipartFieldDeclarationContext) interface{} {
+	fds := ctx.AllFieldDeclaration()
+	result := make([]string, len(fds))
+	for i, fd := range fds {
+		r := fd.Accept(t)
+		if t.err != nil {
+			return nil
+		}
+		result[i] = r.(string)
+	}
+
+	return strings.Join(result, ".")
+}
+
+func (t *fieldDeclarationTranslator) VisitFieldDeclaration(ctx *grammar.FieldDeclarationContext) interface{} {
+	return stripQuotes(ctx.ID())
 }
 
 func parseIntegralValue(s string, radix int, forceLong bool) (*ast.Constant, error) {

@@ -43,7 +43,15 @@ func (v *BaseMQLVisitor) VisitUnwindStage(ctx *UnwindStageContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseMQLVisitor) VisitProjectItem(ctx *ProjectItemContext) interface{} {
+func (v *BaseMQLVisitor) VisitExcludeProjectItem(ctx *ExcludeProjectItemContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseMQLVisitor) VisitIncludeProjectItem(ctx *IncludeProjectItemContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseMQLVisitor) VisitAssignProjectItem(ctx *AssignProjectItemContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -267,10 +275,6 @@ func (v *BaseMQLVisitor) VisitFieldDeclaration(ctx *FieldDeclarationContext) int
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseMQLVisitor) VisitMultipartFieldDeclaration(ctx *MultipartFieldDeclarationContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseMQLVisitor) VisitFieldName(ctx *FieldNameContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -280,6 +284,10 @@ func (v *BaseMQLVisitor) VisitFunctionName(ctx *FunctionNameContext) interface{}
 }
 
 func (v *BaseMQLVisitor) VisitFunctionArgumentName(ctx *FunctionArgumentNameContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseMQLVisitor) VisitMultipartFieldDeclaration(ctx *MultipartFieldDeclarationContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
