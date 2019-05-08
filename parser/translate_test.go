@@ -3,9 +3,10 @@ package parser_test
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/craiggwilson/mql/parser"
-	"github.com/craiggwilson/mql/internal/util/bsonutil"
+	"github.com/craiggwilson/mql/internal/util/astutil"
 
 	"github.com/10gen/mongoast/ast"
 	"github.com/google/go-cmp/cmp"
@@ -20,147 +21,147 @@ func TestParseExpr(t *testing.T) {
 		// Constants
 		{ 
 			"false",
-			ast.NewConstant(bsonutil.False),
+			astutil.False,
 			nil,
 		},
 		{ 
 			"true",
-			ast.NewConstant(bsonutil.True),
+			astutil.True,
 			nil,
 		},
 		{
 			"1",
-			ast.NewConstant(bsonutil.Int32(1)),
+			astutil.Int32(1),
 			nil,
 		},
 		{
 			"-1",
-			ast.NewConstant(bsonutil.Int32(-1)),
+			astutil.Int32(-1),
 			nil,
 		},
 		{
 			"1L",
-			ast.NewConstant(bsonutil.Int64(1)),
+			astutil.Int64(1),
 			nil,
 		},
 		{
 			"-1L",
-			ast.NewConstant(bsonutil.Int64(-1)),
+			astutil.Int64(-1),
 			nil,
 		},
 		{
 			"1000000000000000000",
-			ast.NewConstant(bsonutil.Int64(1000000000000000000)),
+			astutil.Int64(1000000000000000000),
 			nil,
 		},
 		{
 			"-1000000000000000000",
-			ast.NewConstant(bsonutil.Int64(-1000000000000000000)),
+			astutil.Int64(-1000000000000000000),
 			nil,
 		},
 		{
 			"1.234E12",
-			ast.NewConstant(bsonutil.Double(1.234e12)),
+			astutil.Double(1.234e12),
 			nil,
 		},
 		{
 			"-1.234E12",
-			ast.NewConstant(bsonutil.Double(-1.234e12)),
+			astutil.Double(-1.234e12),
 			nil,
 		},
 		{
 			"1M",
-			ast.NewConstant(bsonutil.Decimal128FromString("1")),
+			astutil.Must(astutil.ParseDecimal128("1")),
 			nil,
 		},
 		{
 			"-1M",
-			ast.NewConstant(bsonutil.Decimal128FromString("-1")),
+			astutil.Must(astutil.ParseDecimal128("-1")),
 			nil,
 		},
 		{
 			"1.234E12m",
-			ast.NewConstant(bsonutil.Decimal128FromString("1.234E12")),
+			astutil.Must(astutil.ParseDecimal128("1.234E12")),
 			nil,
 		},
 		{
 			"-1.234E12m",
-			ast.NewConstant(bsonutil.Decimal128FromString("-1.234E12")),
+			astutil.Must(astutil.ParseDecimal128("-1.234E12")),
 			nil,
 		},
 		{
 			"0b1001",
-			ast.NewConstant(bsonutil.Int32(9)),
+			astutil.Int32(9),
 			nil,
 		},
 		{
 			"0b1001L",
-			ast.NewConstant(bsonutil.Int64(9)),
+			astutil.Int64(9),
 			nil,
 		},
 		{
 			"0o644",
-			ast.NewConstant(bsonutil.Int32(420)),
+			astutil.Int32(420),
 			nil,
 		},
 		{
 			"0o644L",
-			ast.NewConstant(bsonutil.Int64(420)),
+			astutil.Int64(420),
 			nil,
 		},
 		{
 			"0xF0L",
-			ast.NewConstant(bsonutil.Int64(240)),
+			astutil.Int64(240),
 			nil,
 		},
 		{
 			"0xF0",
-			ast.NewConstant(bsonutil.Int32(240)),
+			astutil.Int32(240),
 			nil,
 		},
 		{
 			"0xF0L",
-			ast.NewConstant(bsonutil.Int64(240)),
+			astutil.Int64(240),
 			nil,
 		},
 		{
 			"\"testing\"",
-			ast.NewConstant(bsonutil.String("testing")),
+			astutil.String("testing"),
 			nil,
 		},
 		{
 			"'testing'",
-			ast.NewConstant(bsonutil.String("testing")),
+			astutil.String("testing"),
 			nil,
 		},
 		{
 			"null",
-			ast.NewConstant(bsonutil.Null()),
+			astutil.Null,
 			nil,
 		},	
 		{
 			"/foo/i",
-			ast.NewConstant(bsonutil.Regex("foo", "i")),
+			astutil.Regex("foo", "i"),
 			nil,
 		},	
 		{
 			"/fo\\/o/i",
-			ast.NewConstant(bsonutil.Regex("fo/o", "i")),
+			astutil.Regex("fo/o", "i"),
 			nil,
 		},	
 		{
 			"oid'507f1f77bcf86cd799439011'",
-			ast.NewConstant(bsonutil.ObjectIDFromHex("507f1f77bcf86cd799439011")),
+			astutil.Must(astutil.ParseObjectID("507f1f77bcf86cd799439011")),
 			nil,
 		},
 		{
 			"dt'2000-01-01T12:00:00Z'",
-			ast.NewConstant(bsonutil.DateTime(946728000000)),
+			astutil.DateTime(time.Date(2000, 1, 1, 12, 0, 0, 0, time.UTC)),
 			nil,
 		},
 		{
 			"dt'2000-01-01T12:00:00+00:00'",
-			ast.NewConstant(bsonutil.DateTime(946728000000)),
+			astutil.DateTime(time.Date(2000, 1, 1, 12, 0, 0, 0, time.UTC)),
 			nil,
 		},
 
@@ -168,7 +169,7 @@ func TestParseExpr(t *testing.T) {
 		{
 			"{a: true}",
 			ast.NewDocument(
-				ast.NewDocumentElement("a", ast.NewConstant(bsonutil.True)),
+				ast.NewDocumentElement("a", astutil.True),
 			),
 			nil,
 		},
@@ -177,9 +178,9 @@ func TestParseExpr(t *testing.T) {
 		{
 			"[true, false, true]",
 			ast.NewArray(
-				ast.NewConstant(bsonutil.True),
-				ast.NewConstant(bsonutil.False),
-				ast.NewConstant(bsonutil.True),
+				astutil.True,
+				astutil.False,
+				astutil.True,
 			),
 			nil,
 		},
@@ -200,7 +201,7 @@ func TestParseExpr(t *testing.T) {
 			ast.NewFieldRef(
 				"b", 
 				ast.NewArrayIndexRef(
-					ast.NewConstant(bsonutil.Int32(0)),
+					astutil.Int32(0),
 					ast.NewFieldRef("a", nil),
 				),
 			),
@@ -213,7 +214,7 @@ func TestParseExpr(t *testing.T) {
 				ast.NewDocument(
 					ast.NewDocumentElement(
 						"a",
-						ast.NewConstant(bsonutil.False),
+						astutil.False,
 					),
 				),
 			),

@@ -7,13 +7,13 @@ import (
 	"time"
 
 	"github.com/craiggwilson/mql/internal/grammar"
+	"github.com/craiggwilson/mql/internal/util/astutil"
 
 	"github.com/10gen/mongoast/ast"
 	astparser "github.com/10gen/mongoast/parser"
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson/bsontype"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
 )
 
@@ -295,15 +295,11 @@ func (t *exprTranslator) VisitBinValue(ctx *grammar.BinValueContext) interface{}
 }
 
 func (t *exprTranslator) VisitBooleanValue(ctx *grammar.BooleanValueContext) interface{} {
-	var v bool
 	if ctx.TRUE() != nil {
-		v = true
+		return astutil.True
 	}
 
-	return ast.NewConstant(bsoncore.Value{
-		Type: bsontype.Boolean,
-		Data: bsoncore.AppendBoolean(nil, v),
-	})
+	return astutil.False
 }
 
 func (t *exprTranslator) VisitComparisonExpression(ctx *grammar.ComparisonExpressionContext) interface{} {
@@ -349,26 +345,20 @@ func (t *exprTranslator) VisitDateTimeValue(ctx *grammar.DateTimeValueContext) i
 		return nil
 	}
 
-	return ast.NewConstant(bsoncore.Value{
-		Type: bsontype.DateTime,
-		Data: bsoncore.AppendTime(nil, dt),
-	})
+	return astutil.DateTime(dt)
 }
 
 func (t *exprTranslator) VisitDecimalValue(ctx *grammar.DecimalValueContext) interface{} {
 	text := ctx.DECIMAL().GetText()
 	text = text[:len(text)-1]
 
-	v, err := primitive.ParseDecimal128(text)
+	v, err := astutil.ParseDecimal128(text)
 	if err != nil {
 		t.err = errors.Wrap(err, "failed parsing decimal")
 		return nil
 	}
 
-	return ast.NewConstant(bsoncore.Value{
-		Type: bsontype.Decimal128,
-		Data: bsoncore.AppendDecimal128(nil, v),
-	})
+	return v
 }
 
 func (t *exprTranslator) VisitDocument(ctx *grammar.DocumentContext) interface{} {
@@ -403,10 +393,7 @@ func (t *exprTranslator) VisitDoubleValue(ctx *grammar.DoubleValueContext) inter
 		return nil
 	}
 
-	return ast.NewConstant(bsoncore.Value{
-		Type: bsontype.Double,
-		Data: bsoncore.AppendDouble(nil, v),
-	})
+	return astutil.Double(v)
 }
 
 func (t *exprTranslator) VisitFieldExpression(ctx *grammar.FieldExpressionContext) interface{} {
@@ -572,16 +559,13 @@ func (t *exprTranslator) VisitOctValue(ctx *grammar.OctValueContext) interface{}
 }
 
 func (t *exprTranslator) VisitOidValue(ctx *grammar.OidValueContext) interface{} {
-	oid, err := primitive.ObjectIDFromHex(ctx.OID().GetText()[4:28])
+	v, err := astutil.ParseObjectID(ctx.OID().GetText()[4:28])
 	if err != nil {
 		t.err = errors.Wrap(err, "failed parsing ObjectID")
 		return nil
 	}
 
-	return ast.NewConstant(bsoncore.Value{
-		Type: bsontype.ObjectID,
-		Data: bsoncore.AppendObjectID(nil, oid),
-	})
+	return v
 }
 
 func (t *exprTranslator) VisitOrExpression(ctx *grammar.OrExpressionContext) interface{} {
@@ -615,18 +599,11 @@ func (t *exprTranslator) VisitRegexValue(ctx *grammar.RegexValueContext) interfa
 	options := s[split+1:]
 	s = strings.Replace(s[1:split], "\\/", "/", -1)
 
-	c := ast.NewConstant(bsoncore.Value{
-		Type: bsontype.Regex,
-		Data: bsoncore.AppendRegex(nil, s, options),
-	})
-	return c
+	return astutil.Regex(s, options)
 }
 
 func (t *exprTranslator) VisitStringValue(ctx *grammar.StringValueContext) interface{} {
-	return ast.NewConstant(bsoncore.Value{
-		Type: bsontype.String,
-		Data: bsoncore.AppendString(nil, stripQuotes(ctx.STRING())),
-	})
+	return astutil.String(stripQuotes(ctx.STRING()))
 }
 
 func (t *exprTranslator) VisitUnaryMinusExpression(ctx *grammar.UnaryMinusExpressionContext) interface{} {
@@ -640,10 +617,7 @@ func (t *exprTranslator) VisitUnaryMinusExpression(ctx *grammar.UnaryMinusExpres
 		"multiply",
 		ast.NewArray(
 			expr,
-			ast.NewConstant(bsoncore.Value{
-				Type: bsontype.Int32,
-				Data: bsoncore.AppendInt32(nil, -1),
-			}),
+			astutil.Int32(-1),
 		),
 	)
 }
@@ -745,16 +719,10 @@ func parseIntegralValue(s string, radix int, forceLong bool) (*ast.Constant, err
 	}
 
 	if forceLong || n >= math.MaxInt32 || n <= math.MinInt32 {
-		return ast.NewConstant(bsoncore.Value{
-			Type: bsontype.Int64,
-			Data: bsoncore.AppendInt64(nil, n),
-		}), nil
+		return astutil.Int64(n), nil
 	}
 
-	return ast.NewConstant(bsoncore.Value{
-		Type: bsontype.Int32,
-		Data: bsoncore.AppendInt32(nil, int32(n)),
-	}), nil
+	return astutil.Int32(int32(n)), nil
 }
 
 func stripQuotes(n antlr.TerminalNode) string {
