@@ -224,7 +224,7 @@ func (t *exprTranslator) VisitAdditionExpression(ctx *grammar.AdditionExpression
 	var op string
 	switch ctx.GetOp().GetTokenType() {
 	case grammar.MQLParserMINUS:
-		op = "$sub"
+		op = "$subtract"
 	case grammar.MQLParserPLUS:
 		op = "$add"
 	default:
@@ -335,6 +335,22 @@ func (t *exprTranslator) VisitComparisonExpression(ctx *grammar.ComparisonExpres
 	}
 
 	return ast.NewBinary(op, left, right)
+}
+
+func (t *exprTranslator) VisitConcatExpression(ctx *grammar.ConcatExpressionContext) interface{} {
+	allExpressions := ctx.AllExpression()
+	left, err := t.translate(allExpressions[0])
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing AND lhs expression")
+		return nil
+	}
+	right, err := t.translate(allExpressions[1])
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing AND rhs expression")
+		return nil
+	}
+
+	return ast.NewFunction("$concat", ast.NewArray(left, right))
 }
 
 func (t *exprTranslator) VisitDateTimeValue(ctx *grammar.DateTimeValueContext) interface{} {
@@ -513,7 +529,7 @@ func (t *exprTranslator) VisitMultiplicationExpression(ctx *grammar.Multiplicati
 	var op string
 	switch ctx.GetOp().GetTokenType() {
 	case grammar.MQLParserDIV:
-		op = "$div"
+		op = "$divide"
 	case grammar.MQLParserMOD:
 		op = "$mod"
 	case grammar.MQLParserMULT:
@@ -591,6 +607,22 @@ func (t *exprTranslator) VisitOrExpression(ctx *grammar.OrExpressionContext) int
 
 func (t *exprTranslator) VisitParenthesisExpression(ctx *grammar.ParenthesisExpressionContext) interface{} {
 	return ctx.Expression().Accept(t)
+}
+
+func (t *exprTranslator) VisitPowerExpression(ctx *grammar.PowerExpressionContext) interface{} {
+	allExpressions := ctx.AllExpression()
+	left, err := t.translate(allExpressions[0])
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing AND lhs expression")
+		return nil
+	}
+	right, err := t.translate(allExpressions[1])
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing AND rhs expression")
+		return nil
+	}
+
+	return ast.NewFunction("$pow", ast.NewArray(left, right))
 }
 
 func (t *exprTranslator) VisitRegexValue(ctx *grammar.RegexValueContext) interface{} {

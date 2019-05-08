@@ -220,6 +220,136 @@ func TestParseExpr(t *testing.T) {
 			),
 			nil,
 		},
+
+		// Binary
+		{
+			"1 + 2",
+			ast.NewFunction(
+				"$add",
+				ast.NewArray(astutil.Int32(1),astutil.Int32(2)),
+			),
+			nil,
+		},
+		{
+			"1 and 2",
+			ast.NewBinary(
+				ast.And,
+				astutil.Int32(1),
+				astutil.Int32(2),
+			),
+			nil,
+		},
+		{
+			"1 || 2",
+			ast.NewFunction(
+				"$concat",
+				ast.NewArray(astutil.Int32(1),astutil.Int32(2)),
+			),
+			nil,
+		},
+		{
+			"1 / 2",
+			ast.NewFunction(
+				"$divide",
+				ast.NewArray(astutil.Int32(1),astutil.Int32(2)),
+			),
+			nil,
+		},
+		{
+			"1 = 2",
+			ast.NewBinary(
+				ast.Equals,
+				astutil.Int32(1),
+				astutil.Int32(2),
+			),
+			nil,
+		},
+		{
+			"1 > 2",
+			ast.NewBinary(
+				ast.GreaterThan,
+				astutil.Int32(1),
+				astutil.Int32(2),
+			),
+			nil,
+		},
+		{
+			"1 >= 2",
+			ast.NewBinary(
+				ast.GreaterThanOrEquals,
+				astutil.Int32(1),
+				astutil.Int32(2),
+			),
+			nil,
+		},
+		{
+			"1 < 2",
+			ast.NewBinary(
+				ast.LessThan,
+				astutil.Int32(1),
+				astutil.Int32(2),
+			),
+			nil,
+		},
+		{
+			"1 <= 2",
+			ast.NewBinary(
+				ast.LessThanOrEquals,
+				astutil.Int32(1),
+				astutil.Int32(2),
+			),
+			nil,
+		},
+		{
+			"1 % 2",
+			ast.NewFunction(
+				"$mod",
+				ast.NewArray(astutil.Int32(1),astutil.Int32(2)),
+			),
+			nil,
+		},
+		{
+			"1 * 2",
+			ast.NewFunction(
+				"$multiply",
+				ast.NewArray(astutil.Int32(1),astutil.Int32(2)),
+			),
+			nil,
+		},
+		{
+			"1 != 2",
+			ast.NewBinary(
+				ast.NotEquals,
+				astutil.Int32(1),
+				astutil.Int32(2),
+			),
+			nil,
+		},
+		{
+			"1 or 2",
+			ast.NewBinary(
+				ast.Or,
+				astutil.Int32(1),
+				astutil.Int32(2),
+			),
+			nil,
+		},
+		{
+			"1 ** 2",
+			ast.NewFunction(
+				"$pow",
+				ast.NewArray(astutil.Int32(1),astutil.Int32(2)),
+			),
+			nil,
+		},
+		{
+			"1 - 2",
+			ast.NewFunction(
+				"$subtract",
+				ast.NewArray(astutil.Int32(1),astutil.Int32(2)),
+			),
+			nil,
+		},
 	}
 
 	for _, tc := range testCases {
