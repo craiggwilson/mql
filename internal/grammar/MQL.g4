@@ -51,7 +51,7 @@ expression:
 | expression (OR | NOR) expression                                                         #orExpression
 | expression CONCAT expression                                                             #concatExpression
 | expression DQUESTION expression                                                          #nullCoalesceExpression
-| expression NOT? IN expression                                                            #inExpression
+| expression NOT? IN array                                                                 #inExpression
 | SWITCH switchCase+ (ELSE expression)?                                                    #switchExpression
 | IF expression THEN expression ELSE expression                                            #conditionalExpression
 | LBRACE variableAssignment (COMMA variableAssignment)* RBRACE ARROW expression            #letExpression
@@ -60,9 +60,12 @@ expression:
 | fieldName                                                                                #fieldExpression
 | variableName                                                                             #variableReferenceExpression
 | document                                                                                 #documentExpression
-| LBRACK (expression (COMMA expression)*)? RBRACK                                          #arrayExpression
+| array                                                                                    #arrayExpression
 | value                                                                                    #valueExpression
 ;
+
+array:
+  LBRACK (expression (COMMA expression)*)? RBRACK;
 
 document:
   LBRACE (fieldAssignment (COMMA fieldAssignment)*)? RBRACE

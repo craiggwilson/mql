@@ -283,6 +283,31 @@ func TestParseExpr(t *testing.T) {
 			nil,
 		},
 		{
+			"1 in [2, 3]",
+			ast.NewFunction(
+				"$in",
+				ast.NewArray(
+					astutil.Int32(1), 
+					ast.NewArray(astutil.Int32(2),astutil.Int32(3)),
+				),
+			),
+			nil,
+		},
+		{
+			"1 not in [2, 3]",
+			ast.NewFunction(
+				"$not",
+				ast.NewFunction(
+					"$in",
+					ast.NewArray(
+						astutil.Int32(1), 
+						ast.NewArray(astutil.Int32(2),astutil.Int32(3)),
+					),
+				),
+			),
+			nil,
+		},
+		{
 			"1 < 2",
 			ast.NewBinary(
 				ast.LessThan,
@@ -347,6 +372,24 @@ func TestParseExpr(t *testing.T) {
 			ast.NewFunction(
 				"$subtract",
 				ast.NewArray(astutil.Int32(1),astutil.Int32(2)),
+			),
+			nil,
+		},
+
+		// Unary
+		{
+			"NOT true",
+			ast.NewFunction(
+				"$not",
+				astutil.True,
+			),
+			nil,
+		},
+		{
+			"-true",
+			ast.NewFunction(
+				"$multiply",
+				ast.NewArray(astutil.True, astutil.Int32(-1)),
 			),
 			nil,
 		},

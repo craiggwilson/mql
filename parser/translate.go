@@ -251,7 +251,7 @@ func (t *exprTranslator) VisitAndExpression(ctx *grammar.AndExpressionContext) i
 	return ast.NewBinary(ast.And, left, right)
 }
 
-func (t *exprTranslator) VisitArrayExpression(ctx *grammar.ArrayExpressionContext) interface{} {
+func (t *exprTranslator) VisitArray(ctx *grammar.ArrayContext) interface{} {
 	exprs := ctx.AllExpression()
 	elems := make([]ast.Expr, len(exprs))
 	for i, expr := range exprs {
@@ -265,6 +265,10 @@ func (t *exprTranslator) VisitArrayExpression(ctx *grammar.ArrayExpressionContex
 	}
 
 	return ast.NewArray(elems...)
+}
+
+func (t *exprTranslator) VisitArrayExpression(ctx *grammar.ArrayExpressionContext) interface{} {
+	return ctx.Array().Accept(t)
 }
 
 func (t *exprTranslator) VisitArrayAccessExpression(ctx *grammar.ArrayAccessExpressionContext) interface{} {
@@ -431,6 +435,27 @@ func (t *exprTranslator) VisitHexValue(ctx *grammar.HexValueContext) interface{}
 	}
 
 	return c
+}
+
+func (t *exprTranslator) VisitInExpression(ctx *grammar.InExpressionContext) interface{} {
+	expr, err := t.translate(ctx.Expression())
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing subject of in expression")
+		return nil
+	}
+
+	array := ctx.Array().Accept(t)
+	if t.err != nil {
+		t.err = errors.Wrap(t.err, "failed parsing array of in expression")
+		return nil
+	}
+
+	result := ast.NewFunction("$in", ast.NewArray(expr, array.(ast.Expr)))
+	if ctx.NOT() != nil {
+		result = ast.NewFunction("$not", result)
+	}
+
+	return result
 }
 
 func (t *exprTranslator) VisitIntValue(ctx *grammar.IntValueContext) interface{} {
@@ -646,7 +671,7 @@ func (t *exprTranslator) VisitUnaryMinusExpression(ctx *grammar.UnaryMinusExpres
 	}
 
 	return ast.NewFunction(
-		"multiply",
+		"$multiply",
 		ast.NewArray(
 			expr,
 			astutil.Int32(-1),

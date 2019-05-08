@@ -147,11 +147,11 @@ func (v *BaseMQLVisitor) VisitPowerExpression(ctx *PowerExpressionContext) inter
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseMQLVisitor) VisitInExpression(ctx *InExpressionContext) interface{} {
+func (v *BaseMQLVisitor) VisitArrayAccessExpression(ctx *ArrayAccessExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseMQLVisitor) VisitArrayAccessExpression(ctx *ArrayAccessExpressionContext) interface{} {
+func (v *BaseMQLVisitor) VisitInExpression(ctx *InExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -160,6 +160,10 @@ func (v *BaseMQLVisitor) VisitVariableReferenceExpression(ctx *VariableReference
 }
 
 func (v *BaseMQLVisitor) VisitRangeExpression(ctx *RangeExpressionContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseMQLVisitor) VisitArray(ctx *ArrayContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

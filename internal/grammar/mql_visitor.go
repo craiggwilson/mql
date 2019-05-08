@@ -112,17 +112,20 @@ type MQLVisitor interface {
 	// Visit a parse tree produced by MQLParser#powerExpression.
 	VisitPowerExpression(ctx *PowerExpressionContext) interface{}
 
-	// Visit a parse tree produced by MQLParser#inExpression.
-	VisitInExpression(ctx *InExpressionContext) interface{}
-
 	// Visit a parse tree produced by MQLParser#arrayAccessExpression.
 	VisitArrayAccessExpression(ctx *ArrayAccessExpressionContext) interface{}
+
+	// Visit a parse tree produced by MQLParser#inExpression.
+	VisitInExpression(ctx *InExpressionContext) interface{}
 
 	// Visit a parse tree produced by MQLParser#variableReferenceExpression.
 	VisitVariableReferenceExpression(ctx *VariableReferenceExpressionContext) interface{}
 
 	// Visit a parse tree produced by MQLParser#rangeExpression.
 	VisitRangeExpression(ctx *RangeExpressionContext) interface{}
+
+	// Visit a parse tree produced by MQLParser#array.
+	VisitArray(ctx *ArrayContext) interface{}
 
 	// Visit a parse tree produced by MQLParser#document.
 	VisitDocument(ctx *DocumentContext) interface{}
