@@ -577,6 +577,22 @@ func (t *exprTranslator) VisitNotExpression(ctx *grammar.NotExpressionContext) i
 	return ast.NewFunction("$not", expr)
 }
 
+func (t *exprTranslator) VisitNullCoalesceExpression(ctx *grammar.NullCoalesceExpressionContext) interface{} {
+	allExpressions := ctx.AllExpression()
+	left, err := t.translate(allExpressions[0])
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing AND lhs expression")
+		return nil
+	}
+	right, err := t.translate(allExpressions[1])
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing AND rhs expression")
+		return nil
+	}
+
+	return ast.NewFunction("$ifNull", ast.NewArray(left, right))
+}
+
 func (t *exprTranslator) VisitNumberValue(ctx *grammar.NumberValueContext) interface{} {
 	return ctx.Number().Accept(t)
 }
