@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"bitbucket.org/craiggwilson/mql/build"
+	"github.com/craiggwilson/mql/build"
 	"github.com/craiggwilson/goke/task"
 )
 

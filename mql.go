@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"bitbucket.org/craiggwilson/mql/cmd"
+	"github.com/craiggwilson/mql/cmd"
 )
 
 func main() {

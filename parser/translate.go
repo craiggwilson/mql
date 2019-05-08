@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"bitbucket.org/craiggwilson/mql/internal/grammar"
+	"github.com/craiggwilson/mql/internal/grammar"
 
 	"github.com/10gen/mongoast/ast"
 	astparser "github.com/10gen/mongoast/parser"
@@ -417,6 +417,19 @@ func (t *exprTranslator) VisitLongHexValue(ctx *grammar.LongHexValueContext) int
 	return c
 }
 
+func (t *exprTranslator) VisitLongOctValue(ctx *grammar.LongOctValueContext) interface{} {
+	text := ctx.LONG_OCT().GetText()[2:]
+	text = text[:len(text)-1]
+
+	c, err := parseIntegralValue(text, 8, true)
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing long oct")
+		return nil
+	}
+
+	return c
+}
+
 func (t *exprTranslator) VisitLongValue(ctx *grammar.LongValueContext) interface{} {
 	text := ctx.LONG().GetText()
 	text = text[:len(text)-1]
@@ -495,6 +508,18 @@ func (t *exprTranslator) VisitNullValue(ctx *grammar.NullValueContext) interface
 	})
 }
 
+func (t *exprTranslator) VisitOctValue(ctx *grammar.OctValueContext) interface{} {
+	text := ctx.OCT().GetText()[2:]
+
+	c, err := parseIntegralValue(text, 8, false)
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing oct")
+		return nil
+	}
+
+	return c
+}
+
 func (t *exprTranslator) VisitOidValue(ctx *grammar.OidValueContext) interface{} {
 	oid, err := primitive.ObjectIDFromHex(ctx.OID().GetText()[4:28])
 	if err != nil {
@@ -537,18 +562,19 @@ func (t *exprTranslator) VisitRegexValue(ctx *grammar.RegexValueContext) interfa
 	s := ctx.REGEX().GetText()
 	split := strings.LastIndexByte(s, '/')
 	options := s[split+1:]
-	s = s[1:split]
+	s = strings.Replace(s[1:split], "\\/", "/", -1)
 
-	return ast.NewConstant(bsoncore.Value{
-		Type: bsontype.String,
+	c := ast.NewConstant(bsoncore.Value{
+		Type: bsontype.Regex,
 		Data: bsoncore.AppendRegex(nil, s, options),
 	})
+	return c
 }
 
 func (t *exprTranslator) VisitStringValue(ctx *grammar.StringValueContext) interface{} {
 	return ast.NewConstant(bsoncore.Value{
 		Type: bsontype.String,
-		Data: bsoncore.AppendString(nil, ctx.STRING().GetText()),
+		Data: bsoncore.AppendString(nil, stripQuotes(ctx.STRING())),
 	})
 }
 
@@ -649,7 +675,7 @@ func stripQuotes(n antlr.TerminalNode) string {
 	t := n.GetText()
 	switch t[0] {
 	case '"', '\'', '`':
-		return t[1 : len(t)-2]
+		return t[1 : len(t)-1]
 	default:
 		return t
 	}

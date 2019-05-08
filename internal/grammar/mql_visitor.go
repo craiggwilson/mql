@@ -199,6 +199,12 @@ type MQLVisitor interface {
 	// Visit a parse tree produced by MQLParser#longHexValue.
 	VisitLongHexValue(ctx *LongHexValueContext) interface{}
 
+	// Visit a parse tree produced by MQLParser#octValue.
+	VisitOctValue(ctx *OctValueContext) interface{}
+
+	// Visit a parse tree produced by MQLParser#longOctValue.
+	VisitLongOctValue(ctx *LongOctValueContext) interface{}
+
 	// Visit a parse tree produced by MQLParser#collectionName.
 	VisitCollectionName(ctx *CollectionNameContext) interface{}
 

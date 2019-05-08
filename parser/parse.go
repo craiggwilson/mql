@@ -4,7 +4,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	"bitbucket.org/craiggwilson/mql/internal/grammar"
+	"github.com/craiggwilson/mql/internal/grammar"
 
 	"github.com/10gen/mongoast/ast"
 	"github.com/antlr/antlr4/runtime/Go/antlr"
@@ -28,4 +28,23 @@ func ParsePipeline(r io.Reader) (*ast.Pipeline, error) {
 	}
 
 	return ast.NewPipeline(stages...), nil
+}
+
+func ParseExpr(r io.Reader) (ast.Expr, error) {
+	bytes, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	input := antlr.NewInputStream(string(bytes))
+	lexer := grammar.NewMQLLexer(input)
+	tokens := antlr.NewCommonTokenStream(lexer, 0)
+	p := grammar.NewMQLParser(tokens)
+
+	e, err := translateExpr(p.Expression())
+	if err != nil {
+		return nil, err
+	}
+
+	return e, nil
 }

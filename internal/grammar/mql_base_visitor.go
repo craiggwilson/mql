@@ -263,6 +263,14 @@ func (v *BaseMQLVisitor) VisitLongHexValue(ctx *LongHexValueContext) interface{}
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseMQLVisitor) VisitOctValue(ctx *OctValueContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseMQLVisitor) VisitLongOctValue(ctx *LongOctValueContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseMQLVisitor) VisitCollectionName(ctx *CollectionNameContext) interface{} {
 	return v.VisitChildren(ctx)
 }

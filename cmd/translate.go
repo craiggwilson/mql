@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"bitbucket.org/craiggwilson/mql/parser"
+	"github.com/craiggwilson/mql/parser"
 
 	"github.com/10gen/mongoast/astprint"
 	"github.com/spf13/cobra"
