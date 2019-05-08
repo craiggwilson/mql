@@ -2259,44 +2259,6 @@ func (s *NullCoalesceExpressionContext) Accept(visitor antlr.ParseTreeVisitor) i
 	}
 }
 
-type NewDocumentExpressionContext struct {
-	*ExpressionContext
-}
-
-func NewNewDocumentExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *NewDocumentExpressionContext {
-	var p = new(NewDocumentExpressionContext)
-
-	p.ExpressionContext = NewEmptyExpressionContext()
-	p.parser = parser
-	p.CopyFrom(ctx.(*ExpressionContext))
-
-	return p
-}
-
-func (s *NewDocumentExpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *NewDocumentExpressionContext) Document() IDocumentContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*IDocumentContext)(nil)).Elem(), 0)
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IDocumentContext)
-}
-
-func (s *NewDocumentExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case MQLVisitor:
-		return t.VisitNewDocumentExpression(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
-}
-
 type AndExpressionContext struct {
 	*ExpressionContext
 }
@@ -2555,12 +2517,12 @@ func (s *LikeExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface
 	}
 }
 
-type NewArrayExpressionContext struct {
+type DocumentExpressionContext struct {
 	*ExpressionContext
 }
 
-func NewNewArrayExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *NewArrayExpressionContext {
-	var p = new(NewArrayExpressionContext)
+func NewDocumentExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *DocumentExpressionContext {
+	var p = new(DocumentExpressionContext)
 
 	p.ExpressionContext = NewEmptyExpressionContext()
 	p.parser = parser
@@ -2569,19 +2531,57 @@ func NewNewArrayExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleConte
 	return p
 }
 
-func (s *NewArrayExpressionContext) GetRuleContext() antlr.RuleContext {
+func (s *DocumentExpressionContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
 
-func (s *NewArrayExpressionContext) LBRACK() antlr.TerminalNode {
+func (s *DocumentExpressionContext) Document() IDocumentContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IDocumentContext)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IDocumentContext)
+}
+
+func (s *DocumentExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case MQLVisitor:
+		return t.VisitDocumentExpression(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
+type ArrayExpressionContext struct {
+	*ExpressionContext
+}
+
+func NewArrayExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ArrayExpressionContext {
+	var p = new(ArrayExpressionContext)
+
+	p.ExpressionContext = NewEmptyExpressionContext()
+	p.parser = parser
+	p.CopyFrom(ctx.(*ExpressionContext))
+
+	return p
+}
+
+func (s *ArrayExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *ArrayExpressionContext) LBRACK() antlr.TerminalNode {
 	return s.GetToken(MQLParserLBRACK, 0)
 }
 
-func (s *NewArrayExpressionContext) RBRACK() antlr.TerminalNode {
+func (s *ArrayExpressionContext) RBRACK() antlr.TerminalNode {
 	return s.GetToken(MQLParserRBRACK, 0)
 }
 
-func (s *NewArrayExpressionContext) AllExpression() []IExpressionContext {
+func (s *ArrayExpressionContext) AllExpression() []IExpressionContext {
 	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*IExpressionContext)(nil)).Elem())
 	var tst = make([]IExpressionContext, len(ts))
 
@@ -2594,7 +2594,7 @@ func (s *NewArrayExpressionContext) AllExpression() []IExpressionContext {
 	return tst
 }
 
-func (s *NewArrayExpressionContext) Expression(i int) IExpressionContext {
+func (s *ArrayExpressionContext) Expression(i int) IExpressionContext {
 	var t = s.GetTypedRuleContext(reflect.TypeOf((*IExpressionContext)(nil)).Elem(), i)
 
 	if t == nil {
@@ -2604,18 +2604,18 @@ func (s *NewArrayExpressionContext) Expression(i int) IExpressionContext {
 	return t.(IExpressionContext)
 }
 
-func (s *NewArrayExpressionContext) AllCOMMA() []antlr.TerminalNode {
+func (s *ArrayExpressionContext) AllCOMMA() []antlr.TerminalNode {
 	return s.GetTokens(MQLParserCOMMA)
 }
 
-func (s *NewArrayExpressionContext) COMMA(i int) antlr.TerminalNode {
+func (s *ArrayExpressionContext) COMMA(i int) antlr.TerminalNode {
 	return s.GetToken(MQLParserCOMMA, i)
 }
 
-func (s *NewArrayExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+func (s *ArrayExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
 	case MQLVisitor:
-		return t.VisitNewArrayExpression(s)
+		return t.VisitArrayExpression(s)
 
 	default:
 		return t.VisitChildren(s)
@@ -3147,9 +3147,9 @@ func (s *InExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
 type ArrayAccessExpressionContext struct {
 	*ExpressionContext
-	st   IExpressionContext
-	end  IExpressionContext
-	step IExpressionContext
+	index IExpressionContext
+	end   IExpressionContext
+	step  IExpressionContext
 }
 
 func NewArrayAccessExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ArrayAccessExpressionContext {
@@ -3162,13 +3162,13 @@ func NewArrayAccessExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleCo
 	return p
 }
 
-func (s *ArrayAccessExpressionContext) GetSt() IExpressionContext { return s.st }
+func (s *ArrayAccessExpressionContext) GetIndex() IExpressionContext { return s.index }
 
 func (s *ArrayAccessExpressionContext) GetEnd() IExpressionContext { return s.end }
 
 func (s *ArrayAccessExpressionContext) GetStep() IExpressionContext { return s.step }
 
-func (s *ArrayAccessExpressionContext) SetSt(v IExpressionContext) { s.st = v }
+func (s *ArrayAccessExpressionContext) SetIndex(v IExpressionContext) { s.index = v }
 
 func (s *ArrayAccessExpressionContext) SetEnd(v IExpressionContext) { s.end = v }
 
@@ -3546,7 +3546,7 @@ func (p *MQLParser) expression(_p int) (localctx IExpressionContext) {
 		}
 
 	case 10:
-		localctx = NewNewDocumentExpressionContext(p, localctx)
+		localctx = NewDocumentExpressionContext(p, localctx)
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
@@ -3555,7 +3555,7 @@ func (p *MQLParser) expression(_p int) (localctx IExpressionContext) {
 		}
 
 	case 11:
-		localctx = NewNewArrayExpressionContext(p, localctx)
+		localctx = NewArrayExpressionContext(p, localctx)
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
@@ -3883,7 +3883,7 @@ func (p *MQLParser) expression(_p int) (localctx IExpressionContext) {
 
 						var _x = p.expression(0)
 
-						localctx.(*ArrayAccessExpressionContext).st = _x
+						localctx.(*ArrayAccessExpressionContext).index = _x
 					}
 
 				case 2:
@@ -3897,7 +3897,7 @@ func (p *MQLParser) expression(_p int) (localctx IExpressionContext) {
 
 							var _x = p.expression(0)
 
-							localctx.(*ArrayAccessExpressionContext).st = _x
+							localctx.(*ArrayAccessExpressionContext).index = _x
 						}
 
 					}

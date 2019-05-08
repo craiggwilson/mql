@@ -67,9 +67,6 @@ type MQLVisitor interface {
 	// Visit a parse tree produced by MQLParser#nullCoalesceExpression.
 	VisitNullCoalesceExpression(ctx *NullCoalesceExpressionContext) interface{}
 
-	// Visit a parse tree produced by MQLParser#newDocumentExpression.
-	VisitNewDocumentExpression(ctx *NewDocumentExpressionContext) interface{}
-
 	// Visit a parse tree produced by MQLParser#andExpression.
 	VisitAndExpression(ctx *AndExpressionContext) interface{}
 
@@ -85,8 +82,11 @@ type MQLVisitor interface {
 	// Visit a parse tree produced by MQLParser#likeExpression.
 	VisitLikeExpression(ctx *LikeExpressionContext) interface{}
 
-	// Visit a parse tree produced by MQLParser#newArrayExpression.
-	VisitNewArrayExpression(ctx *NewArrayExpressionContext) interface{}
+	// Visit a parse tree produced by MQLParser#documentExpression.
+	VisitDocumentExpression(ctx *DocumentExpressionContext) interface{}
+
+	// Visit a parse tree produced by MQLParser#arrayExpression.
+	VisitArrayExpression(ctx *ArrayExpressionContext) interface{}
 
 	// Visit a parse tree produced by MQLParser#conditionalExpression.
 	VisitConditionalExpression(ctx *ConditionalExpressionContext) interface{}

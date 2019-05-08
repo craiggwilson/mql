@@ -37,10 +37,10 @@ expression:
   <assoc=right>expression POWER expression                                                 #powerExpression
 | MINUS expression                                                                         #unaryMinusExpression
 | NOT expression                                                                           #notExpression
-| expression DOT (fieldName | function)                                                   #memberExpression
+| expression DOT (fieldName | function)                                                    #memberExpression
 | expression LBRACK (
-        st=expression
-      | (st=expression)? RANGE (end=expression)? (COLON step=expression)?
+        index=expression
+      | (index=expression)? RANGE (end=expression)? (COLON step=expression)?
     ) RBRACK                                                                               #arrayAccessExpression
 | expression RANGE expression (COLON expression)?                                          #rangeExpression
 | expression LIKE REGEX                                                                    #likeExpression
@@ -52,15 +52,15 @@ expression:
 | expression CONCAT expression                                                             #concatExpression
 | expression DQUESTION expression                                                          #nullCoalesceExpression
 | expression NOT? IN expression                                                            #inExpression
-| SWITCH switchCase+ (ELSE expression)?                                                   #switchExpression
+| SWITCH switchCase+ (ELSE expression)?                                                    #switchExpression
 | IF expression THEN expression ELSE expression                                            #conditionalExpression
-| LBRACE variableAssignment (COMMA variableAssignment)* RBRACE ARROW expression          #letExpression
+| LBRACE variableAssignment (COMMA variableAssignment)* RBRACE ARROW expression            #letExpression
 | LPAREN expression RPAREN                                                                 #parenthesisExpression
 | function                                                                                 #functionCallExpression
-| fieldName                                                                               #fieldExpression
-| variableName                                                                            #variableReferenceExpression
-| document                                                                                 #newDocumentExpression
-| LBRACK (expression (COMMA expression)*)? RBRACK                                          #newArrayExpression
+| fieldName                                                                                #fieldExpression
+| variableName                                                                             #variableReferenceExpression
+| document                                                                                 #documentExpression
+| LBRACK (expression (COMMA expression)*)? RBRACK                                          #arrayExpression
 | value                                                                                    #valueExpression
 ;
 

@@ -251,6 +251,37 @@ func (t *exprTranslator) VisitAndExpression(ctx *grammar.AndExpressionContext) i
 	return ast.NewBinary(ast.And, left, right)
 }
 
+func (t *exprTranslator) VisitArrayExpression(ctx *grammar.ArrayExpressionContext) interface{} {
+	exprs := ctx.AllExpression()
+	elems := make([]ast.Expr, len(exprs))
+	for i, expr := range exprs {
+		elem, err := t.translate(expr)
+		if err != nil {
+			t.err = errors.Wrapf(err, "failed translated array element %d", i)
+			return nil
+		}
+
+		elems[i] = elem
+	}
+
+	return ast.NewArray(elems...)
+}
+
+func (t *exprTranslator) VisitArrayAccessExpression(ctx *grammar.ArrayAccessExpressionContext) interface{} {
+	parent, err := t.translate(ctx.Expression(0))
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing array access expression parent")
+		return nil
+	}
+	start, err := t.translate(ctx.GetIndex())
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing array access expression index")
+		return nil
+	}
+
+	return ast.NewArrayIndexRef(start, parent)
+}
+
 func (t *exprTranslator) VisitBinValue(ctx *grammar.BinValueContext) interface{} {
 	text := ctx.BIN().GetText()[2:]
 
@@ -338,6 +369,26 @@ func (t *exprTranslator) VisitDecimalValue(ctx *grammar.DecimalValueContext) int
 		Type: bsontype.Decimal128,
 		Data: bsoncore.AppendDecimal128(nil, v),
 	})
+}
+
+func (t *exprTranslator) VisitDocument(ctx *grammar.DocumentContext) interface{} {
+	fas := ctx.AllFieldAssignment()
+	elems := make([]*ast.DocumentElement, len(fas))
+	for i, fa := range fas {
+		elem, err := translateFieldAssignment(fa)
+		if err != nil {
+			t.err = errors.Wrapf(err, "failed translating document element %d", i)
+			return nil
+		}
+
+		elems[i] = elem
+	}
+
+	return ast.NewDocument(elems...)
+}
+
+func (t *exprTranslator) VisitDocumentExpression(ctx *grammar.DocumentExpressionContext) interface{} {
+	return ctx.Document().Accept(t)
 }
 
 func (t *exprTranslator) VisitDoubleValue(ctx *grammar.DoubleValueContext) interface{} {
@@ -599,6 +650,41 @@ func (t *exprTranslator) VisitUnaryMinusExpression(ctx *grammar.UnaryMinusExpres
 
 func (t *exprTranslator) VisitValueExpression(ctx *grammar.ValueExpressionContext) interface{} {
 	return ctx.Value().Accept(t)
+}
+
+func translateFieldAssignment(ctx grammar.IFieldAssignmentContext) (*ast.DocumentElement, error) {
+	t := &fieldAssignmentTranslator{}
+	return t.translate(ctx)
+}
+
+type fieldAssignmentTranslator struct {
+	*grammar.BaseMQLVisitor
+	err error
+}
+
+func (t *fieldAssignmentTranslator) translate(ctx grammar.IFieldAssignmentContext) (*ast.DocumentElement, error) {
+	result := ctx.Accept(t)
+	if t.err != nil {
+		return nil, t.err
+	}
+
+	return result.(*ast.DocumentElement), nil
+}
+
+func (t *fieldAssignmentTranslator) VisitFieldAssignment(ctx *grammar.FieldAssignmentContext) interface{} {
+	fd, err := translateFieldDeclaration(ctx.FieldDeclaration())
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing field declaration")
+		return nil
+	}
+
+	expr, err := translateExpr(ctx.Expression())
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing expression")
+		return nil
+	}
+
+	return ast.NewDocumentElement(fd, expr)
 }
 
 func translateMultipartFieldDeclaration(ctx grammar.IMultipartFieldDeclarationContext) (string, error) {

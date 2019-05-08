@@ -163,6 +163,62 @@ func TestParseExpr(t *testing.T) {
 			ast.NewConstant(bsonutil.DateTime(946728000000)),
 			nil,
 		},
+
+		// Document
+		{
+			"{a: true}",
+			ast.NewDocument(
+				ast.NewDocumentElement("a", ast.NewConstant(bsonutil.True)),
+			),
+			nil,
+		},
+
+		// Arrays
+		{
+			"[true, false, true]",
+			ast.NewArray(
+				ast.NewConstant(bsonutil.True),
+				ast.NewConstant(bsonutil.False),
+				ast.NewConstant(bsonutil.True),
+			),
+			nil,
+		},
+
+		// References
+		{
+			"a",
+			ast.NewFieldRef("a", nil),
+			nil,
+		},
+		{
+			"a.b",
+			ast.NewFieldRef("b", ast.NewFieldRef("a", nil)),
+			nil,
+		},
+		{
+			"a[0].b",
+			ast.NewFieldRef(
+				"b", 
+				ast.NewArrayIndexRef(
+					ast.NewConstant(bsonutil.Int32(0)),
+					ast.NewFieldRef("a", nil),
+				),
+			),
+			nil,
+		},
+		{
+			"{a: false}.a",
+			ast.NewFieldRef(
+				"a", 
+				ast.NewDocument(
+					ast.NewDocumentElement(
+						"a",
+						ast.NewConstant(bsonutil.False),
+					),
+				),
+			),
+			nil,
+		},
 	}
 
 	for _, tc := range testCases {

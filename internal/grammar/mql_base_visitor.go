@@ -87,10 +87,6 @@ func (v *BaseMQLVisitor) VisitNullCoalesceExpression(ctx *NullCoalesceExpression
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseMQLVisitor) VisitNewDocumentExpression(ctx *NewDocumentExpressionContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseMQLVisitor) VisitAndExpression(ctx *AndExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -111,7 +107,11 @@ func (v *BaseMQLVisitor) VisitLikeExpression(ctx *LikeExpressionContext) interfa
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseMQLVisitor) VisitNewArrayExpression(ctx *NewArrayExpressionContext) interface{} {
+func (v *BaseMQLVisitor) VisitDocumentExpression(ctx *DocumentExpressionContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseMQLVisitor) VisitArrayExpression(ctx *ArrayExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
