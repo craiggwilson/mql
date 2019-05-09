@@ -17,7 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
 )
 
-func translateQueryStatement(ctx grammar.IQueryStatementContext) ([]ast.Stage, error) {
+func translateQueryStatement(ctx grammar.IQueryStatementContext) (*QueryStatement, error) {
 	t := &queryStatementTranslator{}
 	return t.translate(ctx)
 }
@@ -27,17 +27,62 @@ type queryStatementTranslator struct {
 	err error
 }
 
-func (t *queryStatementTranslator) translate(ctx grammar.IQueryStatementContext) ([]ast.Stage, error) {
-	stages := ctx.Accept(t)
+func (t *queryStatementTranslator) translate(ctx grammar.IQueryStatementContext) (*QueryStatement, error) {
+	stmt := ctx.Accept(t)
 	if t.err != nil {
 		return nil, t.err
 	}
 
-	return stages.([]ast.Stage), nil
+	return stmt.(*QueryStatement), nil
 }
 
 func (t *queryStatementTranslator) VisitQueryStatement(ctx *grammar.QueryStatementContext) interface{} {
-	var result []ast.Stage
+	pipeline, err := translatePipeline(ctx.Pipeline())
+	if err != nil {
+		t.err = errors.Wrap(err, "failed translating pipeline")
+		return nil
+	}
+
+	ns := ctx.CollectionName().Accept(t).([]string)
+
+	return NewQueryStatement(ns[0], ns[1], pipeline)
+}
+
+func (t *queryStatementTranslator) VisitCollectionName(ctx *grammar.CollectionNameContext) interface{} {
+	c := stripQuotes(ctx.ID())
+	var d string
+	if ctx.DatabaseName() != nil {
+		d = ctx.DatabaseName().Accept(t).(string)
+	}
+
+	return []string{d, c}
+}
+
+func (t *queryStatementTranslator) VisitDatabaseName(ctx *grammar.DatabaseNameContext) interface{} {
+	return stripQuotes(ctx.ID())
+}
+
+func translatePipeline(ctx grammar.IPipelineContext) (*ast.Pipeline, error) {
+	t := &pipelineTranslator{}
+	return t.translate(ctx)
+}
+
+type pipelineTranslator struct {
+	*grammar.BaseMQLVisitor
+	err error
+}
+
+func (t *pipelineTranslator) translate(ctx grammar.IPipelineContext) (*ast.Pipeline, error) {
+	pipeline := ctx.Accept(t)
+	if t.err != nil {
+		return nil, t.err
+	}
+
+	return pipeline.(*ast.Pipeline), nil
+}
+
+func (t *pipelineTranslator) VisitPipeline(ctx *grammar.PipelineContext) interface{} {
+	var stages []ast.Stage
 
 	for i, s := range ctx.AllQueryStage() {
 		stage, err := translateQueryStage(s)
@@ -46,10 +91,10 @@ func (t *queryStatementTranslator) VisitQueryStatement(ctx *grammar.QueryStateme
 			return nil
 		}
 
-		result = append(result, stage)
+		stages = append(stages, stage)
 	}
 
-	return result
+	return ast.NewPipeline(stages...)
 }
 
 func translateQueryStage(ctx grammar.IQueryStageContext) (ast.Stage, error) {

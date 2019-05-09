@@ -1,6 +1,10 @@
 grammar MQL;
 
-queryStatement: FROM collectionName queryStage*;
+queryStatement: FROM collectionName pipeline;
+
+pipeline:
+  queryStage*
+;
 
 // QUERY STAGES
 queryStage:
@@ -8,7 +12,7 @@ queryStage:
 | LIMIT INT                                                                            #limitStage
 | LOOKUP LBRACE multipartFieldDeclaration COLON
     (LBRACE variableAssignment (COMMA variableAssignment)* RBRACE ARROW)?
-    queryStatement
+    FROM collectionName pipeline
   RBRACE                                                                               #lookupStage
 | MATCH expression                                                                     #matchStage
 | PROJECT LBRACE projectItem (COMMA projectItem)* RBRACE                             #projectStage

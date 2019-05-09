@@ -13,6 +13,7 @@ import (
 
 func init() {
 	rootCmd.AddCommand(translateCommand)
+	translateCommand.Flags().StringP("format", "f", "shell", "Specify either 'shell' or 'extjson'. The default is 'shell'.")
 }
 
 var translateCommand = &cobra.Command{
@@ -26,6 +27,19 @@ var translateCommand = &cobra.Command{
 			os.Exit(1)
 		}
 
-		astprint.Print(os.Stdout, pipeline)
+		format, err := cmd.Flags().GetString("format")
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		switch format {
+		case "extjson":
+			astprint.Print(os.Stdout, pipeline)
+		case "shell":
+			astprint.ShellPrint(os.Stdout, pipeline)
+		default:
+			fmt.Println("only 'shell' and 'extjson' are supported for the format flag")
+			os.Exit(1)
+		}
 	},
 }

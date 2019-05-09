@@ -12,6 +12,124 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+func TestParseStatement(t *testing.T) {
+	testCases := []struct{
+		input string
+		expected *parser.QueryStatement
+		err error
+	} {
+		{
+			"FROM foo LIMIT 2",
+			parser.NewQueryStatement(
+				"", 
+				"foo",
+				ast.NewPipeline(
+					ast.NewLimitStage(2),
+				),
+			),
+			nil,
+		},
+		{
+			"FROM test.foo LIMIT 2",
+			parser.NewQueryStatement(
+				"test", 
+				"foo",
+				ast.NewPipeline(
+					ast.NewLimitStage(2),
+				),
+			),
+			nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.input, func(t *testing.T) {
+			actual, err := parser.ParseStatement(strings.NewReader(tc.input))
+			switch {
+			case tc.err != nil && err != nil:
+				if tc.err.Error() != err.Error()  {
+					t.Fatalf("expected error %q, but got %q", tc.err.Error(), err.Error())
+				}	
+			case tc.err != nil && err == nil:
+				t.Fatalf("expected error %q, but got none", tc.err.Error())
+			case tc.err == nil && err != nil:
+				t.Fatalf("expected no error, but got %q", err.Error())
+	
+			default:
+				if !cmp.Equal(tc.expected, actual) {
+					t.Fatalf("expected does not match actual\n  %s", cmp.Diff(tc.expected, actual))
+				}
+			}
+		})
+	}
+}
+
+func TestParsePipeline(t *testing.T) {
+	testCases := []struct{
+		input string
+		expected *ast.Pipeline
+		err error
+	} {
+		{
+			"LIMIT 2",
+			ast.NewPipeline(
+				ast.NewLimitStage(2),
+			),
+			nil,
+		},
+		{
+			"MATCH a = 2",
+			ast.NewPipeline(
+				ast.NewMatchStage(
+					ast.NewBinary(
+						ast.Equals,
+						ast.NewFieldRef("a", nil),
+						astutil.Int32(2),
+					),
+				),
+			),
+			nil,
+		},
+		{
+			"PROJECT { a: 2 }",
+			ast.NewPipeline(
+				ast.NewProjectStage(
+					ast.NewAssignProjectItem("a", astutil.Int32(2)),
+				),
+			),
+			nil,
+		},
+		{
+			"SKIP 2",
+			ast.NewPipeline(
+				ast.NewSkipStage(2),
+			),
+			nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.input, func(t *testing.T) {
+			actual, err := parser.ParsePipeline(strings.NewReader(tc.input))
+			switch {
+			case tc.err != nil && err != nil:
+				if tc.err.Error() != err.Error()  {
+					t.Fatalf("expected error %q, but got %q", tc.err.Error(), err.Error())
+				}	
+			case tc.err != nil && err == nil:
+				t.Fatalf("expected error %q, but got none", tc.err.Error())
+			case tc.err == nil && err != nil:
+				t.Fatalf("expected no error, but got %q", err.Error())
+	
+			default:
+				if !cmp.Equal(tc.expected, actual) {
+					t.Fatalf("expected does not match actual\n  %s", cmp.Diff(tc.expected, actual))
+				}
+			}
+		})
+	}
+}
+
 func TestParseExpr(t *testing.T) {
 	testCases := []struct{
 		input string

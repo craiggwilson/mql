@@ -11,6 +11,10 @@ func (v *BaseMQLVisitor) VisitQueryStatement(ctx *QueryStatementContext) interfa
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseMQLVisitor) VisitPipeline(ctx *PipelineContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseMQLVisitor) VisitGroupStage(ctx *GroupStageContext) interface{} {
 	return v.VisitChildren(ctx)
 }
