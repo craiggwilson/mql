@@ -79,6 +79,10 @@ func (v *BaseMQLVisitor) VisitComparisonExpression(ctx *ComparisonExpressionCont
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseMQLVisitor) VisitVariableExpression(ctx *VariableExpressionContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseMQLVisitor) VisitConcatExpression(ctx *ConcatExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -152,10 +156,6 @@ func (v *BaseMQLVisitor) VisitArrayAccessExpression(ctx *ArrayAccessExpressionCo
 }
 
 func (v *BaseMQLVisitor) VisitInExpression(ctx *InExpressionContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseMQLVisitor) VisitVariableReferenceExpression(ctx *VariableReferenceExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

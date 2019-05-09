@@ -491,6 +491,34 @@ func (t *exprTranslator) VisitIntValue(ctx *grammar.IntValueContext) interface{}
 	return c
 }
 
+func (t *exprTranslator) VisitLetExpression(ctx *grammar.LetExpressionContext) interface{} {
+	vas := ctx.AllVariableAssignment()
+	vars := make([]*ast.DocumentElement, len(vas))
+	for i, va := range vas {
+		v, err := translateVariableAssignment(va)
+		if err != nil {
+			t.err = errors.Wrapf(err, "failed parsing variable assignment %d, of LET expression", i)
+			return nil
+		}
+
+		vars[i] = v
+	}
+
+	expr, err := t.translate(ctx.Expression())
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing expression of LET expression")
+		return nil
+	}
+
+	return ast.NewFunction(
+		"$let",
+		ast.NewDocument(
+			ast.NewDocumentElement("vars", ast.NewDocument(vars...)),
+			ast.NewDocumentElement("in", expr),
+		),
+	)
+}
+
 func (t *exprTranslator) VisitLikeExpression(ctx *grammar.LikeExpressionContext) interface{} {
 	expr, err := t.translate(ctx.Expression())
 	if err != nil {
@@ -806,6 +834,15 @@ func (t *exprTranslator) VisitValueExpression(ctx *grammar.ValueExpressionContex
 	return ctx.Value().Accept(t)
 }
 
+func (t *exprTranslator) VisitVariableExpression(ctx *grammar.VariableExpressionContext) interface{} {
+	variableName := ctx.VariableName().Accept(t).(string)
+	return ast.NewVariableRef(variableName)
+}
+
+func (t *exprTranslator) VisitVariableName(ctx *grammar.VariableNameContext) interface{} {
+	return ctx.VARIABLE_ID().GetText()[1:]
+}
+
 func translateFieldAssignment(ctx grammar.IFieldAssignmentContext) (*ast.DocumentElement, error) {
 	t := &fieldAssignmentTranslator{}
 	return t.translate(ctx)
@@ -890,6 +927,37 @@ func (t *fieldDeclarationTranslator) VisitMultipartFieldDeclaration(ctx *grammar
 
 func (t *fieldDeclarationTranslator) VisitFieldDeclaration(ctx *grammar.FieldDeclarationContext) interface{} {
 	return stripQuotes(ctx.ID())
+}
+
+func translateVariableAssignment(ctx grammar.IVariableAssignmentContext) (*ast.DocumentElement, error) {
+	t := &variableAssignmentTranslator{}
+	return t.translate(ctx)
+}
+
+type variableAssignmentTranslator struct {
+	*grammar.BaseMQLVisitor
+	err error
+}
+
+func (t *variableAssignmentTranslator) translate(ctx grammar.IVariableAssignmentContext) (*ast.DocumentElement, error) {
+	result := ctx.Accept(t)
+	if t.err != nil {
+		return nil, t.err
+	}
+
+	return result.(*ast.DocumentElement), nil
+}
+
+func (t *variableAssignmentTranslator) VisitVariableAssignment(ctx *grammar.VariableAssignmentContext) interface{} {
+	name := ctx.VariableName().GetText()[1:]
+
+	expr, err := translateExpr(ctx.Expression())
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing expression")
+		return nil
+	}
+
+	return ast.NewDocumentElement(name, expr)
 }
 
 func parseIntegralValue(s string, radix int, forceLong bool) (*ast.Constant, error) {

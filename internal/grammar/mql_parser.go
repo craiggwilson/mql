@@ -2152,6 +2152,44 @@ func (s *ComparisonExpressionContext) Accept(visitor antlr.ParseTreeVisitor) int
 	}
 }
 
+type VariableExpressionContext struct {
+	*ExpressionContext
+}
+
+func NewVariableExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *VariableExpressionContext {
+	var p = new(VariableExpressionContext)
+
+	p.ExpressionContext = NewEmptyExpressionContext()
+	p.parser = parser
+	p.CopyFrom(ctx.(*ExpressionContext))
+
+	return p
+}
+
+func (s *VariableExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *VariableExpressionContext) VariableName() IVariableNameContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IVariableNameContext)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IVariableNameContext)
+}
+
+func (s *VariableExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case MQLVisitor:
+		return t.VisitVariableExpression(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
 type ConcatExpressionContext struct {
 	*ExpressionContext
 }
@@ -3198,44 +3236,6 @@ func (s *InExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 	}
 }
 
-type VariableReferenceExpressionContext struct {
-	*ExpressionContext
-}
-
-func NewVariableReferenceExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *VariableReferenceExpressionContext {
-	var p = new(VariableReferenceExpressionContext)
-
-	p.ExpressionContext = NewEmptyExpressionContext()
-	p.parser = parser
-	p.CopyFrom(ctx.(*ExpressionContext))
-
-	return p
-}
-
-func (s *VariableReferenceExpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *VariableReferenceExpressionContext) VariableName() IVariableNameContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*IVariableNameContext)(nil)).Elem(), 0)
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IVariableNameContext)
-}
-
-func (s *VariableReferenceExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case MQLVisitor:
-		return t.VisitVariableReferenceExpression(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
-}
-
 type RangeExpressionContext struct {
 	*ExpressionContext
 }
@@ -3508,7 +3508,7 @@ func (p *MQLParser) expression(_p int) (localctx IExpressionContext) {
 		}
 
 	case 9:
-		localctx = NewVariableReferenceExpressionContext(p, localctx)
+		localctx = NewVariableExpressionContext(p, localctx)
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{

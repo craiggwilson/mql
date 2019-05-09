@@ -61,6 +61,9 @@ type MQLVisitor interface {
 	// Visit a parse tree produced by MQLParser#comparisonExpression.
 	VisitComparisonExpression(ctx *ComparisonExpressionContext) interface{}
 
+	// Visit a parse tree produced by MQLParser#variableExpression.
+	VisitVariableExpression(ctx *VariableExpressionContext) interface{}
+
 	// Visit a parse tree produced by MQLParser#concatExpression.
 	VisitConcatExpression(ctx *ConcatExpressionContext) interface{}
 
@@ -117,9 +120,6 @@ type MQLVisitor interface {
 
 	// Visit a parse tree produced by MQLParser#inExpression.
 	VisitInExpression(ctx *InExpressionContext) interface{}
-
-	// Visit a parse tree produced by MQLParser#variableReferenceExpression.
-	VisitVariableReferenceExpression(ctx *VariableReferenceExpressionContext) interface{}
 
 	// Visit a parse tree produced by MQLParser#rangeExpression.
 	VisitRangeExpression(ctx *RangeExpressionContext) interface{}

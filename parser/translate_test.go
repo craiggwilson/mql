@@ -447,6 +447,31 @@ func TestParseExpr(t *testing.T) {
 			nil,
 		},
 
+		// Let
+		{
+			"{ $a: 10, $b: 12 } => $a + $b",
+			ast.NewFunction(
+				"$let",
+				ast.NewDocument(
+					ast.NewDocumentElement(
+						"vars",
+						ast.NewDocument(
+							ast.NewDocumentElement("a", astutil.Int32(10)),
+							ast.NewDocumentElement("b", astutil.Int32(12)),
+						),
+					),
+					ast.NewDocumentElement(
+						"in",
+						ast.NewFunction(
+							"$add",
+							ast.NewArray(ast.NewVariableRef("a"), ast.NewVariableRef("b")),
+						),
+					),
+				),
+			),
+			nil,
+		},
+
 		// Range
 		{
 			"1..4",

@@ -58,7 +58,7 @@ expression:
 | LPAREN expression RPAREN                                                                 #parenthesisExpression
 | function                                                                                 #functionCallExpression
 | fieldName                                                                                #fieldExpression
-| variableName                                                                             #variableReferenceExpression
+| variableName                                                                             #variableExpression
 | document                                                                                 #documentExpression
 | array                                                                                    #arrayExpression
 | value                                                                                    #valueExpression
