@@ -357,6 +357,27 @@ func (t *exprTranslator) VisitConcatExpression(ctx *grammar.ConcatExpressionCont
 	return ast.NewFunction("$concat", ast.NewArray(left, right))
 }
 
+func (t *exprTranslator) VisitConditionalExpression(ctx *grammar.ConditionalExpressionContext) interface{} {
+	allExpressions := ctx.AllExpression()
+	cond, err := t.translate(allExpressions[0])
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing conditional condition expression")
+		return nil
+	}
+	truePart, err := t.translate(allExpressions[1])
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing conditional true expression")
+		return nil
+	}
+	falsePart, err := t.translate(allExpressions[2])
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing conditional false expression")
+		return nil
+	}
+
+	return ast.NewFunction("$cond", ast.NewArray(cond, truePart, falsePart))
+}
+
 func (t *exprTranslator) VisitDateTimeValue(ctx *grammar.DateTimeValueContext) interface{} {
 	text := ctx.DATE_TIME().GetText()
 	dt, err := time.Parse(time.RFC3339, text[3:len(text)-1])

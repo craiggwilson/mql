@@ -410,6 +410,20 @@ func TestParseExpr(t *testing.T) {
 			nil,
 		},
 
+		// Conditional
+		{
+			"if 1 then 2 else 3",
+			ast.NewFunction(
+				"$cond",
+				ast.NewArray(
+					astutil.Int32(1), 
+					astutil.Int32(2),
+					astutil.Int32(3),
+				),
+			),
+			nil,
+		},
+
 		// Range
 		{
 			"1..4",
