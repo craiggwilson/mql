@@ -470,6 +470,22 @@ func (t *exprTranslator) VisitIntValue(ctx *grammar.IntValueContext) interface{}
 	return c
 }
 
+func (t *exprTranslator) VisitLikeExpression(ctx *grammar.LikeExpressionContext) interface{} {
+	expr, err := t.translate(ctx.Expression())
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing expression of regex expression")
+		return nil
+	}
+
+	s, options := parseRegex(ctx.REGEX().GetText())
+
+	return ast.NewBinary(
+		ast.Equals,
+		expr,
+		astutil.Regex(s, options),
+	)
+}
+
 func (t *exprTranslator) VisitLongBinValue(ctx *grammar.LongBinValueContext) interface{} {
 	text := ctx.LONG_BIN().GetText()[2:]
 	text = text[:len(text)-1]
@@ -692,10 +708,7 @@ func (t *exprTranslator) VisitRangeExpression(ctx *grammar.RangeExpressionContex
 }
 
 func (t *exprTranslator) VisitRegexValue(ctx *grammar.RegexValueContext) interface{} {
-	s := ctx.REGEX().GetText()
-	split := strings.LastIndexByte(s, '/')
-	options := s[split+1:]
-	s = strings.Replace(s[1:split], "\\/", "/", -1)
+	s, options := parseRegex(ctx.REGEX().GetText())
 
 	return astutil.Regex(s, options)
 }
@@ -821,6 +834,12 @@ func parseIntegralValue(s string, radix int, forceLong bool) (*ast.Constant, err
 	}
 
 	return astutil.Int32(int32(n)), nil
+}
+
+func parseRegex(s string) (string, string) {
+	split := strings.LastIndexByte(s, '/')
+	options := s[split+1:]
+	return strings.Replace(s[1:split], "\\/", "/", -1), options
 }
 
 func stripQuotes(n antlr.TerminalNode) string {

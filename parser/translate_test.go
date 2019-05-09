@@ -351,6 +351,15 @@ func TestParseExpr(t *testing.T) {
 			nil,
 		},
 		{
+			"1 like /foo.*/i",
+			ast.NewBinary(
+				ast.Equals,
+				astutil.Int32(1),
+				astutil.Regex("foo.*", "i"),
+			),
+			nil,
+		},
+		{
 			"1 % 2",
 			ast.NewFunction(
 				"$mod",
