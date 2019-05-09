@@ -116,6 +116,34 @@ func (t *queryStageTranslator) translate(ctx grammar.IQueryStageContext) (ast.St
 	return result.(ast.Stage), nil
 }
 
+func (t *queryStageTranslator) VisitGroupStage(ctx *grammar.GroupStageContext) interface{} {
+	fas := ctx.AllFieldAssignment()
+	items := make([]*ast.GroupItem, len(fas))
+	for i, fa := range fas {
+		elem, err := translateFieldAssignment(fa)
+		if err != nil {
+			t.err = errors.Wrapf(err, "failed translating document element %d", i)
+			return nil
+		}
+
+		items[i] = ast.NewGroupItem(elem.Name, elem.Expr)
+	}
+
+	var by ast.Expr
+	if ctx.BY() != nil {
+		var err error
+		by, err = translateExpr(ctx.Expression())
+		if err != nil {
+			t.err = errors.Wrapf(err, "failed parsing match expression")
+			return nil
+		}
+	} else {
+		by = astutil.Null
+	}
+
+	return ast.NewGroupStage(by, items...)
+}
+
 func (t *queryStageTranslator) VisitLimitStage(ctx *grammar.LimitStageContext) interface{} {
 	n, err := strconv.ParseInt(ctx.INT().GetText(), 10, 64)
 	if err != nil {

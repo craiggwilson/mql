@@ -71,6 +71,26 @@ func TestParsePipeline(t *testing.T) {
 		err error
 	} {
 		{
+			"GROUP {a: a}",
+			ast.NewPipeline(
+				ast.NewGroupStage(
+					astutil.Null,
+					ast.NewGroupItem("a", ast.NewFieldRef("a", nil)),
+				),
+			),
+			nil,
+		},
+		{
+			"GROUP {a: a} BY false",
+			ast.NewPipeline(
+				ast.NewGroupStage(
+					astutil.False,
+					ast.NewGroupItem("a", ast.NewFieldRef("a", nil)),
+				),
+			),
+			nil,
+		},
+		{
 			"LIMIT 2",
 			ast.NewPipeline(
 				ast.NewLimitStage(2),
@@ -130,6 +150,50 @@ func TestParsePipeline(t *testing.T) {
 				ast.NewSortStage(
 					ast.NewSortItem(ast.NewFieldRef("a", nil), false),
 					ast.NewSortItem(ast.NewFieldRef("b", nil), true),
+				),
+			),
+			nil,
+		},
+		{
+			"UNWIND a",
+			ast.NewPipeline(
+				ast.NewUnwindStage(
+					ast.NewFieldRef("a", nil),
+					"",
+					false,
+				),
+			),
+			nil,
+		},
+		{
+			"UNWIND a WITH(preserve_null_and_empty)",
+			ast.NewPipeline(
+				ast.NewUnwindStage(
+					ast.NewFieldRef("a", nil),
+					"",
+					true,
+				),
+			),
+			nil,
+		},
+		{
+			"UNWIND a WITH(index b)",
+			ast.NewPipeline(
+				ast.NewUnwindStage(
+					ast.NewFieldRef("a", nil),
+					"b",
+					false,
+				),
+			),
+			nil,
+		},
+		{
+			"UNWIND a WITH(index b preserve_null_and_empty)",
+			ast.NewPipeline(
+				ast.NewUnwindStage(
+					ast.NewFieldRef("a", nil),
+					"b",
+					true,
 				),
 			),
 			nil,
