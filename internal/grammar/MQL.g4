@@ -8,22 +8,22 @@ pipeline:
 
 // QUERY STAGES
 queryStage:
-  GROUP LBRACE fieldAssignment (COMMA fieldAssignment)* RBRACE (BY expression)?      #groupStage
-| LIMIT INT                                                                            #limitStage
+  GROUP LBRACE fieldAssignment (COMMA fieldAssignment)* RBRACE (BY expression)?         #groupStage
+| LIMIT INT                                                                             #limitStage
 | LOOKUP LBRACE multipartFieldDeclaration COLON
     (LBRACE variableAssignment (COMMA variableAssignment)* RBRACE ARROW)?
     FROM collectionName pipeline
-  RBRACE                                                                               #lookupStage
-| MATCH expression                                                                     #matchStage
-| PROJECT LBRACE projectItem (COMMA projectItem)* RBRACE                             #projectStage
-| SKIP_ INT                                                                            #skipStage
-| SORT sortField (COMMA sortField)*                                                  #sortStage
-| UNWIND multipartFieldName (WITH unwindOption+)?                                   #unwindStage
+  RBRACE                                                                                #lookupStage
+| MATCH expression                                                                      #matchStage
+| PROJECT LBRACE projectItem (COMMA projectItem)* RBRACE                                #projectStage
+| SKIP_ INT                                                                             #skipStage
+| SORT sortField (COMMA sortField)*                                                     #sortStage
+| UNWIND multipartFieldName (WITH LPAREN unwindOption+ RPAREN)?                         #unwindStage
 ;
 
 projectItem:
   EXCLUDE multipartFieldDeclaration #excludeProjectItem
-| multipartFieldDeclaration #includeProjectItem
+| multipartFieldDeclaration         #includeProjectItem
 | fieldDeclaration COLON expression #assignProjectItem
 ;
 

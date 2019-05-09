@@ -181,6 +181,57 @@ func (t *queryStageTranslator) VisitSortField(ctx *grammar.SortFieldContext) int
 	return ast.NewSortItem(fr, ctx.DESC() != nil)
 }
 
+func (t *queryStageTranslator) VisitUnwindStage(ctx *grammar.UnwindStageContext) interface{} {
+	fr, err := translateMultipartFieldName(ctx.MultipartFieldName())
+	if err != nil {
+		t.err = err
+		return nil
+	}
+
+	var arrayIndexField string
+	var preserveNullAndEmpty bool
+	options := ctx.AllUnwindOption()
+	for _, o := range options {
+		temp := o.Accept(t)
+		if t.err != nil {
+			return nil
+		}
+
+		uo := temp.(unwindOption)
+		switch {
+		case uo.arrayIndexField != "":
+			arrayIndexField = uo.arrayIndexField
+		case uo.preserveNullAndEmpty:
+			preserveNullAndEmpty = true
+		}
+	}
+
+	return ast.NewUnwindStage(fr, arrayIndexField, preserveNullAndEmpty)
+}
+
+type unwindOption struct {
+	arrayIndexField      string
+	preserveNullAndEmpty bool
+}
+
+func (t *queryStageTranslator) VisitUnwindOption(ctx *grammar.UnwindOptionContext) interface{} {
+	switch {
+	case ctx.MultipartFieldDeclaration() != nil:
+		arrayIndexField, err := translateMultipartFieldDeclaration(ctx.MultipartFieldDeclaration())
+		if err != nil {
+			t.err = err
+			return nil
+		}
+
+		return unwindOption{arrayIndexField: arrayIndexField}
+	case ctx.PRESERVE_NULL_AND_EMPTY() != nil:
+		return unwindOption{preserveNullAndEmpty: true}
+	default:
+		t.err = errors.New("unsupported unwind option")
+		return nil
+	}
+}
+
 func translateProjectStage(ctx *grammar.ProjectStageContext) (*ast.ProjectStage, error) {
 	t := &projectItemTranslator{}
 	pis := ctx.AllProjectItem()
