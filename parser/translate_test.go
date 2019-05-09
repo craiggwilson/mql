@@ -106,6 +106,34 @@ func TestParsePipeline(t *testing.T) {
 			),
 			nil,
 		},
+		{
+			"SORT a",
+			ast.NewPipeline(
+				ast.NewSortStage(
+					ast.NewSortItem(ast.NewFieldRef("a", nil), false),
+				),
+			),
+			nil,
+		},
+		{
+			"SORT a.b DESC",
+			ast.NewPipeline(
+				ast.NewSortStage(
+					ast.NewSortItem(ast.NewFieldRef("b", ast.NewFieldRef("a", nil)), true),
+				),
+			),
+			nil,
+		},
+		{
+			"SORT a ASC, b DESC",
+			ast.NewPipeline(
+				ast.NewSortStage(
+					ast.NewSortItem(ast.NewFieldRef("a", nil), false),
+					ast.NewSortItem(ast.NewFieldRef("b", nil), true),
+				),
+			),
+			nil,
+		},
 	}
 
 	for _, tc := range testCases {

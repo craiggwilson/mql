@@ -156,6 +156,31 @@ func (t *queryStageTranslator) VisitSkipStage(ctx *grammar.SkipStageContext) int
 	return ast.NewSkipStage(n)
 }
 
+func (t *queryStageTranslator) VisitSortStage(ctx *grammar.SortStageContext) interface{} {
+	sfs := ctx.AllSortField()
+	items := make([]*ast.SortItem, len(sfs))
+	for i, sf := range sfs {
+		item := sf.Accept(t)
+		if t.err != nil {
+			return nil
+		}
+
+		items[i] = item.(*ast.SortItem)
+	}
+
+	return ast.NewSortStage(items...)
+}
+
+func (t *queryStageTranslator) VisitSortField(ctx *grammar.SortFieldContext) interface{} {
+	fr, err := translateMultipartFieldName(ctx.MultipartFieldName())
+	if err != nil {
+		t.err = err
+		return nil
+	}
+
+	return ast.NewSortItem(fr, ctx.DESC() != nil)
+}
+
 func translateProjectStage(ctx *grammar.ProjectStageContext) (*ast.ProjectStage, error) {
 	t := &projectItemTranslator{}
 	pis := ctx.AllProjectItem()
@@ -483,12 +508,13 @@ func (t *exprTranslator) VisitDoubleValue(ctx *grammar.DoubleValueContext) inter
 }
 
 func (t *exprTranslator) VisitFieldExpression(ctx *grammar.FieldExpressionContext) interface{} {
-	fieldName := ctx.FieldName().Accept(t).(string)
-	return ast.NewFieldRef(fieldName, nil)
-}
+	ref, err := translateFieldName(ctx.FieldName())
+	if err != nil {
+		t.err = err
+		return nil
+	}
 
-func (t *exprTranslator) VisitFieldName(ctx *grammar.FieldNameContext) interface{} {
-	return stripQuotes(ctx.ID())
+	return ref
 }
 
 func (t *exprTranslator) VisitHexValue(ctx *grammar.HexValueContext) interface{} {
@@ -971,6 +997,63 @@ func (t *fieldDeclarationTranslator) VisitMultipartFieldDeclaration(ctx *grammar
 }
 
 func (t *fieldDeclarationTranslator) VisitFieldDeclaration(ctx *grammar.FieldDeclarationContext) interface{} {
+	return stripQuotes(ctx.ID())
+}
+
+func translateMultipartFieldName(ctx grammar.IMultipartFieldNameContext) (*ast.FieldRef, error) {
+	t := &fieldNameTranslator{}
+	return t.translateMultipartFieldName(ctx)
+}
+
+func translateFieldName(ctx grammar.IFieldNameContext) (*ast.FieldRef, error) {
+	t := &fieldNameTranslator{}
+	return t.translateFieldName(ctx)
+}
+
+type fieldNameTranslator struct {
+	*grammar.BaseMQLVisitor
+	err error
+}
+
+func (t *fieldNameTranslator) translateMultipartFieldName(ctx grammar.IMultipartFieldNameContext) (*ast.FieldRef, error) {
+	result := ctx.Accept(t)
+	if t.err != nil {
+		return nil, t.err
+	}
+
+	return result.(*ast.FieldRef), nil
+}
+
+func (t *fieldNameTranslator) translateFieldName(ctx grammar.IFieldNameContext) (*ast.FieldRef, error) {
+	result := ctx.Accept(t)
+	if t.err != nil {
+		return nil, t.err
+	}
+
+	return ast.NewFieldRef(result.(string), nil), nil
+}
+
+func (t *fieldNameTranslator) VisitMultipartFieldName(ctx *grammar.MultipartFieldNameContext) interface{} {
+	fns := ctx.AllFieldName()
+	var ref *ast.FieldRef
+	for _, fn := range fns {
+		r := fn.Accept(t)
+		if t.err != nil {
+			return nil
+		}
+
+		// NOTE: handling difference between typed nil and bare nil.
+		if ref == nil {
+			ref = ast.NewFieldRef(r.(string), nil)
+		} else {
+			ref = ast.NewFieldRef(r.(string), ref)
+		}
+	}
+
+	return ref
+}
+
+func (t *fieldNameTranslator) VisitFieldName(ctx *grammar.FieldNameContext) interface{} {
 	return stripQuotes(ctx.ID())
 }
 
