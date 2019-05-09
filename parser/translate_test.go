@@ -423,6 +423,29 @@ func TestParseExpr(t *testing.T) {
 			),
 			nil,
 		},
+		{
+			"switch case 1 then 2 case 3 then 4 else 5",
+			ast.NewFunction(
+				"$switch",
+				ast.NewDocument(
+					ast.NewDocumentElement(
+						"branches",
+						ast.NewArray(
+							ast.NewDocument(
+								ast.NewDocumentElement("case", astutil.Int32(1)),
+								ast.NewDocumentElement("then", astutil.Int32(2)),
+							),
+							ast.NewDocument(
+								ast.NewDocumentElement("case", astutil.Int32(3)),
+								ast.NewDocumentElement("then", astutil.Int32(4)),
+							),
+						),
+					),
+					ast.NewDocumentElement("default", astutil.Int32(5)),
+				),
+			),
+			nil,
+		},
 
 		// Range
 		{

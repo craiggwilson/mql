@@ -738,6 +738,54 @@ func (t *exprTranslator) VisitStringValue(ctx *grammar.StringValueContext) inter
 	return astutil.String(stripQuotes(ctx.STRING()))
 }
 
+func (t *exprTranslator) VisitSwitchExpression(ctx *grammar.SwitchExpressionContext) interface{} {
+	cases := ctx.AllSwitchCase()
+	branches := make([]ast.Expr, len(cases))
+	for i, c := range cases {
+		b := c.Accept(t)
+		if t.err != nil {
+			return nil
+		}
+
+		branches[i] = b.(ast.Expr)
+	}
+
+	elems := []*ast.DocumentElement{
+		ast.NewDocumentElement("branches", ast.NewArray(branches...)),
+	}
+
+	expr := ctx.Expression()
+	if expr != nil {
+		def, err := t.translate(expr)
+		if err != nil {
+			t.err = errors.Wrap(err, "failed parsing SWITCH else expression")
+			return nil
+		}
+		elems = append(elems, ast.NewDocumentElement("default", def))
+	}
+
+	return ast.NewFunction("$switch", ast.NewDocument(elems...))
+}
+
+func (t *exprTranslator) VisitSwitchCase(ctx *grammar.SwitchCaseContext) interface{} {
+	allExpressions := ctx.AllExpression()
+	cond, err := t.translate(allExpressions[0])
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing SWITCH CASE conditional expression")
+		return nil
+	}
+	then, err := t.translate(allExpressions[1])
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing SWITCH CASE then expression")
+		return nil
+	}
+
+	return ast.NewDocument(
+		ast.NewDocumentElement("case", cond),
+		ast.NewDocumentElement("then", then),
+	)
+}
+
 func (t *exprTranslator) VisitUnaryMinusExpression(ctx *grammar.UnaryMinusExpressionContext) interface{} {
 	expr, err := t.translate(ctx.Expression())
 	if err != nil {
