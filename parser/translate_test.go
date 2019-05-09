@@ -401,6 +401,31 @@ func TestParseExpr(t *testing.T) {
 			nil,
 		},
 
+		// Range
+		{
+			"1..4",
+			ast.NewFunction(
+				"$range",
+				ast.NewArray(
+					astutil.Int32(1), 
+					astutil.Int32(4),
+				),
+			),
+			nil,
+		},
+		{
+			"1..4:2",
+			ast.NewFunction(
+				"$range",
+				ast.NewArray(
+					astutil.Int32(1), 
+					astutil.Int32(4),
+					astutil.Int32(2),
+				),
+			),
+			nil,
+		},
+
 		// Unary
 		{
 			"NOT true",

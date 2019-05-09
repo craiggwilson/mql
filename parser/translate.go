@@ -629,12 +629,12 @@ func (t *exprTranslator) VisitOrExpression(ctx *grammar.OrExpressionContext) int
 	allExpressions := ctx.AllExpression()
 	left, err := t.translate(allExpressions[0])
 	if err != nil {
-		t.err = errors.Wrap(err, "failed parsing AND lhs expression")
+		t.err = errors.Wrap(err, "failed parsing OR lhs expression")
 		return nil
 	}
 	right, err := t.translate(allExpressions[1])
 	if err != nil {
-		t.err = errors.Wrap(err, "failed parsing AND rhs expression")
+		t.err = errors.Wrap(err, "failed parsing OR rhs expression")
 		return nil
 	}
 
@@ -654,16 +654,41 @@ func (t *exprTranslator) VisitPowerExpression(ctx *grammar.PowerExpressionContex
 	allExpressions := ctx.AllExpression()
 	left, err := t.translate(allExpressions[0])
 	if err != nil {
-		t.err = errors.Wrap(err, "failed parsing AND lhs expression")
+		t.err = errors.Wrap(err, "failed parsing POWER lhs expression")
 		return nil
 	}
 	right, err := t.translate(allExpressions[1])
 	if err != nil {
-		t.err = errors.Wrap(err, "failed parsing AND rhs expression")
+		t.err = errors.Wrap(err, "failed parsing POWER rhs expression")
 		return nil
 	}
 
 	return ast.NewFunction("$pow", ast.NewArray(left, right))
+}
+
+func (t *exprTranslator) VisitRangeExpression(ctx *grammar.RangeExpressionContext) interface{} {
+	allExpressions := ctx.AllExpression()
+	start, err := t.translate(allExpressions[0])
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing RANGE start expression")
+		return nil
+	}
+	end, err := t.translate(allExpressions[1])
+	if err != nil {
+		t.err = errors.Wrap(err, "failed parsing RANGE end expression")
+		return nil
+	}
+
+	if len(allExpressions) == 3 {
+		step, err := t.translate(allExpressions[2])
+		if err != nil {
+			t.err = errors.Wrap(err, "failed parsing RANGE step expression")
+			return nil
+		}
+		return ast.NewFunction("$range", ast.NewArray(start, end, step))
+	}
+
+	return ast.NewFunction("$range", ast.NewArray(start, end))
 }
 
 func (t *exprTranslator) VisitRegexValue(ctx *grammar.RegexValueContext) interface{} {
