@@ -627,6 +627,81 @@ func (t *exprTranslator) VisitFieldExpression(ctx *grammar.FieldExpressionContex
 	return ref
 }
 
+func (t *exprTranslator) VisitFunction(ctx *grammar.FunctionContext) interface{} {
+	name, err := translateFunctionName(ctx.FunctionName())
+	if err != nil {
+		t.err = err
+		return nil
+	}
+
+	var arg ast.Expr
+	if args := ctx.FunctionArguments(); args != nil {
+		r := args.Accept(t)
+		if t.err != nil {
+			return nil
+		}
+
+		arg = r.(ast.Expr)
+	}
+
+	return ast.NewFunction(name, arg)
+}
+
+func (t *exprTranslator) VisitFunctionArrayArguments(ctx *grammar.FunctionArrayArgumentsContext) interface{} {
+	args := ctx.AllExpression()
+	items := make([]ast.Expr, len(args))
+	for i, arg := range args {
+		item, err := t.translate(arg)
+		if err != nil {
+			t.err = err
+			return nil
+		}
+
+		items[i] = item
+	}
+
+	return ast.NewArray(items...)
+}
+
+func (t *exprTranslator) VisitFunctionDocumentArguments(ctx *grammar.FunctionDocumentArgumentsContext) interface{} {
+	args := ctx.AllFunctionNamedArgument()
+	items := make([]*ast.DocumentElement, len(args))
+	for i, arg := range args {
+		item := arg.Accept(t)
+		if t.err != nil {
+			return nil
+		}
+
+		items[i] = item.(*ast.DocumentElement)
+	}
+
+	return ast.NewDocument(items...)
+}
+
+func (t *exprTranslator) VisitFunctionExpression(ctx *grammar.FunctionExpressionContext) interface{} {
+	return ctx.Function().Accept(t)
+}
+
+func (t *exprTranslator) VisitFunctionName(ctx *grammar.FunctionNameContext) interface{} {
+	return stripQuotes(ctx.ID())
+}
+
+func (t *exprTranslator) VisitFunctionNamedArgument(ctx *grammar.FunctionNamedArgumentContext) interface{} {
+	name, err := translateFunctionArgumentName(ctx.FunctionArgumentName())
+	if err != nil {
+		t.err = nil
+		return nil
+	}
+
+	expr, err := t.translate(ctx.Expression())
+	if err != nil {
+		t.err = nil
+		return nil
+	}
+
+	return ast.NewDocumentElement(name, expr)
+}
+
 func (t *exprTranslator) VisitHexValue(ctx *grammar.HexValueContext) interface{} {
 	text := ctx.HEX().GetText()[2:]
 
@@ -776,8 +851,13 @@ func (t *exprTranslator) VisitMemberExpression(ctx *grammar.MemberExpressionCont
 	}
 
 	if fn := ctx.FieldName(); fn != nil {
-		name := fn.Accept(t).(string)
-		return ast.NewFieldRef(name, parentExpr)
+		ref, err := translateFieldName(ctx.FieldName())
+		if err != nil {
+			t.err = err
+			return nil
+		}
+
+		return ast.NewFieldRef(ref.Name, parentExpr)
 	}
 
 	t.err = errors.New("functions are only supported at the top-level")
@@ -1110,31 +1190,32 @@ func (t *fieldDeclarationTranslator) VisitFieldDeclaration(ctx *grammar.FieldDec
 	return stripQuotes(ctx.ID())
 }
 
-func translateMultipartFieldName(ctx grammar.IMultipartFieldNameContext) (*ast.FieldRef, error) {
-	t := &fieldNameTranslator{}
-	return t.translateMultipartFieldName(ctx)
-}
-
 func translateFieldName(ctx grammar.IFieldNameContext) (*ast.FieldRef, error) {
-	t := &fieldNameTranslator{}
+	t := &nameTranslator{}
 	return t.translateFieldName(ctx)
 }
 
-type fieldNameTranslator struct {
+func translateFunctionName(ctx grammar.IFunctionNameContext) (string, error) {
+	t := &nameTranslator{}
+	return t.translateFunctionName(ctx)
+}
+
+func translateFunctionArgumentName(ctx grammar.IFunctionArgumentNameContext) (string, error) {
+	t := &nameTranslator{}
+	return t.translateFunctionArgumentName(ctx)
+}
+
+func translateMultipartFieldName(ctx grammar.IMultipartFieldNameContext) (*ast.FieldRef, error) {
+	t := &nameTranslator{}
+	return t.translateMultipartFieldName(ctx)
+}
+
+type nameTranslator struct {
 	*grammar.BaseMQLVisitor
 	err error
 }
 
-func (t *fieldNameTranslator) translateMultipartFieldName(ctx grammar.IMultipartFieldNameContext) (*ast.FieldRef, error) {
-	result := ctx.Accept(t)
-	if t.err != nil {
-		return nil, t.err
-	}
-
-	return result.(*ast.FieldRef), nil
-}
-
-func (t *fieldNameTranslator) translateFieldName(ctx grammar.IFieldNameContext) (*ast.FieldRef, error) {
+func (t *nameTranslator) translateFieldName(ctx grammar.IFieldNameContext) (*ast.FieldRef, error) {
 	result := ctx.Accept(t)
 	if t.err != nil {
 		return nil, t.err
@@ -1143,7 +1224,46 @@ func (t *fieldNameTranslator) translateFieldName(ctx grammar.IFieldNameContext) 
 	return ast.NewFieldRef(result.(string), nil), nil
 }
 
-func (t *fieldNameTranslator) VisitMultipartFieldName(ctx *grammar.MultipartFieldNameContext) interface{} {
+func (t *nameTranslator) translateFunctionName(ctx grammar.IFunctionNameContext) (string, error) {
+	result := ctx.Accept(t)
+	if t.err != nil {
+		return "", t.err
+	}
+
+	return result.(string), nil
+}
+
+func (t *nameTranslator) translateFunctionArgumentName(ctx grammar.IFunctionArgumentNameContext) (string, error) {
+	result := ctx.Accept(t)
+	if t.err != nil {
+		return "", t.err
+	}
+
+	return result.(string), nil
+}
+
+func (t *nameTranslator) translateMultipartFieldName(ctx grammar.IMultipartFieldNameContext) (*ast.FieldRef, error) {
+	result := ctx.Accept(t)
+	if t.err != nil {
+		return nil, t.err
+	}
+
+	return result.(*ast.FieldRef), nil
+}
+
+func (t *nameTranslator) VisitFieldName(ctx *grammar.FieldNameContext) interface{} {
+	return stripQuotes(ctx.ID())
+}
+
+func (t *nameTranslator) VisitFunctionName(ctx *grammar.FunctionNameContext) interface{} {
+	return stripQuotes(ctx.ID())
+}
+
+func (t *nameTranslator) VisitFunctionArgumentName(ctx *grammar.FunctionArgumentNameContext) interface{} {
+	return stripQuotes(ctx.ID())
+}
+
+func (t *nameTranslator) VisitMultipartFieldName(ctx *grammar.MultipartFieldNameContext) interface{} {
 	fns := ctx.AllFieldName()
 	var ref *ast.FieldRef
 	for _, fn := range fns {
@@ -1161,10 +1281,6 @@ func (t *fieldNameTranslator) VisitMultipartFieldName(ctx *grammar.MultipartFiel
 	}
 
 	return ref
-}
-
-func (t *fieldNameTranslator) VisitFieldName(ctx *grammar.FieldNameContext) interface{} {
-	return stripQuotes(ctx.ID())
 }
 
 func translateVariableAssignment(ctx grammar.IVariableAssignmentContext) (*ast.DocumentElement, error) {

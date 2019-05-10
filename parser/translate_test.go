@@ -657,6 +657,45 @@ func TestParseExpr(t *testing.T) {
 			nil,
 		},
 
+		// Function
+		{
+			"testFunc()",
+			ast.NewFunction("testFunc", nil),
+			nil,
+		},
+		{
+			"testFunc(a)",
+			ast.NewFunction(
+				"testFunc", 
+				ast.NewArray(
+					ast.NewFieldRef("a", nil),
+				),
+			),
+			nil,
+		},
+		{
+			"testFunc(a, b)",
+			ast.NewFunction(
+				"testFunc", 
+				ast.NewArray(
+					ast.NewFieldRef("a", nil), 
+					ast.NewFieldRef("b", nil),
+				),
+			),
+			nil,
+		},
+		{
+			"testFunc(a: b, b: c)",
+			ast.NewFunction(
+				"testFunc",
+				ast.NewDocument(
+					ast.NewDocumentElement("a", ast.NewFieldRef("b", nil)),
+					ast.NewDocumentElement("b", ast.NewFieldRef("c", nil)),
+				),
+			),
+			nil,
+		},
+
 		// Let
 		{
 			"{ $a: 10, $b: 12 } => $a + $b",

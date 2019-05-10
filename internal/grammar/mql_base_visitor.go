@@ -95,6 +95,10 @@ func (v *BaseMQLVisitor) VisitNullCoalesceExpression(ctx *NullCoalesceExpression
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseMQLVisitor) VisitFunctionExpression(ctx *FunctionExpressionContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseMQLVisitor) VisitAndExpression(ctx *AndExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -104,10 +108,6 @@ func (v *BaseMQLVisitor) VisitLetExpression(ctx *LetExpressionContext) interface
 }
 
 func (v *BaseMQLVisitor) VisitFieldExpression(ctx *FieldExpressionContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseMQLVisitor) VisitFunctionCallExpression(ctx *FunctionCallExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -191,7 +191,15 @@ func (v *BaseMQLVisitor) VisitFunction(ctx *FunctionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseMQLVisitor) VisitFunctionArgument(ctx *FunctionArgumentContext) interface{} {
+func (v *BaseMQLVisitor) VisitFunctionArrayArguments(ctx *FunctionArrayArgumentsContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseMQLVisitor) VisitFunctionDocumentArguments(ctx *FunctionDocumentArgumentsContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseMQLVisitor) VisitFunctionNamedArgument(ctx *FunctionNamedArgumentContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

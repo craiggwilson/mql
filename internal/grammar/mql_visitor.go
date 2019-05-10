@@ -73,6 +73,9 @@ type MQLVisitor interface {
 	// Visit a parse tree produced by MQLParser#nullCoalesceExpression.
 	VisitNullCoalesceExpression(ctx *NullCoalesceExpressionContext) interface{}
 
+	// Visit a parse tree produced by MQLParser#functionExpression.
+	VisitFunctionExpression(ctx *FunctionExpressionContext) interface{}
+
 	// Visit a parse tree produced by MQLParser#andExpression.
 	VisitAndExpression(ctx *AndExpressionContext) interface{}
 
@@ -81,9 +84,6 @@ type MQLVisitor interface {
 
 	// Visit a parse tree produced by MQLParser#fieldExpression.
 	VisitFieldExpression(ctx *FieldExpressionContext) interface{}
-
-	// Visit a parse tree produced by MQLParser#functionCallExpression.
-	VisitFunctionCallExpression(ctx *FunctionCallExpressionContext) interface{}
 
 	// Visit a parse tree produced by MQLParser#likeExpression.
 	VisitLikeExpression(ctx *LikeExpressionContext) interface{}
@@ -145,8 +145,14 @@ type MQLVisitor interface {
 	// Visit a parse tree produced by MQLParser#function.
 	VisitFunction(ctx *FunctionContext) interface{}
 
-	// Visit a parse tree produced by MQLParser#functionArgument.
-	VisitFunctionArgument(ctx *FunctionArgumentContext) interface{}
+	// Visit a parse tree produced by MQLParser#functionArrayArguments.
+	VisitFunctionArrayArguments(ctx *FunctionArrayArgumentsContext) interface{}
+
+	// Visit a parse tree produced by MQLParser#functionDocumentArguments.
+	VisitFunctionDocumentArguments(ctx *FunctionDocumentArgumentsContext) interface{}
+
+	// Visit a parse tree produced by MQLParser#functionNamedArgument.
+	VisitFunctionNamedArgument(ctx *FunctionNamedArgumentContext) interface{}
 
 	// Visit a parse tree produced by MQLParser#lambdaArgument.
 	VisitLambdaArgument(ctx *LambdaArgumentContext) interface{}

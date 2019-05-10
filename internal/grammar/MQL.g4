@@ -18,7 +18,7 @@ queryStage:
 | PROJECT LBRACE projectItem (COMMA projectItem)* RBRACE                                #projectStage
 | SKIP_ INT                                                                             #skipStage
 | SORT sortField (COMMA sortField)*                                                     #sortStage
-| UNWIND multipartFieldName WITH(unwindOption+)?                                        #unwindStage
+| UNWIND multipartFieldName (WITH LPAREN unwindOption+ RPAREN)?                         #unwindStage
 ;
 
 projectItem:
@@ -60,7 +60,7 @@ expression:
 | IF expression THEN expression ELSE expression                                            #conditionalExpression
 | LBRACE variableAssignment (COMMA variableAssignment)* RBRACE ARROW expression            #letExpression
 | LPAREN expression RPAREN                                                                 #parenthesisExpression
-| function                                                                                 #functionCallExpression
+| function                                                                                 #functionExpression
 | fieldName                                                                                #fieldExpression
 | variableName                                                                             #variableExpression
 | document                                                                                 #documentExpression
@@ -88,13 +88,17 @@ multipartFieldAssignment:
 ;
 
 function:
-  functionName LPAREN (functionArgument (COMMA functionArgument)*)? RPAREN
+  functionName LPAREN functionArguments? RPAREN
 ;
 
-functionArgument:
-  expression
-| functionArgumentName COLON expression
-| lambdaExpression;
+functionArguments:
+  expression (COMMA expression)*                        #functionArrayArguments
+| functionNamedArgument (COMMA functionNamedArgument)*  #functionDocumentArguments
+;
+
+functionNamedArgument:
+  functionArgumentName COLON expression
+;
 
 lambdaArgument:
   variableName
