@@ -154,6 +154,37 @@ func (t *queryStageTranslator) VisitLimitStage(ctx *grammar.LimitStageContext) i
 	return ast.NewLimitStage(n)
 }
 
+func (t *queryStageTranslator) VisitLookupStage(ctx *grammar.LookupStageContext) interface{} {
+	as, err := translateMultipartFieldDeclaration(ctx.MultipartFieldDeclaration())
+	if err != nil {
+		t.err = err
+		return nil
+	}
+
+	vas := ctx.AllVariableAssignment()
+	var lets []*ast.LookupLetItem
+	if len(vas) > 0 {
+		lets = make([]*ast.LookupLetItem, len(vas))
+		for i, va := range vas {
+			let, err := translateVariableAssignment(va)
+			if err != nil {
+				t.err = err
+				return nil
+			}
+
+			lets[i] = ast.NewLookupLetItem(let.Name, let.Expr)
+		}
+	}
+
+	stmt, err := translateQueryStatement(ctx.QueryStatement())
+	if err != nil {
+		t.err = err
+		return nil
+	}
+
+	return ast.NewLookupStage(stmt.DatabaseName+stmt.CollectionName, "", "", as, lets, stmt.Pipeline)
+}
+
 func (t *queryStageTranslator) VisitMatchStage(ctx *grammar.MatchStageContext) interface{} {
 	expr, err := translateExpr(ctx.Expression())
 	if err != nil {

@@ -12,13 +12,13 @@ queryStage:
 | LIMIT INT                                                                             #limitStage
 | LOOKUP LBRACE multipartFieldDeclaration COLON
     (LBRACE variableAssignment (COMMA variableAssignment)* RBRACE ARROW)?
-    FROM collectionName pipeline
+    queryStatement
   RBRACE                                                                                #lookupStage
 | MATCH expression                                                                      #matchStage
 | PROJECT LBRACE projectItem (COMMA projectItem)* RBRACE                                #projectStage
 | SKIP_ INT                                                                             #skipStage
 | SORT sortField (COMMA sortField)*                                                     #sortStage
-| UNWIND multipartFieldName (WITH LPAREN unwindOption+ RPAREN)?                         #unwindStage
+| UNWIND multipartFieldName WITH(unwindOption+)?                                        #unwindStage
 ;
 
 projectItem:
