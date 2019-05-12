@@ -860,8 +860,21 @@ func (t *exprTranslator) VisitMemberExpression(ctx *grammar.MemberExpressionCont
 		return ast.NewFieldRef(ref.Name, parentExpr)
 	}
 
-	t.err = errors.New("functions are only supported at the top-level")
-	return nil
+	f := ctx.Function().Accept(t)
+	if t.err != nil {
+		return nil
+	}
+
+	fn := f.(*ast.Function)
+	switch typedArg := fn.Arg.(type) {
+	case nil:
+		return ast.NewFunction(fn.Name, ast.NewArray(parentExpr))
+	case *ast.Array:
+		return ast.NewFunction(fn.Name, ast.NewArray(append([]ast.Expr{parentExpr}, typedArg.Elements...)...))
+	default:
+		t.err = errors.New("member functions can only be used with positional arguments")
+		return nil
+	}
 }
 
 func (t *exprTranslator) VisitMultiplicationExpression(ctx *grammar.MultiplicationExpressionContext) interface{} {
