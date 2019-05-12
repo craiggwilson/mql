@@ -7,11 +7,17 @@ import "github.com/antlr/antlr4/runtime/Go/antlr"
 type MQLVisitor interface {
 	antlr.ParseTreeVisitor
 
+	// Visit a parse tree produced by MQLParser#statement.
+	VisitStatement(ctx *StatementContext) interface{}
+
 	// Visit a parse tree produced by MQLParser#queryStatement.
 	VisitQueryStatement(ctx *QueryStatementContext) interface{}
 
 	// Visit a parse tree produced by MQLParser#pipeline.
 	VisitPipeline(ctx *PipelineContext) interface{}
+
+	// Visit a parse tree produced by MQLParser#useDatabaseStatement.
+	VisitUseDatabaseStatement(ctx *UseDatabaseStatementContext) interface{}
 
 	// Visit a parse tree produced by MQLParser#groupStage.
 	VisitGroupStage(ctx *GroupStageContext) interface{}

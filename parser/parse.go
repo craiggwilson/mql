@@ -11,24 +11,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// NewQueryStatement makes a QueryStatement.
-func NewQueryStatement(databaseName, collectionName string, pipeline *ast.Pipeline) *QueryStatement {
-	return &QueryStatement{
-		DatabaseName:   databaseName,
-		CollectionName: collectionName,
-		Pipeline:       pipeline,
-	}
-}
-
-// QueryStatement is a query statement.
-type QueryStatement struct {
-	DatabaseName   string
-	CollectionName string
-	Pipeline       *ast.Pipeline
-}
-
-// ParseStatement takes a read and parses it into a QueryStatement.
-func ParseStatement(r io.Reader) (stmt *QueryStatement, err error) {
+// ParseStatement takes a read and parses it into a Statement.
+func ParseStatement(r io.Reader) (stmt Statement, err error) {
 	var p *grammar.MQLParser
 	var errs *errorCollector
 	p, errs, err = setupParser(r)
@@ -46,10 +30,11 @@ func ParseStatement(r io.Reader) (stmt *QueryStatement, err error) {
 			if len(errs.errs) > 0 {
 				err = errs.errs[0]
 			}
+			panic(e)
 		}
 	}()
 
-	stmt, err = translateQueryStatement(p.QueryStatement())
+	stmt, err = translateStatement(p.Statement())
 	return
 }
 

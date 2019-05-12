@@ -1,10 +1,18 @@
 grammar MQL;
 
+// STATEMENTS
+statement:
+  queryStatement
+| useDatabaseStatement
+;
+
 queryStatement: FROM collectionName pipeline;
 
 pipeline:
   queryStage*
 ;
+
+useDatabaseStatement: USE databaseName;
 
 // QUERY STAGES
 queryStage:
@@ -232,6 +240,7 @@ THEN:     T H E N;
 TRUE:     T R U E;
 UNWIND:   U N W I N D;
 UPDATE:   U P D A T E;
+USE:      U S E;
 WITH:     W I T H;
 
 PRESERVE_NULL_AND_EMPTY: P R E S E R V E '_' N U L L '_' A N D '_' E M P T Y;

@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"errors"
 	"os"
 	"strings"
 
@@ -20,26 +20,23 @@ var translateCommand = &cobra.Command{
 	Use:   "translate",
 	Short: "Translate an MQL query into the aggregation framework.",
 	Args:  cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		pipeline, err := parser.ParsePipeline(strings.NewReader(args[0]))
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			return err
 		}
 
 		format, err := cmd.Flags().GetString("format")
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			return err
 		}
 		switch format {
 		case "extjson":
 			astprint.Print(os.Stdout, pipeline)
 		case "shell":
 			astprint.ShellPrint(os.Stdout, pipeline)
-		default:
-			fmt.Println("only 'shell' and 'extjson' are supported for the format flag")
-			os.Exit(1)
 		}
+
+		return errors.New("only 'shell' and 'extjson' are supported for the format flag")
 	},
 }

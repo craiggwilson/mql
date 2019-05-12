@@ -17,17 +17,31 @@ import (
 	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
 )
 
-func translateQueryStatement(ctx grammar.IQueryStatementContext) (*QueryStatement, error) {
-	t := &queryStatementTranslator{}
+func translateStatement(ctx grammar.IStatementContext) (Statement, error) {
+	t := &statementTranslator{}
 	return t.translate(ctx)
 }
 
-type queryStatementTranslator struct {
+func translateQueryStatement(ctx grammar.IQueryStatementContext) (*QueryStatement, error) {
+	t := &statementTranslator{}
+	return t.translateQueryStatement(ctx)
+}
+
+type statementTranslator struct {
 	*grammar.BaseMQLVisitor
 	err error
 }
 
-func (t *queryStatementTranslator) translate(ctx grammar.IQueryStatementContext) (*QueryStatement, error) {
+func (t *statementTranslator) translate(ctx grammar.IStatementContext) (Statement, error) {
+	stmt := ctx.Accept(t)
+	if t.err != nil {
+		return nil, t.err
+	}
+
+	return stmt.(Statement), nil
+}
+
+func (t *statementTranslator) translateQueryStatement(ctx grammar.IQueryStatementContext) (*QueryStatement, error) {
 	stmt := ctx.Accept(t)
 	if t.err != nil {
 		return nil, t.err
@@ -36,30 +50,41 @@ func (t *queryStatementTranslator) translate(ctx grammar.IQueryStatementContext)
 	return stmt.(*QueryStatement), nil
 }
 
-func (t *queryStatementTranslator) VisitQueryStatement(ctx *grammar.QueryStatementContext) interface{} {
+func (t *statementTranslator) VisitStatement(ctx *grammar.StatementContext) interface{} {
+	switch {
+	case ctx.QueryStatement() != nil:
+		return ctx.QueryStatement().Accept(t)
+	case ctx.UseDatabaseStatement() != nil:
+		return ctx.UseDatabaseStatement().Accept(t)
+	}
+
+	return nil
+}
+
+func (t *statementTranslator) VisitQueryStatement(ctx *grammar.QueryStatementContext) interface{} {
 	pipeline, err := translatePipeline(ctx.Pipeline())
 	if err != nil {
 		t.err = errors.Wrap(err, "failed translating pipeline")
 		return nil
 	}
 
-	ns := ctx.CollectionName().Accept(t).([]string)
+	ns, err := translateCollectionName(ctx.CollectionName())
+	if err != nil {
+		t.err = err
+		return nil
+	}
 
 	return NewQueryStatement(ns[0], ns[1], pipeline)
 }
 
-func (t *queryStatementTranslator) VisitCollectionName(ctx *grammar.CollectionNameContext) interface{} {
-	c := stripQuotes(ctx.ID())
-	var d string
-	if ctx.DatabaseName() != nil {
-		d = ctx.DatabaseName().Accept(t).(string)
+func (t *statementTranslator) VisitUseDatabaseStatement(ctx *grammar.UseDatabaseStatementContext) interface{} {
+	databaseName, err := translateDatabaseName(ctx.DatabaseName())
+	if err != nil {
+		t.err = err
+		return nil
 	}
 
-	return []string{d, c}
-}
-
-func (t *queryStatementTranslator) VisitDatabaseName(ctx *grammar.DatabaseNameContext) interface{} {
-	return stripQuotes(ctx.ID())
+	return NewUseDatabaseStatement(databaseName)
 }
 
 func translatePipeline(ctx grammar.IPipelineContext) (*ast.Pipeline, error) {
@@ -1203,6 +1228,16 @@ func (t *fieldDeclarationTranslator) VisitFieldDeclaration(ctx *grammar.FieldDec
 	return stripQuotes(ctx.ID())
 }
 
+func translateCollectionName(ctx grammar.ICollectionNameContext) ([]string, error) {
+	t := &nameTranslator{}
+	return t.translateCollectionName(ctx)
+}
+
+func translateDatabaseName(ctx grammar.IDatabaseNameContext) (string, error) {
+	t := &nameTranslator{}
+	return t.translateDatabaseName(ctx)
+}
+
 func translateFieldName(ctx grammar.IFieldNameContext) (*ast.FieldRef, error) {
 	t := &nameTranslator{}
 	return t.translateFieldName(ctx)
@@ -1226,6 +1261,24 @@ func translateMultipartFieldName(ctx grammar.IMultipartFieldNameContext) (*ast.F
 type nameTranslator struct {
 	*grammar.BaseMQLVisitor
 	err error
+}
+
+func (t *nameTranslator) translateCollectionName(ctx grammar.ICollectionNameContext) ([]string, error) {
+	result := ctx.Accept(t)
+	if t.err != nil {
+		return nil, t.err
+	}
+
+	return result.([]string), nil
+}
+
+func (t *nameTranslator) translateDatabaseName(ctx grammar.IDatabaseNameContext) (string, error) {
+	result := ctx.Accept(t)
+	if t.err != nil {
+		return "", t.err
+	}
+
+	return result.(string), nil
 }
 
 func (t *nameTranslator) translateFieldName(ctx grammar.IFieldNameContext) (*ast.FieldRef, error) {
@@ -1262,6 +1315,20 @@ func (t *nameTranslator) translateMultipartFieldName(ctx grammar.IMultipartField
 	}
 
 	return result.(*ast.FieldRef), nil
+}
+
+func (t *nameTranslator) VisitCollectionName(ctx *grammar.CollectionNameContext) interface{} {
+	c := stripQuotes(ctx.ID())
+	var d string
+	if ctx.DatabaseName() != nil {
+		d = ctx.DatabaseName().Accept(t).(string)
+	}
+
+	return []string{d, c}
+}
+
+func (t *nameTranslator) VisitDatabaseName(ctx *grammar.DatabaseNameContext) interface{} {
+	return stripQuotes(ctx.ID())
 }
 
 func (t *nameTranslator) VisitFieldName(ctx *grammar.FieldNameContext) interface{} {

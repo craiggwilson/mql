@@ -7,11 +7,19 @@ type BaseMQLVisitor struct {
 	*antlr.BaseParseTreeVisitor
 }
 
+func (v *BaseMQLVisitor) VisitStatement(ctx *StatementContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseMQLVisitor) VisitQueryStatement(ctx *QueryStatementContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
 func (v *BaseMQLVisitor) VisitPipeline(ctx *PipelineContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseMQLVisitor) VisitUseDatabaseStatement(ctx *UseDatabaseStatementContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
