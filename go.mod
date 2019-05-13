@@ -4,6 +4,9 @@ require (
 	github.com/10gen/mongoast v0.0.0-20190506222631-b7d83939fcd3
 	github.com/antlr/antlr4 v0.0.0-20190325153624-837aa60e2c47
 	github.com/c-bata/go-prompt v0.2.3
+	github.com/chzyer/logex v1.1.10 // indirect
+	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
+	github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1 // indirect
 	github.com/craiggwilson/goke v0.0.0-20190124143249-837c7060f58d
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/snappy v0.0.1 // indirect

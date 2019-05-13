@@ -8,7 +8,8 @@ import (
 	"strings"
 
 	astparser "github.com/10gen/mongoast/parser"
-	prompt "github.com/c-bata/go-prompt"
+	"github.com/c-bata/go-prompt"
+	"github.com/chzyer/readline"
 	"github.com/craiggwilson/mql/parser"
 	"github.com/spf13/cobra"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -31,25 +32,22 @@ var rootCmd = &cobra.Command{
 	Use:   "mql",
 	Short: "MQL is a tool for an expirimental language on top of MongoDB's aggregation framework.",
 	Args:  cobra.MaximumNArgs(0),
-	RunE: func(cmd *cobra.Command, args []string) error {
+	Run: func(cmd *cobra.Command, args []string) {
 		uri, err := cmd.Flags().GetString("uri")
 		if err != nil {
-			return err
+			fmt.Println(err)
+			os.Exit(1)
 		}
 
 		client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
 		if err != nil {
-			return err
+			fmt.Println(err)
+			os.Exit(1)
 		}
 
 		i := interactor{client: client}
 
-		for {
-			i.parseInput()
-			fmt.Println()
-		}
-
-		return nil
+		i.run()
 	},
 }
 
@@ -59,24 +57,65 @@ type interactor struct {
 	currentDB string
 }
 
-func (i *interactor) parseInput() {
-	line := prompt.Input("> ", i.completer)
-	switch line {
-	case "exit":
-		os.Exit(0)
-	default:
-		stmt, err := parser.ParseStatement(strings.NewReader(line))
-		if err != nil {
-			fmt.Println(err)
-			return
+func (i *interactor) run() {
+	rl, err := readline.NewEx(&readline.Config{
+		Prompt:          ">>> ",
+		InterruptPrompt: "^C",
+		EOFPrompt:       "exit",
+
+		HistorySearchFold:      true,
+		DisableAutoSaveHistory: true,
+	})
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer rl.Close()
+
+	var current []string
+	for {
+		result := rl.Line()
+		if result.CanContinue() {
+			continue
+		}
+		if result.CanBreak() {
+			break
 		}
 
-		err = i.executeStatement(stmt)
-		if err != nil {
-			fmt.Println(err)
-			return
+		line := strings.TrimSpace(result.Line)
+		if len(line) == 0 {
+			continue
+		}
+
+		switch {
+		case line == "exit":
+			os.Exit(0)
+		default:
+			current = append(current, line)
+			if !strings.HasSuffix(line, ";") {
+				rl.SetPrompt("... ")
+				continue
+			}
+
+			stmtString := strings.TrimSuffix(strings.Join(current, " "), ";")
+			current = current[:0]
+			rl.SetPrompt(">>> ")
+			rl.SaveHistory(stmtString + ";")
+
+			stmt, err := parser.ParseStatement(strings.NewReader(stmtString))
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
+			err = i.executeStatement(stmt)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
 		}
 	}
+
 }
 
 func (i *interactor) executeStatement(stmt parser.Statement) error {
