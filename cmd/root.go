@@ -8,8 +8,7 @@ import (
 	"strings"
 
 	astparser "github.com/10gen/mongoast/parser"
-	"github.com/c-bata/go-prompt"
-	"github.com/chzyer/readline"
+	"github.com/abiosoft/readline"
 	"github.com/craiggwilson/mql/parser"
 	"github.com/spf13/cobra"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -17,6 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
 )
 
+// Execute runs the binary with the specified args.
 func Execute(args []string) {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -88,8 +88,10 @@ func (i *interactor) run() {
 		}
 
 		switch {
-		case line == "exit":
+		case len(current) == 0 && line == "exit":
 			os.Exit(0)
+		case len(current) == 0 && (line == "clear" || line == "cls"):
+			readline.ClearScreen(nil)
 		default:
 			current = append(current, line)
 			if !strings.HasSuffix(line, ";") {
@@ -115,7 +117,6 @@ func (i *interactor) run() {
 			}
 		}
 	}
-
 }
 
 func (i *interactor) executeStatement(stmt parser.Statement) error {
@@ -160,8 +161,4 @@ func (i *interactor) executeQueryStatement(stmt *parser.QueryStatement) error {
 func (i *interactor) executeUseDatabaseStatement(stmt *parser.UseDatabaseStatement) error {
 	i.currentDB = stmt.DatabaseName
 	return nil
-}
-
-func (i *interactor) completer(in prompt.Document) []prompt.Suggest {
-	return []prompt.Suggest{}
 }
