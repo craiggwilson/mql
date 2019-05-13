@@ -12,82 +12,54 @@ import (
 )
 
 // ParseStatement takes a read and parses it into a Statement.
-func ParseStatement(r io.Reader) (stmt Statement, err error) {
-	var p *grammar.MQLParser
-	var errs *errorCollector
-	p, errs, err = setupParser(r)
+func ParseStatement(r io.Reader) (Statement, error) {
+	errs := &errorCollector{}
+	p, err := setupParser(r, errs)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	defer func() {
-		if e := recover(); e != nil {
-			var ok bool
-			err, ok = e.(error)
-			if !ok {
-				err = errors.Errorf("%v", e)
-			}
-			if len(errs.errs) > 0 {
-				err = errs.errs[0]
-			}
-			panic(e)
-		}
-	}()
+	tree := p.Statement()
+	if err := errs.Error(); err != nil {
+		return nil, errs.Error()
+	}
 
-	stmt, err = translateStatement(p.Statement())
-	return
+	// parse complete, now build the tree
+	return translateStatement(tree)
 }
 
 // ParsePipeline takes a reader and parses it into a mongoast.Pipeline.
-func ParsePipeline(r io.Reader) (pipeline *ast.Pipeline, err error) {
-	var p *grammar.MQLParser
-	var errs *errorCollector
-	p, errs, err = setupParser(r)
+func ParsePipeline(r io.Reader) (*ast.Pipeline, error) {
+	errs := &errorCollector{}
+	p, err := setupParser(r, errs)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	defer func() {
-		if e := recover(); e != nil {
-			var ok bool
-			err, ok = e.(error)
-			if !ok {
-				err = errors.Errorf("%v", e)
-			}
-			if len(errs.errs) > 0 {
-				err = errs.errs[0]
-			}
-		}
-	}()
+	tree := p.Pipeline()
+	if err := errs.Error(); err != nil {
+		return nil, errs.Error()
+	}
 
-	pipeline, err = translatePipeline(p.Pipeline())
-	return
+	// parse complete, now build the tree
+	return translatePipeline(tree)
 }
 
 // ParseExpr takes a reader and parses it into an ast.Expr.
-func ParseExpr(r io.Reader) (expr ast.Expr, err error) {
-	var p *grammar.MQLParser
-	var errs *errorCollector
-	p, errs, err = setupParser(r)
+func ParseExpr(r io.Reader) (ast.Expr, error) {
+	errs := &errorCollector{}
+	p, err := setupParser(r, errs)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	defer func() {
-		if e := recover(); e != nil {
-			var ok bool
-			err, ok = e.(error)
-			if !ok {
-				err = errors.Errorf("%v", e)
-			}
-			if len(errs.errs) > 0 {
-				err = errs.errs[0]
-			}
-		}
-	}()
+	tree := p.Expression()
+	if err := errs.Error(); err != nil {
+		return nil, errs.Error()
+	}
 
-	expr, err = translateExpr(p.Expression())
-	return
+	// parse complete, now build the tree
+	return translateExpr(tree)
 }
 
 type errorCollector struct {
@@ -95,24 +67,32 @@ type errorCollector struct {
 	errs []error
 }
 
-func (l *errorCollector) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line, column int, msg string, e antlr.RecognitionException) {
-	l.errs = append(l.errs, errors.Errorf("%s on line %d, character %d", msg, line, column))
+func (ec *errorCollector) Error() error {
+	if len(ec.errs) > 0 {
+		return ec.errs[0]
+	}
+
+	return nil
 }
 
-func setupParser(r io.Reader) (*grammar.MQLParser, *errorCollector, error) {
+func (ec *errorCollector) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line, column int, msg string, e antlr.RecognitionException) {
+	ec.errs = append(ec.errs, errors.Errorf("%s on line %d, character %d", msg, line, column))
+}
+
+func setupParser(r io.Reader, errorListener antlr.ErrorListener) (*grammar.MQLParser, error) {
 	bytes, err := ioutil.ReadAll(r)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	input := antlr.NewInputStream(string(bytes))
 	lexer := grammar.NewMQLLexer(input)
-	tokens := antlr.NewCommonTokenStream(lexer, 0)
+	lexer.RemoveErrorListeners()
+	tokens := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 	p := grammar.NewMQLParser(tokens)
 	p.Interpreter.SetPredictionMode(antlr.PredictionModeSLL)
 	p.RemoveErrorListeners()
-	errs := &errorCollector{}
-	p.AddErrorListener(errs)
+	p.AddErrorListener(errorListener)
 
-	return p, errs, nil
+	return p, nil
 }
