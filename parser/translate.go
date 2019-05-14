@@ -101,7 +101,7 @@ func (t *statementTranslator) VisitShowCollectionsStatement(ctx *grammar.ShowCol
 		}
 	}
 
-	return NewShowCollectionsStatement(databaseName, expr)
+	return NewShowCollectionsStatement(databaseName, ctx.FULL() != nil, expr)
 }
 
 func (t *statementTranslator) VisitShowDatabasesStatement(ctx *grammar.ShowDatabasesStatementContext) interface{} {
@@ -115,7 +115,7 @@ func (t *statementTranslator) VisitShowDatabasesStatement(ctx *grammar.ShowDatab
 		}
 	}
 
-	return NewShowDatabasesStatement(expr)
+	return NewShowDatabasesStatement(ctx.FULL() != nil, expr)
 }
 
 func (t *statementTranslator) VisitUseDatabaseStatement(ctx *grammar.UseDatabaseStatementContext) interface{} {

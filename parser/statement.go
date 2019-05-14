@@ -31,10 +31,11 @@ type QueryStatement struct {
 }
 
 // NewShowCollectionsStatement makes a ShowCollectionsStatement.
-func NewShowCollectionsStatement(databaseName string, filter ast.Expr) *ShowCollectionsStatement {
+func NewShowCollectionsStatement(databaseName string, full bool, filter ast.Expr) *ShowCollectionsStatement {
 	return &ShowCollectionsStatement{
 		DatabaseName: databaseName,
 		Filter: filter,
+		Full: full,
 	}
 }
 
@@ -42,18 +43,21 @@ func NewShowCollectionsStatement(databaseName string, filter ast.Expr) *ShowColl
 type ShowCollectionsStatement struct {
 	DatabaseName string
 	Filter ast.Expr
+	Full bool
 }
 
 // NewShowDatabasesStatement makes a ShowDatabasesStatement.
-func NewShowDatabasesStatement(filter ast.Expr) *ShowDatabasesStatement {
+func NewShowDatabasesStatement(full bool, filter ast.Expr) *ShowDatabasesStatement {
 	return &ShowDatabasesStatement{
 		Filter: filter,
+		Full: full,
 	}
 }
 
 // ShowDatabasesStatement is a show databases statement.
 type ShowDatabasesStatement struct {
 	Filter ast.Expr
+	Full bool
 }
 
 // NewUseDatabaseStatement makes a UseDatabaseStatement.

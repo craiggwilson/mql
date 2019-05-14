@@ -9,6 +9,7 @@ import (
 
 	"github.com/craiggwilson/mql/internal/version"
 
+	"github.com/10gen/mongoast/ast"
 	astparser "github.com/10gen/mongoast/parser"
 	"github.com/abiosoft/readline"
 	"github.com/craiggwilson/mql/parser"
@@ -171,36 +172,71 @@ func (i *interactor) executeQueryStatement(stmt *parser.QueryStatement) error {
 }
 
 func (i *interactor) executeShowCollectionsStatement(stmt *parser.ShowCollectionsStatement) error {
-	return nil
-}
-
-func (i *interactor) executeShowDatabasesStatement(stmt *parser.ShowDatabasesStatement) error {
-	var filter bsoncore.Document
-	if stmt.Filter != nil {
-		value := astparser.DeparseMatchExpr(stmt.Filter)
-		valueDoc, ok := value.DocumentOK()
-		if !ok {
-			return fmt.Errorf("invalid filter")
-		}
-
-		filter = valueDoc
-	} else {
-		_, filter = bsoncore.AppendDocumentStart(nil)
-		filter, _ = bsoncore.AppendDocumentEnd(filter, 0)
-	}
-
-	result, err := i.client.ListDatabases(context.Background(), filter)
+	ctx := context.Background()
+	filter, err := deparseMatchExpr(stmt.Filter)
 	if err != nil {
 		return err
 	}
 
-	for _, db := range result.Databases {
-		_, doc := bsoncore.AppendDocumentStart(nil)
-		doc = bsoncore.AppendStringElement(doc, "name", db.Name)
-		doc = bsoncore.AppendInt64Element(doc, "sizeOnDisk", db.SizeOnDisk)
-		doc = bsoncore.AppendBooleanElement(doc, "empty", db.Empty)
-		doc, _ = bsoncore.AppendDocumentEnd(doc, 0)
-		fmt.Println(bson.Raw(doc))
+	cmd := struct {
+		ListCollections int               `bson:"listCollections"`
+		Filter          bsoncore.Document `bson:"filter"`
+		NameOnly        bool              `bson:"nameOnly"`
+	}{
+		ListCollections: 1,
+		Filter:          filter,
+		NameOnly:        !stmt.Full,
+	}
+
+	db := stmt.DatabaseName
+	if db == "" {
+		db = i.currentDB
+	}
+
+	cursor, err := i.client.Database(db).RunCommandCursor(context.Background(), cmd)
+	if err != nil {
+		return err
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		fmt.Println(cursor.Current)
+	}
+
+	return cursor.Err()
+}
+
+func (i *interactor) executeShowDatabasesStatement(stmt *parser.ShowDatabasesStatement) error {
+	filter, err := deparseMatchExpr(stmt.Filter)
+	if err != nil {
+		return err
+	}
+
+	cmd := struct {
+		ListDatabases int               `bson:"listDatabases"`
+		Filter        bsoncore.Document `bson:"filter"`
+	}{
+		ListDatabases: 1,
+		Filter:        filter,
+	}
+
+	result := i.client.Database("admin").RunCommand(context.Background(), cmd)
+	if result.Err() != nil {
+		return result.Err()
+	}
+
+	resultDoc, err := result.DecodeBytes()
+	if err != nil {
+		return err
+	}
+
+	databases, err := bsoncore.Document(resultDoc).Lookup("databases").Array().Values()
+	if err != nil {
+		return err
+	}
+
+	for _, db := range databases {
+		fmt.Println(bson.Raw(db.Document()))
 	}
 
 	return nil
@@ -213,4 +249,22 @@ func (i *interactor) executeUseDatabaseStatement(stmt *parser.UseDatabaseStateme
 
 func (i *interactor) printHelp() {
 
+}
+
+func deparseMatchExpr(expr ast.Expr) (bsoncore.Document, error) {
+	var result bsoncore.Document
+	if expr != nil {
+		value := astparser.DeparseMatchExpr(expr)
+		valueDoc, ok := value.DocumentOK()
+		if !ok {
+			return nil, fmt.Errorf("invalid expression")
+		}
+
+		result = valueDoc
+	} else {
+		_, result = bsoncore.AppendDocumentStart(nil)
+		result, _ = bsoncore.AppendDocumentEnd(result, 0)
+	}
+
+	return result, nil
 }

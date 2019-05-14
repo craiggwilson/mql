@@ -15,11 +15,11 @@ pipeline:
 ;
 
 showCollectionsStatement:
-  SHOW COLLECTIONS (IN databaseName)? (MATCH expression)?
+  SHOW FULL? COLLECTIONS (IN databaseName)? (MATCH expression)?
 ;
 
 showDatabasesStatement: 
-  SHOW DATABASES (MATCH expression)?
+  SHOW FULL? DATABASES (MATCH expression)?
 ;
 
 useDatabaseStatement: USE databaseName;
@@ -225,6 +225,7 @@ DESC:     D E S C;
 ELSE:     E L S E;
 FALSE:    F A L S E;
 FROM:     F R O M;
+FULL:     F U L L;
 GROUP:    G R O U P;
 IF:       I F;
 IN:       I N;
