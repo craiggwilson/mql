@@ -16,6 +16,12 @@ type MQLVisitor interface {
 	// Visit a parse tree produced by MQLParser#pipeline.
 	VisitPipeline(ctx *PipelineContext) interface{}
 
+	// Visit a parse tree produced by MQLParser#showCollectionsStatement.
+	VisitShowCollectionsStatement(ctx *ShowCollectionsStatementContext) interface{}
+
+	// Visit a parse tree produced by MQLParser#showDatabasesStatement.
+	VisitShowDatabasesStatement(ctx *ShowDatabasesStatementContext) interface{}
+
 	// Visit a parse tree produced by MQLParser#useDatabaseStatement.
 	VisitUseDatabaseStatement(ctx *UseDatabaseStatementContext) interface{}
 

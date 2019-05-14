@@ -3,6 +3,8 @@ grammar MQL;
 // STATEMENTS
 statement:
   queryStatement
+| showCollectionsStatement
+| showDatabasesStatement
 | useDatabaseStatement
 ;
 
@@ -10,6 +12,14 @@ queryStatement: FROM collectionName pipeline;
 
 pipeline:
   queryStage*
+;
+
+showCollectionsStatement:
+  SHOW COLLECTIONS (IN databaseName)? (MATCH expression)?
+;
+
+showDatabasesStatement: 
+  SHOW DATABASES (MATCH expression)?
 ;
 
 useDatabaseStatement: USE databaseName;
@@ -208,6 +218,8 @@ AND:      A N D;
 ASC:      A S C;
 BY:       B Y;
 CASE:     C A S E;
+COLLECTIONS: C O L L E C T I O N S;
+DATABASES: D A T A B A S E S;
 DELETE:   D E L E T E;
 DESC:     D E S C;
 ELSE:     E L S E;
@@ -232,6 +244,7 @@ ONE:      O N E;
 OR:       O R;
 PROJECT:  P R O J E C T;
 SET:      S E T;
+SHOW: S H O W;
 SKIP_:    S K I P;
 SORT:     S O R T;
 STEP:     S T E P;

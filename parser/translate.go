@@ -54,6 +54,10 @@ func (t *statementTranslator) VisitStatement(ctx *grammar.StatementContext) inte
 	switch {
 	case ctx.QueryStatement() != nil:
 		return ctx.QueryStatement().Accept(t)
+	case ctx.ShowCollectionsStatement() != nil:
+		return ctx.ShowCollectionsStatement().Accept(t)
+	case ctx.ShowDatabasesStatement() != nil:
+		return ctx.ShowDatabasesStatement().Accept(t)
 	case ctx.UseDatabaseStatement() != nil:
 		return ctx.UseDatabaseStatement().Accept(t)
 	}
@@ -75,6 +79,43 @@ func (t *statementTranslator) VisitQueryStatement(ctx *grammar.QueryStatementCon
 	}
 
 	return NewQueryStatement(ns[0], ns[1], pipeline)
+}
+
+func (t *statementTranslator) VisitShowCollectionsStatement(ctx *grammar.ShowCollectionsStatementContext) interface{} {
+	databaseName := ""
+	var err error
+	if ctx.DatabaseName() != nil {
+		databaseName, err = translateDatabaseName(ctx.DatabaseName())
+		if err != nil {
+			t.err = err
+			return nil
+		}
+	}
+
+	var expr ast.Expr
+	if ctx.Expression() != nil {
+		expr, err = translateExpr(ctx.Expression())
+		if err != nil {
+			t.err = err
+			return nil
+		}
+	}
+
+	return NewShowCollectionsStatement(databaseName, expr)
+}
+
+func (t *statementTranslator) VisitShowDatabasesStatement(ctx *grammar.ShowDatabasesStatementContext) interface{} {
+	var expr ast.Expr
+	var err error
+	if ctx.Expression() != nil {
+		expr, err = translateExpr(ctx.Expression())
+		if err != nil {
+			t.err = err
+			return nil
+		}
+	}
+
+	return NewShowDatabasesStatement(expr)
 }
 
 func (t *statementTranslator) VisitUseDatabaseStatement(ctx *grammar.UseDatabaseStatementContext) interface{} {

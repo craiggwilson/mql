@@ -19,6 +19,14 @@ func (v *BaseMQLVisitor) VisitPipeline(ctx *PipelineContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseMQLVisitor) VisitShowCollectionsStatement(ctx *ShowCollectionsStatementContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseMQLVisitor) VisitShowDatabasesStatement(ctx *ShowDatabasesStatementContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseMQLVisitor) VisitUseDatabaseStatement(ctx *UseDatabaseStatementContext) interface{} {
 	return v.VisitChildren(ctx)
 }

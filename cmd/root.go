@@ -7,10 +7,13 @@ import (
 	"os"
 	"strings"
 
+	"github.com/craiggwilson/mql/internal/version"
+
 	astparser "github.com/10gen/mongoast/parser"
 	"github.com/abiosoft/readline"
 	"github.com/craiggwilson/mql/parser"
 	"github.com/spf13/cobra"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
@@ -72,6 +75,9 @@ func (i *interactor) run() {
 	}
 	defer rl.Close()
 
+	fmt.Printf("MQL %s (%s) [%s]\n", version.Version, version.Date, version.Commit)
+	fmt.Println("Type \"help\" for more information")
+
 	var current []string
 	for {
 		result := rl.Line()
@@ -88,6 +94,8 @@ func (i *interactor) run() {
 		}
 
 		switch {
+		case len(current) == 0 && line == "help":
+			i.printHelp()
 		case len(current) == 0 && line == "exit":
 			os.Exit(0)
 		case len(current) == 0 && (line == "clear" || line == "cls"):
@@ -123,6 +131,10 @@ func (i *interactor) executeStatement(stmt parser.Statement) error {
 	switch typedStmt := stmt.(type) {
 	case *parser.QueryStatement:
 		return i.executeQueryStatement(typedStmt)
+	case *parser.ShowCollectionsStatement:
+		return i.executeShowCollectionsStatement(typedStmt)
+	case *parser.ShowDatabasesStatement:
+		return i.executeShowDatabasesStatement(typedStmt)
 	case *parser.UseDatabaseStatement:
 		return i.executeUseDatabaseStatement(typedStmt)
 	default:
@@ -158,7 +170,47 @@ func (i *interactor) executeQueryStatement(stmt *parser.QueryStatement) error {
 	return cursor.Err()
 }
 
+func (i *interactor) executeShowCollectionsStatement(stmt *parser.ShowCollectionsStatement) error {
+	return nil
+}
+
+func (i *interactor) executeShowDatabasesStatement(stmt *parser.ShowDatabasesStatement) error {
+	var filter bsoncore.Document
+	if stmt.Filter != nil {
+		value := astparser.DeparseMatchExpr(stmt.Filter)
+		valueDoc, ok := value.DocumentOK()
+		if !ok {
+			return fmt.Errorf("invalid filter")
+		}
+
+		filter = valueDoc
+	} else {
+		_, filter = bsoncore.AppendDocumentStart(nil)
+		filter, _ = bsoncore.AppendDocumentEnd(filter, 0)
+	}
+
+	result, err := i.client.ListDatabases(context.Background(), filter)
+	if err != nil {
+		return err
+	}
+
+	for _, db := range result.Databases {
+		_, doc := bsoncore.AppendDocumentStart(nil)
+		doc = bsoncore.AppendStringElement(doc, "name", db.Name)
+		doc = bsoncore.AppendInt64Element(doc, "sizeOnDisk", db.SizeOnDisk)
+		doc = bsoncore.AppendBooleanElement(doc, "empty", db.Empty)
+		doc, _ = bsoncore.AppendDocumentEnd(doc, 0)
+		fmt.Println(bson.Raw(doc))
+	}
+
+	return nil
+}
+
 func (i *interactor) executeUseDatabaseStatement(stmt *parser.UseDatabaseStatement) error {
 	i.currentDB = stmt.DatabaseName
 	return nil
+}
+
+func (i *interactor) printHelp() {
+
 }

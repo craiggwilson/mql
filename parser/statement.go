@@ -10,6 +10,8 @@ type Statement interface {
 }
 
 func (*QueryStatement) stmt() {}
+func (*ShowCollectionsStatement) stmt() {}
+func (*ShowDatabasesStatement) stmt() {}
 func (*UseDatabaseStatement) stmt() {}
 
 // NewQueryStatement makes a QueryStatement.
@@ -26,6 +28,32 @@ type QueryStatement struct {
 	DatabaseName   string
 	CollectionName string
 	Pipeline       *ast.Pipeline
+}
+
+// NewShowCollectionsStatement makes a ShowCollectionsStatement.
+func NewShowCollectionsStatement(databaseName string, filter ast.Expr) *ShowCollectionsStatement {
+	return &ShowCollectionsStatement{
+		DatabaseName: databaseName,
+		Filter: filter,
+	}
+}
+
+// ShowCollectionsStatement is a show collections statement.
+type ShowCollectionsStatement struct {
+	DatabaseName string
+	Filter ast.Expr
+}
+
+// NewShowDatabasesStatement makes a ShowDatabasesStatement.
+func NewShowDatabasesStatement(filter ast.Expr) *ShowDatabasesStatement {
+	return &ShowDatabasesStatement{
+		Filter: filter,
+	}
+}
+
+// ShowDatabasesStatement is a show databases statement.
+type ShowDatabasesStatement struct {
+	Filter ast.Expr
 }
 
 // NewUseDatabaseStatement makes a UseDatabaseStatement.
