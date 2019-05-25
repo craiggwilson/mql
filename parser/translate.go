@@ -710,7 +710,7 @@ func (t *exprTranslator) VisitFunction(ctx *grammar.FunctionContext) interface{}
 		arg = r.(ast.Expr)
 	}
 
-	return ast.NewFunction(name, arg)
+	return ast.NewFunction("$"+name, arg)
 }
 
 func (t *exprTranslator) VisitFunctionArrayArguments(ctx *grammar.FunctionArrayArgumentsContext) interface{} {
