@@ -6,7 +6,7 @@ require (
 	github.com/antlr/antlr4 v0.0.0-20190325153624-837aa60e2c47
 	github.com/chzyer/logex v1.1.10 // indirect
 	github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1 // indirect
-	github.com/craiggwilson/goke v0.0.0-20190124143249-837c7060f58d
+	github.com/craiggwilson/goke v0.0.0-20190530205941-d530be9077a8
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/google/go-cmp v0.3.0

@@ -7,6 +7,15 @@ import "github.com/antlr/antlr4/runtime/Go/antlr"
 type MQLVisitor interface {
 	antlr.ParseTreeVisitor
 
+	// Visit a parse tree produced by MQLParser#fullStatement.
+	VisitFullStatement(ctx *FullStatementContext) interface{}
+
+	// Visit a parse tree produced by MQLParser#fullPipeline.
+	VisitFullPipeline(ctx *FullPipelineContext) interface{}
+
+	// Visit a parse tree produced by MQLParser#fullExpression.
+	VisitFullExpression(ctx *FullExpressionContext) interface{}
+
 	// Visit a parse tree produced by MQLParser#statement.
 	VisitStatement(ctx *StatementContext) interface{}
 

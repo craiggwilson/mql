@@ -17,9 +17,14 @@ import (
 	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
 )
 
+func translateFullStatement(ctx grammar.IFullStatementContext) (Statement, error) {
+	t := &statementTranslator{}
+	return t.translateFullStatement(ctx)
+}
+
 func translateStatement(ctx grammar.IStatementContext) (Statement, error) {
 	t := &statementTranslator{}
-	return t.translate(ctx)
+	return t.translateStatement(ctx)
 }
 
 func translateQueryStatement(ctx grammar.IQueryStatementContext) (*QueryStatement, error) {
@@ -32,7 +37,16 @@ type statementTranslator struct {
 	err error
 }
 
-func (t *statementTranslator) translate(ctx grammar.IStatementContext) (Statement, error) {
+func (t *statementTranslator) translateFullStatement(ctx grammar.IFullStatementContext) (Statement, error) {
+	stmt := ctx.Accept(t)
+	if t.err != nil {
+		return nil, t.err
+	}
+
+	return stmt.(Statement), nil
+}
+
+func (t *statementTranslator) translateStatement(ctx grammar.IStatementContext) (Statement, error) {
 	stmt := ctx.Accept(t)
 	if t.err != nil {
 		return nil, t.err
@@ -48,6 +62,10 @@ func (t *statementTranslator) translateQueryStatement(ctx grammar.IQueryStatemen
 	}
 
 	return stmt.(*QueryStatement), nil
+}
+
+func (t *statementTranslator) VisitFullStatement(ctx *grammar.FullStatementContext) interface{} {
+	return ctx.Statement().Accept(t)
 }
 
 func (t *statementTranslator) VisitStatement(ctx *grammar.StatementContext) interface{} {
@@ -128,9 +146,14 @@ func (t *statementTranslator) VisitUseDatabaseStatement(ctx *grammar.UseDatabase
 	return NewUseDatabaseStatement(databaseName)
 }
 
+func translateFullPipeline(ctx grammar.IFullPipelineContext) (*ast.Pipeline, error) {
+	t := &pipelineTranslator{}
+	return t.translateFullPipeline(ctx)
+}
+
 func translatePipeline(ctx grammar.IPipelineContext) (*ast.Pipeline, error) {
 	t := &pipelineTranslator{}
-	return t.translate(ctx)
+	return t.translatePipeline(ctx)
 }
 
 type pipelineTranslator struct {
@@ -138,13 +161,26 @@ type pipelineTranslator struct {
 	err error
 }
 
-func (t *pipelineTranslator) translate(ctx grammar.IPipelineContext) (*ast.Pipeline, error) {
+func (t *pipelineTranslator) translateFullPipeline(ctx grammar.IFullPipelineContext) (*ast.Pipeline, error) {
 	pipeline := ctx.Accept(t)
 	if t.err != nil {
 		return nil, t.err
 	}
 
 	return pipeline.(*ast.Pipeline), nil
+}
+
+func (t *pipelineTranslator) translatePipeline(ctx grammar.IPipelineContext) (*ast.Pipeline, error) {
+	pipeline := ctx.Accept(t)
+	if t.err != nil {
+		return nil, t.err
+	}
+
+	return pipeline.(*ast.Pipeline), nil
+}
+
+func (t *pipelineTranslator) VisitFullPipeline(ctx *grammar.FullPipelineContext) interface{} {
+	return ctx.Pipeline().Accept(t)
 }
 
 func (t *pipelineTranslator) VisitPipeline(ctx *grammar.PipelineContext) interface{} {

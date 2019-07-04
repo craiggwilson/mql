@@ -19,13 +19,13 @@ func ParseStatement(r io.Reader) (Statement, error) {
 		return nil, err
 	}
 
-	tree := p.Statement()
+	tree := p.FullStatement()
 	if err := errs.Error(); err != nil {
 		return nil, errs.Error()
 	}
 
 	// parse complete, now build the tree
-	return translateStatement(tree)
+	return translateFullStatement(tree)
 }
 
 // ParsePipeline takes a reader and parses it into a mongoast.Pipeline.
@@ -36,13 +36,13 @@ func ParsePipeline(r io.Reader) (*ast.Pipeline, error) {
 		return nil, err
 	}
 
-	tree := p.Pipeline()
+	tree := p.FullPipeline()
 	if err := errs.Error(); err != nil {
 		return nil, errs.Error()
 	}
 
 	// parse complete, now build the tree
-	return translatePipeline(tree)
+	return translateFullPipeline(tree)
 }
 
 // ParseExpr takes a reader and parses it into an ast.Expr.
@@ -88,6 +88,7 @@ func setupParser(r io.Reader, errorListener antlr.ErrorListener) (*grammar.MQLPa
 	input := antlr.NewInputStream(string(bytes))
 	lexer := grammar.NewMQLLexer(input)
 	lexer.RemoveErrorListeners()
+	lexer.AddErrorListener(errorListener)
 	tokens := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 	p := grammar.NewMQLParser(tokens)
 	p.Interpreter.SetPredictionMode(antlr.PredictionModeSLL)

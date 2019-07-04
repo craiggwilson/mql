@@ -1,5 +1,9 @@
 grammar MQL;
 
+// EOF
+fullStatement: statement EOF;
+fullPipeline: pipeline EOF;
+
 // STATEMENTS
 statement:
   queryStatement

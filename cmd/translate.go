@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -8,12 +9,14 @@ import (
 	"github.com/craiggwilson/mql/parser"
 
 	"github.com/10gen/mongoast/astprint"
+	"github.com/10gen/mongoast/optimizer"
 	"github.com/spf13/cobra"
 )
 
 func init() {
 	rootCmd.AddCommand(translateCommand)
 	translateCommand.Flags().StringP("format", "f", "shell", "Specify either \"shell\" or \"extjson\".")
+	translateCommand.Flags().BoolP("optimize", "o", false, "Whether to optimize the pipeline")
 }
 
 var translateCommand = &cobra.Command{
@@ -25,6 +28,16 @@ var translateCommand = &cobra.Command{
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
+		}
+
+		optimize, err := cmd.Flags().GetBool("optimize")
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		if optimize {
+			pipeline = optimizer.Optimize(context.Background(), pipeline)
 		}
 
 		format, err := cmd.Flags().GetString("format")
