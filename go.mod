@@ -1,7 +1,7 @@
 module github.com/craiggwilson/mql
 
 require (
-	github.com/10gen/mongoast v0.0.0-20190506222631-b7d83939fcd3
+	github.com/10gen/mongoast v0.0.0-20190611201535-0b492dd4acd6
 	github.com/abiosoft/readline v0.0.0-20180607040430-155bce2042db
 	github.com/antlr/antlr4 v0.0.0-20190325153624-837aa60e2c47
 	github.com/chzyer/logex v1.1.10 // indirect

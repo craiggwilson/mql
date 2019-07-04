@@ -1,5 +1,7 @@
 github.com/10gen/mongoast v0.0.0-20190506222631-b7d83939fcd3 h1:2PX4QgoR0HQdIYUQVm4L1Sq+tlZSs+DfFAoQUuuRCJ4=
 github.com/10gen/mongoast v0.0.0-20190506222631-b7d83939fcd3/go.mod h1:/7PWuJoJT196Y2SfK6JlU0r59cEY8xwdZ662XY8YaG4=
+github.com/10gen/mongoast v0.0.0-20190611201535-0b492dd4acd6 h1:L+MPkrl7gUJfsXjLSHrJLcwJVjNkTTnkeozgTrCtZ50=
+github.com/10gen/mongoast v0.0.0-20190611201535-0b492dd4acd6/go.mod h1:/7PWuJoJT196Y2SfK6JlU0r59cEY8xwdZ662XY8YaG4=
 github.com/abiosoft/readline v0.0.0-20180607040430-155bce2042db h1:CjPUSXOiYptLbTdr1RceuZgSFDQ7U15ITERUGrUORx8=
 github.com/abiosoft/readline v0.0.0-20180607040430-155bce2042db/go.mod h1:rB3B4rKii8V21ydCbIzH5hZiCQE7f5E9SzUb/ZZx530=
 github.com/antlr/antlr4 v0.0.0-20190325153624-837aa60e2c47 h1:Lp5nUoQzppfVmfZadpzAytNyb5IMtxyOJLzoQS5dExg=

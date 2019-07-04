@@ -248,7 +248,14 @@ func (t *queryStageTranslator) VisitLookupStage(ctx *grammar.LookupStageContext)
 		return nil
 	}
 
-	return ast.NewLookupStage(stmt.DatabaseName+stmt.CollectionName, "", "", as, lets, stmt.Pipeline)
+	return ast.NewLookupStage(
+		stmt.DatabaseName+"."+stmt.CollectionName,
+		nil,
+		"",
+		as,
+		lets,
+		stmt.Pipeline,
+	)
 }
 
 func (t *queryStageTranslator) VisitMatchStage(ctx *grammar.MatchStageContext) interface{} {
@@ -979,6 +986,7 @@ func (t *exprTranslator) VisitNotExpression(ctx *grammar.NotExpressionContext) i
 		return nil
 	}
 
+	return ast.NewUnary(ast.Not, expr)
 	return ast.NewFunction("$not", expr)
 }
 

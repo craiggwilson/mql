@@ -5,23 +5,23 @@ import (
 	"testing"
 	"time"
 
-	"github.com/craiggwilson/mql/parser"
 	"github.com/craiggwilson/mql/internal/util/astutil"
+	"github.com/craiggwilson/mql/parser"
 
 	"github.com/10gen/mongoast/ast"
 	"github.com/google/go-cmp/cmp"
 )
 
 func TestParseStatement(t *testing.T) {
-	testCases := []struct{
-		input string
+	testCases := []struct {
+		input    string
 		expected *parser.QueryStatement
-		err error
-	} {
+		err      error
+	}{
 		{
 			"FROM foo LIMIT 2",
 			parser.NewQueryStatement(
-				"", 
+				"",
 				"foo",
 				ast.NewPipeline(
 					ast.NewLimitStage(2),
@@ -32,7 +32,7 @@ func TestParseStatement(t *testing.T) {
 		{
 			"FROM test.foo LIMIT 2",
 			parser.NewQueryStatement(
-				"test", 
+				"test",
 				"foo",
 				ast.NewPipeline(
 					ast.NewLimitStage(2),
@@ -47,14 +47,14 @@ func TestParseStatement(t *testing.T) {
 			actual, err := parser.ParseStatement(strings.NewReader(tc.input))
 			switch {
 			case tc.err != nil && err != nil:
-				if tc.err.Error() != err.Error()  {
+				if tc.err.Error() != err.Error() {
 					t.Fatalf("expected error %q, but got %q", tc.err.Error(), err.Error())
-				}	
+				}
 			case tc.err != nil && err == nil:
 				t.Fatalf("expected error %q, but got none", tc.err.Error())
 			case tc.err == nil && err != nil:
 				t.Fatalf("expected no error, but got %q", err.Error())
-	
+
 			default:
 				if !cmp.Equal(tc.expected, actual) {
 					t.Fatalf("expected does not match actual\n  %s", cmp.Diff(tc.expected, actual))
@@ -65,11 +65,11 @@ func TestParseStatement(t *testing.T) {
 }
 
 func TestParsePipeline(t *testing.T) {
-	testCases := []struct{
-		input string
+	testCases := []struct {
+		input    string
 		expected *ast.Pipeline
-		err error
-	} {
+		err      error
+	}{
 		{
 			"GROUP {a: a}",
 			ast.NewPipeline(
@@ -205,14 +205,14 @@ func TestParsePipeline(t *testing.T) {
 			actual, err := parser.ParsePipeline(strings.NewReader(tc.input))
 			switch {
 			case tc.err != nil && err != nil:
-				if tc.err.Error() != err.Error()  {
+				if tc.err.Error() != err.Error() {
 					t.Fatalf("expected error %q, but got %q", tc.err.Error(), err.Error())
-				}	
+				}
 			case tc.err != nil && err == nil:
 				t.Fatalf("expected error %q, but got none", tc.err.Error())
 			case tc.err == nil && err != nil:
 				t.Fatalf("expected no error, but got %q", err.Error())
-	
+
 			default:
 				if !cmp.Equal(tc.expected, actual) {
 					t.Fatalf("expected does not match actual\n  %s", cmp.Diff(tc.expected, actual))
@@ -223,18 +223,18 @@ func TestParsePipeline(t *testing.T) {
 }
 
 func TestParseExpr(t *testing.T) {
-	testCases := []struct{
-		input string
+	testCases := []struct {
+		input    string
 		expected ast.Expr
-		err error
-	} {
+		err      error
+	}{
 		// Constants
-		{ 
+		{
 			"false",
 			astutil.False,
 			nil,
 		},
-		{ 
+		{
 			"true",
 			astutil.True,
 			nil,
@@ -348,17 +348,17 @@ func TestParseExpr(t *testing.T) {
 			"null",
 			astutil.Null,
 			nil,
-		},	
+		},
 		{
 			"/foo/i",
 			astutil.Regex("foo", "i"),
 			nil,
-		},	
+		},
 		{
 			"/fo\\/o/i",
 			astutil.Regex("fo/o", "i"),
 			nil,
-		},	
+		},
 		{
 			"oid'507f1f77bcf86cd799439011'",
 			astutil.Must(astutil.ParseObjectID("507f1f77bcf86cd799439011")),
@@ -409,7 +409,7 @@ func TestParseExpr(t *testing.T) {
 		{
 			"a[0].b",
 			ast.NewFieldRef(
-				"b", 
+				"b",
 				ast.NewArrayIndexRef(
 					astutil.Int32(0),
 					ast.NewFieldRef("a", nil),
@@ -420,7 +420,7 @@ func TestParseExpr(t *testing.T) {
 		{
 			"{a: false}.a",
 			ast.NewFieldRef(
-				"a", 
+				"a",
 				ast.NewDocument(
 					ast.NewDocumentElement(
 						"a",
@@ -436,7 +436,7 @@ func TestParseExpr(t *testing.T) {
 			"1 + 2",
 			ast.NewFunction(
 				"$add",
-				ast.NewArray(astutil.Int32(1),astutil.Int32(2)),
+				ast.NewArray(astutil.Int32(1), astutil.Int32(2)),
 			),
 			nil,
 		},
@@ -453,7 +453,7 @@ func TestParseExpr(t *testing.T) {
 			"1 || 2",
 			ast.NewFunction(
 				"$concat",
-				ast.NewArray(astutil.Int32(1),astutil.Int32(2)),
+				ast.NewArray(astutil.Int32(1), astutil.Int32(2)),
 			),
 			nil,
 		},
@@ -461,7 +461,7 @@ func TestParseExpr(t *testing.T) {
 			"1 / 2",
 			ast.NewFunction(
 				"$divide",
-				ast.NewArray(astutil.Int32(1),astutil.Int32(2)),
+				ast.NewArray(astutil.Int32(1), astutil.Int32(2)),
 			),
 			nil,
 		},
@@ -496,7 +496,7 @@ func TestParseExpr(t *testing.T) {
 			"1 ?? 2",
 			ast.NewFunction(
 				"$ifNull",
-				ast.NewArray(astutil.Int32(1),astutil.Int32(2)),
+				ast.NewArray(astutil.Int32(1), astutil.Int32(2)),
 			),
 			nil,
 		},
@@ -522,8 +522,8 @@ func TestParseExpr(t *testing.T) {
 			ast.NewFunction(
 				"$in",
 				ast.NewArray(
-					astutil.Int32(1), 
-					ast.NewArray(astutil.Int32(2),astutil.Int32(3)),
+					astutil.Int32(1),
+					ast.NewArray(astutil.Int32(2), astutil.Int32(3)),
 				),
 			),
 			nil,
@@ -535,8 +535,8 @@ func TestParseExpr(t *testing.T) {
 				ast.NewFunction(
 					"$in",
 					ast.NewArray(
-						astutil.Int32(1), 
-						ast.NewArray(astutil.Int32(2),astutil.Int32(3)),
+						astutil.Int32(1),
+						ast.NewArray(astutil.Int32(2), astutil.Int32(3)),
 					),
 				),
 			),
@@ -573,7 +573,7 @@ func TestParseExpr(t *testing.T) {
 			"1 % 2",
 			ast.NewFunction(
 				"$mod",
-				ast.NewArray(astutil.Int32(1),astutil.Int32(2)),
+				ast.NewArray(astutil.Int32(1), astutil.Int32(2)),
 			),
 			nil,
 		},
@@ -581,7 +581,7 @@ func TestParseExpr(t *testing.T) {
 			"1 * 2",
 			ast.NewFunction(
 				"$multiply",
-				ast.NewArray(astutil.Int32(1),astutil.Int32(2)),
+				ast.NewArray(astutil.Int32(1), astutil.Int32(2)),
 			),
 			nil,
 		},
@@ -607,7 +607,7 @@ func TestParseExpr(t *testing.T) {
 			"1 ** 2",
 			ast.NewFunction(
 				"$pow",
-				ast.NewArray(astutil.Int32(1),astutil.Int32(2)),
+				ast.NewArray(astutil.Int32(1), astutil.Int32(2)),
 			),
 			nil,
 		},
@@ -615,7 +615,7 @@ func TestParseExpr(t *testing.T) {
 			"1 - 2",
 			ast.NewFunction(
 				"$subtract",
-				ast.NewArray(astutil.Int32(1),astutil.Int32(2)),
+				ast.NewArray(astutil.Int32(1), astutil.Int32(2)),
 			),
 			nil,
 		},
@@ -626,7 +626,7 @@ func TestParseExpr(t *testing.T) {
 			ast.NewFunction(
 				"$cond",
 				ast.NewArray(
-					astutil.Int32(1), 
+					astutil.Int32(1),
 					astutil.Int32(2),
 					astutil.Int32(3),
 				),
@@ -660,13 +660,13 @@ func TestParseExpr(t *testing.T) {
 		// Function
 		{
 			"testFunc()",
-			ast.NewFunction("testFunc", nil),
+			ast.NewFunction("$testFunc", nil),
 			nil,
 		},
 		{
 			"testFunc(a)",
 			ast.NewFunction(
-				"testFunc", 
+				"$testFunc",
 				ast.NewArray(
 					ast.NewFieldRef("a", nil),
 				),
@@ -676,7 +676,7 @@ func TestParseExpr(t *testing.T) {
 		{
 			"a.testFunc()",
 			ast.NewFunction(
-				"testFunc", 
+				"$testFunc",
 				ast.NewArray(
 					ast.NewFieldRef("a", nil),
 				),
@@ -686,9 +686,9 @@ func TestParseExpr(t *testing.T) {
 		{
 			"testFunc(a, b)",
 			ast.NewFunction(
-				"testFunc", 
+				"$testFunc",
 				ast.NewArray(
-					ast.NewFieldRef("a", nil), 
+					ast.NewFieldRef("a", nil),
 					ast.NewFieldRef("b", nil),
 				),
 			),
@@ -697,9 +697,9 @@ func TestParseExpr(t *testing.T) {
 		{
 			"a.testFunc(b)",
 			ast.NewFunction(
-				"testFunc", 
+				"$testFunc",
 				ast.NewArray(
-					ast.NewFieldRef("a", nil), 
+					ast.NewFieldRef("a", nil),
 					ast.NewFieldRef("b", nil),
 				),
 			),
@@ -708,7 +708,7 @@ func TestParseExpr(t *testing.T) {
 		{
 			"testFunc(a: b, b: c)",
 			ast.NewFunction(
-				"testFunc",
+				"$testFunc",
 				ast.NewDocument(
 					ast.NewDocumentElement("a", ast.NewFieldRef("b", nil)),
 					ast.NewDocumentElement("b", ast.NewFieldRef("c", nil)),
@@ -748,7 +748,7 @@ func TestParseExpr(t *testing.T) {
 			ast.NewFunction(
 				"$range",
 				ast.NewArray(
-					astutil.Int32(1), 
+					astutil.Int32(1),
 					astutil.Int32(4),
 				),
 			),
@@ -759,7 +759,7 @@ func TestParseExpr(t *testing.T) {
 			ast.NewFunction(
 				"$range",
 				ast.NewArray(
-					astutil.Int32(1), 
+					astutil.Int32(1),
 					astutil.Int32(4),
 					astutil.Int32(2),
 				),
@@ -770,8 +770,8 @@ func TestParseExpr(t *testing.T) {
 		// Unary
 		{
 			"NOT true",
-			ast.NewFunction(
-				"$not",
+			ast.NewUnary(
+				ast.Not,
 				astutil.True,
 			),
 			nil,
@@ -791,14 +791,14 @@ func TestParseExpr(t *testing.T) {
 			actual, err := parser.ParseExpr(strings.NewReader(tc.input))
 			switch {
 			case tc.err != nil && err != nil:
-				if tc.err.Error() != err.Error()  {
+				if tc.err.Error() != err.Error() {
 					t.Fatalf("expected error %q, but got %q", tc.err.Error(), err.Error())
-				}	
+				}
 			case tc.err != nil && err == nil:
 				t.Fatalf("expected error %q, but got none", tc.err.Error())
 			case tc.err == nil && err != nil:
 				t.Fatalf("expected no error, but got %q", err.Error())
-	
+
 			default:
 				if !cmp.Equal(tc.expected, actual) {
 					t.Fatalf("expected does not match actual\n  %s", cmp.Diff(tc.expected, actual))
