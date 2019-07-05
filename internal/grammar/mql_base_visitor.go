@@ -15,10 +15,6 @@ func (v *BaseMQLVisitor) VisitFullPipeline(ctx *FullPipelineContext) interface{}
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseMQLVisitor) VisitFullExpression(ctx *FullExpressionContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseMQLVisitor) VisitStatement(ctx *StatementContext) interface{} {
 	return v.VisitChildren(ctx)
 }

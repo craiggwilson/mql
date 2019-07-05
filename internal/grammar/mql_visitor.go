@@ -13,9 +13,6 @@ type MQLVisitor interface {
 	// Visit a parse tree produced by MQLParser#fullPipeline.
 	VisitFullPipeline(ctx *FullPipelineContext) interface{}
 
-	// Visit a parse tree produced by MQLParser#fullExpression.
-	VisitFullExpression(ctx *FullExpressionContext) interface{}
-
 	// Visit a parse tree produced by MQLParser#statement.
 	VisitStatement(ctx *StatementContext) interface{}
 

@@ -566,13 +566,157 @@ func (t *exprTranslator) VisitArrayAccessExpression(ctx *grammar.ArrayAccessExpr
 		t.err = errors.Wrap(err, "failed parsing array access expression parent")
 		return nil
 	}
-	start, err := t.translate(ctx.GetIndex())
-	if err != nil {
-		t.err = errors.Wrap(err, "failed parsing array access expression index")
-		return nil
+
+	var indexExpr ast.Expr
+	if index := ctx.GetIndex(); index != nil {
+		indexExpr, err = t.translate(index)
+		if err != nil {
+			t.err = errors.Wrap(err, "failed parsing array access index expression")
+			return nil
+		}
 	}
 
-	return ast.NewArrayIndexRef(start, parent)
+	var endExpr ast.Expr
+	if end := ctx.GetEnd(); end != nil {
+		endExpr, err = t.translate(end)
+		if err != nil {
+			t.err = errors.Wrap(err, "failed parsing array access end expression")
+			return nil
+		}
+	}
+
+	var stepExpr ast.Expr
+	if step := ctx.GetStep(); step != nil {
+		stepExpr, err = t.translate(step)
+		if err != nil {
+			t.err = errors.Wrap(err, "failed parsing array access step expression")
+		}
+	}
+
+	isRange := ctx.RANGE() != nil
+	if rangeExpr, ok := indexExpr.(*ast.Function); ok && rangeExpr.Name == "$range" {
+		args := rangeExpr.Arg.(*ast.Array).Elements
+		indexExpr = args[0]
+		endExpr = args[1]
+		if len(args) == 3 {
+			stepExpr = args[2]
+		}
+		isRange = true
+	}
+
+	if !isRange {
+		if indexExpr != nil {
+			return ast.NewArrayIndexRef(indexExpr, parent)
+		}
+
+		return parent
+	}
+
+	var access ast.Expr
+	switch {
+	case indexExpr == nil && endExpr == nil:
+		access = parent
+	case indexExpr == nil:
+		access = ast.NewFunction(
+			"$slice",
+			ast.NewArray(
+				parent,
+				endExpr,
+			),
+		)
+	case endExpr == nil:
+		access = ast.NewLet(
+			[]*ast.LetVariable{
+				ast.NewLetVariable("array", parent),
+			},
+			ast.NewFunction(
+				"$slice",
+				ast.NewArray(
+					ast.NewVariableRef("array"),
+					ast.NewFunction(
+						"$subtract",
+						ast.NewArray(
+							indexExpr,
+							ast.NewFunction(
+								"$size",
+								ast.NewVariableRef("array"),
+							),
+						),
+					),
+				),
+			),
+		)
+	default:
+		access = ast.NewFunction(
+			"$slice",
+			ast.NewArray(
+				parent,
+				indexExpr,
+				ast.NewFunction(
+					"$subtract",
+					ast.NewArray(
+						endExpr,
+						indexExpr,
+					),
+				),
+			),
+		)
+	}
+
+	if stepExpr != nil {
+		return ast.NewLet(
+			[]*ast.LetVariable{
+				ast.NewLetVariable("array", access),
+			},
+			ast.NewMap(
+				ast.NewFilter(
+					ast.NewFunction(
+						"$zip",
+						ast.NewDocument(
+							ast.NewDocumentElement(
+								"inputs",
+								ast.NewArray(
+									ast.NewFunction(
+										"$range",
+										ast.NewArray(
+											astutil.Int32(0),
+											ast.NewFunction(
+												"$size",
+												ast.NewVariableRef("array"),
+											),
+										),
+									),
+									ast.NewVariableRef("array"),
+								),
+							),
+						),
+					),
+					"x",
+					ast.NewBinary(
+						ast.Equals,
+						astutil.Int32(0),
+						ast.NewFunction(
+							"$mod",
+							ast.NewArray(
+								ast.NewArrayIndexRef(
+									astutil.Int32(0),
+									ast.NewVariableRef("x"),
+								),
+								stepExpr,
+							),
+						),
+					),
+				),
+				"x",
+				ast.NewArrayIndexRef(
+					astutil.Int32(1),
+					ast.NewVariableRef("x"),
+				),
+			),
+		)
+	}
+
+	return access
 }
 
 func (t *exprTranslator) VisitBinValue(ctx *grammar.BinValueContext) interface{} {

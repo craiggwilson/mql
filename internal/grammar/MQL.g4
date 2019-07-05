@@ -66,7 +66,9 @@ expression:
 | expression DOT (fieldName | function)                                                    #memberExpression
 | expression LBRACK (
         index=expression
-      | (index=expression)? RANGE (end=expression)? (COLON step=expression)?
+      | index=expression RANGE (COLON step=expression)?
+      | RANGE (end=expression) (COLON step=expression)?
+      | RANGE COLON step=expression
     ) RBRACK                                                                               #arrayAccessExpression
 | expression RANGE expression (COLON expression)?                                          #rangeExpression
 | expression LIKE REGEX                                                                    #likeExpression
