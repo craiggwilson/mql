@@ -139,6 +139,10 @@ func (v *BaseMQLVisitor) VisitLikeExpression(ctx *LikeExpressionContext) interfa
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseMQLVisitor) VisitLambdaExpression(ctx *LambdaExpressionContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseMQLVisitor) VisitDocumentExpression(ctx *DocumentExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -228,10 +232,6 @@ func (v *BaseMQLVisitor) VisitFunctionNamedArgument(ctx *FunctionNamedArgumentCo
 }
 
 func (v *BaseMQLVisitor) VisitLambdaArgument(ctx *LambdaArgumentContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseMQLVisitor) VisitLambdaExpression(ctx *LambdaExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

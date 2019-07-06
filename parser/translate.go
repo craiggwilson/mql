@@ -977,6 +977,14 @@ func (t *exprTranslator) VisitIntValue(ctx *grammar.IntValueContext) interface{}
 	return c
 }
 
+func (t *exprTranslator) VisitLambdaExpression(ctx *grammar.LambdaExpressionContext) interface{} {
+	args := ctx.AllLambdaArgument()
+}
+
+func (t *exprTranslator) VisitLambdaArgument(ctx *grammar.LambdaArgumentContext) interface{} {
+	return ctx.GetText()
+}
+
 func (t *exprTranslator) VisitLetExpression(ctx *grammar.LetExpressionContext) interface{} {
 	vas := ctx.AllVariableAssignment()
 	vars := make([]*ast.DocumentElement, len(vas))

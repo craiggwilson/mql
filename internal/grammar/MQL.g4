@@ -84,6 +84,10 @@ expression:
 | IF expression THEN expression ELSE expression                                            #conditionalExpression
 | LBRACE variableAssignment (COMMA variableAssignment)* RBRACE ARROW expression            #letExpression
 | LPAREN expression RPAREN                                                                 #parenthesisExpression
+| (
+    lambdaArgument ARROW expression
+    | LPAREN lambdaArgument (COMMA lambdaArgument)* RPAREN ARROW expression               
+  )                                                                                        #lambdaExpression
 | function                                                                                 #functionExpression
 | fieldName                                                                                #fieldExpression
 | variableName                                                                             #variableExpression
@@ -127,11 +131,6 @@ functionNamedArgument:
 lambdaArgument:
   variableName
 | UNDERSCORE
-;
-
-lambdaExpression:
-  lambdaArgument ARROW expression
-| LPAREN lambdaArgument (COMMA lambdaArgument)* RPAREN ARROW expression
 ;
 
 switchCase:

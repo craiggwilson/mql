@@ -106,6 +106,9 @@ type MQLVisitor interface {
 	// Visit a parse tree produced by MQLParser#likeExpression.
 	VisitLikeExpression(ctx *LikeExpressionContext) interface{}
 
+	// Visit a parse tree produced by MQLParser#lambdaExpression.
+	VisitLambdaExpression(ctx *LambdaExpressionContext) interface{}
+
 	// Visit a parse tree produced by MQLParser#documentExpression.
 	VisitDocumentExpression(ctx *DocumentExpressionContext) interface{}
 
@@ -174,9 +177,6 @@ type MQLVisitor interface {
 
 	// Visit a parse tree produced by MQLParser#lambdaArgument.
 	VisitLambdaArgument(ctx *LambdaArgumentContext) interface{}
-
-	// Visit a parse tree produced by MQLParser#lambdaExpression.
-	VisitLambdaExpression(ctx *LambdaExpressionContext) interface{}
 
 	// Visit a parse tree produced by MQLParser#switchCase.
 	VisitSwitchCase(ctx *SwitchCaseContext) interface{}
