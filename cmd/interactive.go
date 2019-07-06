@@ -63,7 +63,7 @@ func (i *interactor) run() {
 		case len(current) == 0 && line == "exit":
 			os.Exit(0)
 		case len(current) == 0 && (line == "clear" || line == "cls"):
-			readline.ClearScreen(nil)
+			_ = readline.ClearScreen(nil)
 		default:
 			current = append(current, line)
 			if !strings.HasSuffix(line, ";") {
@@ -74,7 +74,7 @@ func (i *interactor) run() {
 			stmtString := strings.TrimSuffix(strings.Join(current, " "), ";")
 			current = current[:0]
 			rl.SetPrompt(">>> ")
-			rl.SaveHistory(stmtString + ";")
+			_ = rl.SaveHistory(stmtString + ";")
 
 			stmt, err := parser.ParseStatement(strings.NewReader(stmtString))
 			if err != nil {

@@ -22,11 +22,6 @@ func translateFullStatement(ctx grammar.IFullStatementContext) (Statement, error
 	return t.translateFullStatement(ctx)
 }
 
-func translateStatement(ctx grammar.IStatementContext) (Statement, error) {
-	t := &statementTranslator{}
-	return t.translateStatement(ctx)
-}
-
 func translateQueryStatement(ctx grammar.IQueryStatementContext) (*QueryStatement, error) {
 	t := &statementTranslator{}
 	return t.translateQueryStatement(ctx)
@@ -38,15 +33,6 @@ type statementTranslator struct {
 }
 
 func (t *statementTranslator) translateFullStatement(ctx grammar.IFullStatementContext) (Statement, error) {
-	stmt := ctx.Accept(t)
-	if t.err != nil {
-		return nil, t.err
-	}
-
-	return stmt.(Statement), nil
-}
-
-func (t *statementTranslator) translateStatement(ctx grammar.IStatementContext) (Statement, error) {
 	stmt := ctx.Accept(t)
 	if t.err != nil {
 		return nil, t.err
@@ -419,15 +405,6 @@ func translateProjectStage(ctx *grammar.ProjectStageContext) (*ast.ProjectStage,
 type projectItemTranslator struct {
 	*grammar.BaseMQLVisitor
 	err error
-}
-
-func (t *projectItemTranslator) translate(ctx grammar.IProjectItemContext) (ast.ProjectItem, error) {
-	result := ctx.Accept(t)
-	if t.err != nil {
-		return nil, t.err
-	}
-
-	return result.(ast.ProjectItem), nil
 }
 
 func (t *projectItemTranslator) VisitAssignProjectItem(ctx *grammar.AssignProjectItemContext) interface{} {
@@ -1167,7 +1144,6 @@ func (t *exprTranslator) VisitNotExpression(ctx *grammar.NotExpressionContext) i
 	}
 
 	return ast.NewUnary(ast.Not, expr)
-	return ast.NewFunction("$not", expr)
 }
 
 func (t *exprTranslator) VisitNullCoalesceExpression(ctx *grammar.NullCoalesceExpressionContext) interface{} {

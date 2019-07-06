@@ -9,10 +9,10 @@ type Statement interface {
 	stmt()
 }
 
-func (*QueryStatement) stmt() {}
+func (*QueryStatement) stmt()           {}
 func (*ShowCollectionsStatement) stmt() {}
-func (*ShowDatabasesStatement) stmt() {}
-func (*UseDatabaseStatement) stmt() {}
+func (*ShowDatabasesStatement) stmt()   {}
+func (*UseDatabaseStatement) stmt()     {}
 
 // NewQueryStatement makes a QueryStatement.
 func NewQueryStatement(databaseName, collectionName string, pipeline *ast.Pipeline) *QueryStatement {
@@ -34,30 +34,30 @@ type QueryStatement struct {
 func NewShowCollectionsStatement(databaseName string, full bool, filter ast.Expr) *ShowCollectionsStatement {
 	return &ShowCollectionsStatement{
 		DatabaseName: databaseName,
-		Filter: filter,
-		Full: full,
+		Filter:       filter,
+		Full:         full,
 	}
 }
 
 // ShowCollectionsStatement is a show collections statement.
 type ShowCollectionsStatement struct {
 	DatabaseName string
-	Filter ast.Expr
-	Full bool
+	Filter       ast.Expr
+	Full         bool
 }
 
 // NewShowDatabasesStatement makes a ShowDatabasesStatement.
 func NewShowDatabasesStatement(full bool, filter ast.Expr) *ShowDatabasesStatement {
 	return &ShowDatabasesStatement{
 		Filter: filter,
-		Full: full,
+		Full:   full,
 	}
 }
 
 // ShowDatabasesStatement is a show databases statement.
 type ShowDatabasesStatement struct {
 	Filter ast.Expr
-	Full bool
+	Full   bool
 }
 
 // NewUseDatabaseStatement makes a UseDatabaseStatement.

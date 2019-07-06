@@ -93,7 +93,7 @@ func Int64(v int64) *ast.Constant {
 	})
 }
 
-var Null = ast.NewConstant(bsoncore.Value {
+var Null = ast.NewConstant(bsoncore.Value{
 	Type: bsontype.Null,
 })
 
