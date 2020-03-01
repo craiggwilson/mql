@@ -1,0 +1,58 @@
+{
+package internal
+
+import (
+    "strings"
+
+    "github.com/craiggwilson/mql/tree"
+)
+
+func toIfaceSlice(v interface{}) []interface{} {
+    if v == nil {
+        return nil
+    }
+    return v.([]interface{})
+}
+}
+
+Tree <- _ v:(Statement ';')* EOF {
+    t := tree.New()
+    for _, i := range toIfaceSlice(v) {
+        t.AddStatement(i.(tree.Statement))
+    }
+
+    return t, nil
+}
+
+Statement <- "USE"i __ databaseName:DatabaseName {
+    return strings.Trim(databaseName.(string))
+}
+
+DatabaseName <- ID
+
+ID <- QuotedID | UnquotedID
+
+QuotedID <- '`' ( !EscapedChar . / '\\' EscapeSequence )* '`'
+
+UnquotedID <- [_a-zA-Z] [_a-zA-Z0-9]+
+
+String <- SingleString | DoubleString
+
+SingleString <- '\'' ( !EscapedChar . / '\\' EscapeSequence )* '\'' {
+    c.text = bytes.Replace(c.text, []byte(`\/`), []byte(`/`), -1)
+    return strconv.Unquote(string(c.text))
+}
+
+DoubleString <- '"' ( !EscapedChar . / '\\' EscapeSequence )* '"' {
+    c.text = bytes.Replace(c.text, []byte(`\/`), []byte(`/`), -1)
+    return strconv.Unquote(string(c.text))
+}
+
+EscapedChar <- [\x00-\x1f"\\]
+EscapeSequence <- SingleCharEscape / UnicodeEscape
+SingleCharEscape <- ["\\/bfnrt]
+UnicodeEscape <- 'u' HexDigit HexDigit HexDigit HexDigit
+
+_ "whitespace" <- [ \r\n\t]*
+__ "whitespace" <- [ \r\n\t]+
+EOF <- _ !.
