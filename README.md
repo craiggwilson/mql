@@ -62,13 +62,6 @@ Some general statements:
 ```
 
 ```
-❯ go run mql.go translate "PROJECT {b: b[a..10:2]}"
-[
-        {"$project": {"c": NumberInt("0")}}
- ]
-```
-
-```
 // project column `b` (which is an array) starting from index `a` up to 10 stepping by 2.
 ❯ go run mql.go translate "PROJECT {b: b[a..10:2]}"
 [
